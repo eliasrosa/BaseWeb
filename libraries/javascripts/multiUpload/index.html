@@ -1,0 +1,80 @@
+<html>
+
+<head>
+
+	<title>multiUpload</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<style type="text/css">
+		@import 'multiUpload.css';
+		@import 'style.css';
+	</style>
+
+</head>
+
+<body>
+
+	<h1>multiUpload</h1>
+	<p>
+		Desenvolvido por <strong>Fredi Machado</strong> &lt;fredisoft at gmail dot com&gt;<br />
+		<a href="http://fredimachado.com.br" target="_blank">http://fredimachado.com.br</a>
+	</h4>
+
+	<br /><br />
+
+	<p>
+		Este projeto é básicamente uma tentativa de tornar meu Upload
+		múltiplo de arquivos muito mais fácil de implementar e com várias
+		opções que podem ser modificadas e extendidas conforme a necessidade
+		de cada um. O multiUpload usa o poder do ActionScript 3 e do Flash 
+		Player 9 para permitir a seleção múltipla dos arquivos, Javascript 
+		para fácil integração com seu site e qualquer linguagem para 
+		processar os uploads no servidor. Este projeto foi inspirado pelo
+		método que o Orkut utiliza para o envio de fotos.
+	</p>
+
+	<br />
+
+	<h4><a href="examples">Exemplos</a></h4>
+
+	<br />
+
+	<h4>Instruções de Uso:</h4>
+
+	<p>Primeiro você deve adicionar o SWFObject e a classe base do multiUpload na tag head da sua página:</p>
+
+	<pre>&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="js/multiUpload.js"&gt;&lt;/script&gt;</pre>
+
+	<p>O próximo passo é criar duas DIVs com ids diferentes, uma que se transformará no botão de seleção dos arquivos e a outra para exibir a lista dos arquivos selecionados e suas informações.</p>
+
+	<pre>&lt;div id="uploader"&gt;&lt;/div&gt;
+&lt;div id="uploader_files"&gt;&lt;/div&gt;</pre>
+
+	<p>Agora você deve criar uma nova instância da classe multiUpload, enviando como parâmetros o id da div que será o botão, o id da div que exibirá a lista dos arquivos e informações e um objeto com opções de configuração respectivamente.</p>
+
+	<pre>&lt;script type="text/javascript"&gt;
+	var uploader = new multiUpload('uploader', 'uploader_files', {
+		swf:            'swf/multiUpload.swf', // 
+		script:         'upload.php',
+		expressInstall: 'swf/expressInstall.swf',
+		multi:          true
+	});
+&lt;/script&gt;</pre>
+
+	<p>Finalmente, adicione as ações:</p>
+
+	<pre>&lt;a href="javascript:uploader.startUpload();"&gt;Start Upload&lt;/a&gt; | &lt;a href="javascript:uploader.clearUploadQueue();"&gt;Clear Upload Queue&lt;/a&gt;</pre>
+
+	<p>Para ficar mais bonito utilize a folha de estilos padrão do multiUpload:</p>
+
+	<pre>&lt;style type="text/css"&gt;
+	@import "css/multiUpload.css";
+&lt;/style&gt;</pre>
+
+	<h4><a href="examples">Exemplos</a></h4>
+
+</body>
+
+</html>

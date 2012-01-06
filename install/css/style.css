@@ -1,0 +1,23 @@
+html { height:100%; font-family: Arial, Tahoma, Verdana; font-size: 12px !important; }
+body { margin: 0; padding: 0; background: #f9f9f9; color: #666; }
+textarea { resize: none; font-family: Arial, Tahoma, Verdana; font-size: 12px; }
+label { display: block; }
+img { border: 0; }
+h2 { color: #666; font-size: 20px; border-bottom: 1px solid #DDD; margin-top: 20px; }
+hr { margin: 12px 0; border: 1px solid #999; clear: both; }
+input { display: block; margin-bottom: 20px; border: 1px solid #DDD; padding: 2px; color: #666; }
+legend { font-weight: 700; font-size: 14px; }
+fieldset { padding-top: 20px; }
+
+.sub { margin-top: 25px; }
+.w1 { width: 400px; }
+.w2 { width: 50px; }
+.w3 { width: 150px; }
+.page { width: 700px; padding: 30px; background: #FFF; margin: 20px auto; min-height: 500px; border: 1px solid #dfdfdf; border-radius: 20px; }
+.logo { text-align: center; margin-bottom: 30px; }
+.instalando-msg { display:  none; }
+
+form { padding: 0; margin: 0; border: 0; }
+form table { margin: 0; padding: 0; }
+form table tr { background: #F3F3F3; }
+form table tr td { border-bottom: 8px solid #FFFFFF; margin-bottom: 9px; padding: 10px; }

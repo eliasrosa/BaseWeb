@@ -1,0 +1,8 @@
+html { height:100%; font-family: Arial, Tahoma, Verdana; }
+body { margin: 0; padding: 0; width: 100%; font-size: 12px; text-align: center; line-height: 100%; }
+
+.logo { margin: 80px 0 35px 0; }
+.login { background: #DDD; border: 1px solid #999; padding: 15px 10px; width: 270px; margin: 15px auto; text-align: left; }
+.login input.txt { width: 258px; border: 1px solid #999; background: #FFF; padding: 5px; font-size: 18px; margin: 3px 0 10px 0; }
+.login label { font-size: 13px; color: #444; }
+.erro { background: #FFEBE8; color: #333; border: 1px solid #C00; padding: 15px 10px; width: 270px; margin: 0 auto;}

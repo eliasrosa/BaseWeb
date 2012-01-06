@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /adm/
+Disallow: /components/
+Disallow: /libraries/
+Disallow: /media/
+Disallow: /modules/
+Disallow: /plugins/
+Disallow: /templates/
+Disallow: /material/
+Disallow: /install/
+Disallow: /install.php
