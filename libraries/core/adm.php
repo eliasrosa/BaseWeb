@@ -9,46 +9,6 @@ class bwAdm
         $class = $class ? $class : __CLASS__;
         return bwObject::getInstance($class);
     }
-
-    /*
-     * retorna 
-     * array(
-     *   array(
-     *      'nome' => 'nome do componente',
-     *      'com' => 'pasta do componente',
-     *      'link' => 'link inicial do componente',
-     *      'active' => bool,
-     *      'visivel' => bool,
-     *   )
-     * )
-     */
-    function getMenuPrincipal()
-    {
-        $r = array();
-        $comAtual = bwRequest::getVar('com');
-        $components = bwFolder::listarConteudo(BW_PATH_COMPONENTS, false, true, false, false);
-        sort($components);
-        
-        foreach($components as $com)
-        {
-            $file = BW_PATH_COMPONENTS .DS. $com . DS . 'api.php';
-            if(bwFile::exists($file))
-            {
-                $class = 'bw'.ucfirst(strtolower($com));
-                $api = call_user_func(array($class, 'getInstance'));
-            
-                $r[] = array(
-                    'nome' => $api->adm_nome,
-                    'com' => $com,
-                    'link' => bwRouter::_($api->adm_pagina_padrao),
-                    'active' => ($com == $comAtual) ? true : false,
-                    'visivel' => $api->adm_menu_visivel
-                );
-            }
-        }
-        
-        return $r;
-    }
     
     function init()
     {

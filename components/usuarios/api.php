@@ -4,11 +4,12 @@ defined('BW') or die("Acesso negado!");
 
 class bwUsuarios extends bwComponent
 {
-    // variaveis ADM
-    var $adm_nome = 'Usuários';
-    var $adm_pagina_padrao = 'adm.php?com=usuarios&view=perfil';
-    var $adm_menu_visivel = true;
-    
+    // variaveis obrigatórias
+    var $id = 'usuarios';
+    var $nome = 'Usuários';
+    var $adm_url_default = 'adm.php?com=usuarios&view=perfil';
+    var $adm_visivel = true;
+        
 
     // getInstance
     function getInstance($class = false)
@@ -17,10 +18,6 @@ class bwUsuarios extends bwComponent
         return bwObject::getInstance($class);
     }
     
-    public function getConfig()
-    {
-        return parent::getConfig('usuarios');
-    }
 
     function usuarioSalvar($dados)
     {

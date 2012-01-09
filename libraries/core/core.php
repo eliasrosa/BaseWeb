@@ -4,22 +4,6 @@ defined('BW') or die("Acesso negado!");
 
 class bwCore
 {
-
-    function getVersion($useDot = true)
-    {
-        $m = Doctrine_Manager::getInstance();
-        $c = $m->getConnection('default');
-        $a = bwCore::getConexao()->fetchOne("SHOW TABLES");
-
-        if(!$a)
-            return '0';
-
-        if(!$useDot)
-            return str_replace('bw_', '', $a);
-        else
-            return str_replace('_', '.', str_replace('bw_', '', $a));
-    }
-    
     function getConexao()
     {
         return Doctrine_Manager::getInstance()->getConnection('default');    

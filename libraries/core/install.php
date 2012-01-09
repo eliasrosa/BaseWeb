@@ -3,11 +3,127 @@ defined('BW') or die("Acesso negado!");
 
 class bwInstall
 {
-    public function init()
+    public function __construct($params)
     {
+        echo "\n";
+        $opcoes = @$params[2];
+        
+        unset($params[0], $params[1], $params[2]);
+        $this->params = $params;
+        
+        switch($opcoes)
+        {
+            case 'create-config':
+                $this->createConfig(
+                    $this->getParms('h', 'localhost'),
+                    $this->getParms('u', 'root'),
+                    $this->getParms('s', ''),
+                    $this->getParms('p', '3306'),
+                    $this->getParms('b', 'baseweb'),
+                    0
+                );
+                break;
+
+            case 'update':
+                $this->loadConfig();
+                
+                do{
+                    $versao = bwConfig::$versao + 1;
+                    $method = "bwUpdate_{$versao}";
+                    
+                    if(method_exists($this, $method))
+                        $this->update();
+                    else
+                        break;
+                        
+                } while(true);
+                break;
+
+            case '--help':
+                echo "Lista de opções disponíves";
+
+                echo "\n\n";
+                echo "  update         - Executa as funções de atualização do sistema";
+               
+                echo "\n\n";
+                echo "  update-com     - Atualiza componente selecionado\n";
+                echo "    <opções>\n";
+                echo "      --c  Pasta do componente, Ex.: --c=noticias";
+                
+                echo "\n\n";
+                echo "  create-config  - Cria arquivo config.php\n";
+                echo "    <opções>\n";
+                echo "      --h  Servidor MySql [localhost]\n";
+                echo "      --b  Nome do banco de dados MySql [baseweb]\n";
+                echo "      --u  Usuário MySql [root]\n";
+                echo "      --s  Senha MySql, Ex.: --s=\"senha do banco\"\n";
+                echo "      --p  Porta MySql [3306]\n";
+                echo "    <exemplos>\n";
+                echo "      $ bw install create-config\n";
+                echo "      $ bw install create-config --h=10.1.1.5 --u=root --s=\"123\" --b=baseweb";
+                
+                break;
+
+            default:
+                echo "Para informações, use: bw install --help";
+                break;
+        }
+        echo "\n\n";
+        die();
+    }
+    
+    private function getParms($var, $default = '')
+    {
+        if(count($this->params))
+        {
+            foreach($this->params as $p)
+            {
+                if(preg_match("#^--{$var}=(.*)$#", $p, $r))
+                {
+                    return $r[1];
+                }
+            }
+        }
+        
+        return $default;
+    }
+    
+    private function createConfig($h, $u, $s, $p, $b, $v)
+    {
+        require_once(BW_PATH .DS. 'libraries' .DS. 'defines.php');
+        require_once(BW_PATH_LIBRARIES .DS. 'core' .DS. 'config.php');
+          
+        $c = new bwConfigCreatorClass('bwConfig', BW_PATH_CONFIG);
+        $c->set('db_host', $h);
+        $c->set('db_user', $u);
+        $c->set('db_pass', $s);
+        $c->set('db_port', $p);
+        $c->set('db_name', $b);
+        $c->set('versao', $v);
+       
+        if(@mysql_connect($c->get('db_host').':'.$c->get('db_port'), $c->get('db_user'), $c->get('db_pass')))
+        {
+            if(@mysql_select_db($c->get('db_name')))
+            {
+                $c->create();
+                echo "Aquivo config.php criado com sucesso!";
+            }
+            else
+               echo "Não foi possível encontrar o banco de dados '".$c->get('db_name'). "'";
+        }
+        else
+            echo "Não foi possível conectar ao banco de dados";
+    }
+    
+    private function loadConfig()
+    {
+        if(isset($this->config))
+            return;
+    
         // loader
+        require_once(BW_PATH_CONFIG);    
         require_once(BW_PATH .DS. 'libraries' .DS. 'defines.php');    
-        require(BW_PATH_LIBRARIES .DS. 'core' .DS. 'loader.php');
+        require_once(BW_PATH_LIBRARIES .DS. 'core' .DS. 'loader.php');
 
         // auto load
         bwLoader::import('doctrine.doctrine');
@@ -16,116 +132,53 @@ class bwInstall
         spl_autoload_register('bwLoader::autoload');
 
         // arquivos importantes
-        bwLoader::import('core.functions');   
-    
-        if(!bwInstall::is_exists_config())
-        {
-            bwInstall::show_upgrade('config'); 
-        }
-        else
-        {
-            require(BW_PATH_CONFIG);
-            bwLoader::import('core.conexao');
-            
-            $versaoAtual = bwCore::getVersion();
-            
-            //
-            bwInstall::show_upgrade($versaoAtual);
-        }    
-    }
-
-    public function show_upgrade($versaoAtual)
-    {
-        if($versaoAtual != 0 && (bwUtil::getIpReal() != bwConfig::$allowUpdate))
-            bwInstall::show_page_error("Acesso negado!<br/><br/>IP:". bwUtil::getIpReal());
-    
-        $file = BW_PATH_UPGRADE_FILES .DS. $versaoAtual .'.php';
-        if(!file_exists($file) && $versaoAtual != 'config')
-            bwInstall::show_page_error("Sua versão está instalada e/ou atualizada!", "Parabéns!");
-        else
-            require($file);
+        bwLoader::import('core.functions');
         
-        if(method_exists(bwUpgrade, 'show_form') && empty($_POST))  
-        {          
-            bwInstall::show_header_html();
-            bwUpgrade::show_form();
-            bwInstall::show_submit_html();
-            bwInstall::show_footer_html();    
-        }
-        elseif(!method_exists(bwUpgrade, 'show_form') && empty($_POST))  
-        {          
-            bwInstall::show_page_update($versaoAtual);
-        }
-        elseif(!empty($_POST))
-        {
-            bwUpgrade::execute($versaoAtual);
-        }
+        //
+        $this->config = true;
     }
 
-    public function show_page_error($html, $titulo = "Erro")
+    private function is_exists_config()
     {
-        bwInstall::show_header_html();
-        bwInstall::show_error($html, $titulo);
-        bwInstall::show_footer_html();
-        exit();    
+        return bwFile::exists(BW_PATH_CONFIG);
     }
 
-    public function show_page_update($versaoAtual)
+    private function update()
     {
-        bwInstall::show_header_html();
-        bwInstall::show_error("", "Atualização #$versaoAtual");
-        bwInstall::show_submit_html();
-        bwInstall::show_footer_html();
-        exit();    
-    }
-
-    public function show_header_html()
-    {
-        echo <<<TOP
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>              
-        <title>Instalação/Upgrade do BaseWeb</title>
+        $this->loadConfig();
         
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <script type="text/javascript" src="libraries/javascripts/jquery/jquery-1.6.min.js"></script> 
-        <script type="text/javascript" src="libraries/javascripts/validaform/jquery.meio.mask.min.js"></script> 
-        <script type="text/javascript" src="libraries/javascripts/validaform/jquery.validaform.js"></script> 
-        <link type="text/css" href="install/css/style.css" rel="Stylesheet" />
-        <script type="text/javascript" src="install/js/comum.js"></script> 
-    </head>
-    <body>  
-        <div class="page">
-            <div class="logo">
-                <img src="install/img/logo.jpg" />
-            </div>
-            <form action="" class="validaForm" method="post">
-TOP;
+        $versao = bwConfig::$versao + 1;
+        $method = "bwUpdate_{$versao}";
+
+        if(method_exists($this, $method))
+        {
+            echo "Executando update #{$versao}\n";
+            $r = call_user_func(array($this, $method));
+        
+            $this->createConfig(
+                bwConfig::$db_host,
+                bwConfig::$db_user,
+                bwConfig::$db_pass,
+                bwConfig::$db_port,
+                bwConfig::$db_name,
+                $versao
+            );
+            
+            bwConfig::$versao = $versao;
+            
+            echo "\n";
+            echo "Atualização concluída com sucesso!\n\n";
+        }
     }
 
-    public function show_submit_html()
+    private function showProgressMsg($msg)
     {
-        echo "<p class=\"instalando-msg\">Instalando...</p><input class=\"sub\" type=\"submit\" name=\"__submit__\" value=\"Instalar!\" />";
-    }
-    
-    public function show_footer_html()
-    {
-        echo "</form></div></body></html>";
+        echo "  - $msg\n";
     }
 
-    public function show_error($html, $titulo = "Erro")
+    private function bwUpdate_0()
     {
-        echo "<div class=\"error\"><h2>$titulo</h2>$html</div>";
-    }
-
-    public function is_exists_config()
-    {
-        return file_exists(BW_PATH_CONFIG);
-    }
-
-    public function is_installed()
-    {
-        return file_exists(BW_PATH_CONFIG);
+        //bwCore::getConexao()->exec();
     }
 }
 ?>

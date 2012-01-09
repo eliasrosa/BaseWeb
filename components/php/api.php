@@ -4,12 +4,13 @@ defined('BW') or die("Acesso negado!");
 
 class bwPhp extends bwComponent
 {
-    // variaveis ADM
-    var $adm_nome = 'PHP';
-    var $adm_pagina_padrao = '';
-    var $adm_menu_visivel = false;
-    
+    // variaveis obrigatórias
+    var $id = 'php';
+    var $nome = 'PHP';
+    var $adm_url_default = '';
+    var $adm_visivel = false;
 
+    
     // getInstance
     function getInstance($class = false)
     {
@@ -26,11 +27,6 @@ class bwPhp extends bwComponent
 
         $this->setPath();
         $this->setUrl();
-    }
-
-    public function getConfig()
-    {
-        return parent::getConfig('php');
     }
 
     public function setPath()

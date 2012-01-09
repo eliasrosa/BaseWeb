@@ -16,10 +16,6 @@ define('BW_PATH_MODELS', BW_PATH_LIBRARIES .DS. 'models');
 define('BW_PATH_ADM', BW_PATH . DS . 'adm');
 define('BW_PATH_ADM_LOGIN', BW_PATH_ADM . DS . 'login');
 
-if(defined('BW_INSTALL'))
-    define('BW_URL_BASE', str_replace('/install.php', '', $_SERVER['SCRIPT_NAME']));
-else
-    define('BW_URL_BASE', bwConfig::$install_url);
     
 define('BW_URL_BASE2', 'http://'. $_SERVER['HTTP_HOST'] . BW_URL_BASE);
 define('BW_URL_TEMPLATES', BW_URL_BASE . '/templates');

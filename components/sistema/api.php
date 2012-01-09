@@ -4,12 +4,13 @@ defined('BW') or die("Acesso negado!");
 
 class bwSistema extends bwComponent
 {
-    // variaveis ADM
-    var $adm_nome = 'Sistema';
-    var $adm_pagina_padrao = '';
-    var $adm_menu_visivel = false;
-
-
+    // variaveis obrigatórias
+    var $id = 'sistema';
+    var $nome = 'Sistema';
+    var $adm_url_default = '';
+    var $adm_visivel = false;
+    
+    
     // getInstance
     function getInstance($class = false)
     {

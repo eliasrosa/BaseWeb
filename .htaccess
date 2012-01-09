@@ -6,6 +6,7 @@ RewriteEngine On
 
 # Bloaqueio das pasta .git e material
 RewriteRule ^\.git(.*)$ %{QUERY_STRING} [R=404]
+RewriteRule ^bw$ %{QUERY_STRING} [R=404]
 RewriteRule ^material(.*)$ %{QUERY_STRING} [R=404]
 
 ## End of deny access to extension xml files
