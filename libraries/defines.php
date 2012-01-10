@@ -4,6 +4,8 @@ ini_set("display_errors", 1);
 
 defined('BW') or die("Acesso negado!");
 
+
+// PATH
 define('BW_PATH_CACHE', BW_PATH .DS. 'cache');
 define('BW_PATH_MEDIA', BW_PATH .DS. 'media');
 define('BW_PATH_MODULOS', BW_PATH .DS. 'modules');
@@ -16,7 +18,9 @@ define('BW_PATH_MODELS', BW_PATH_LIBRARIES .DS. 'models');
 define('BW_PATH_ADM', BW_PATH . DS . 'adm');
 define('BW_PATH_ADM_LOGIN', BW_PATH_ADM . DS . 'login');
 
-    
+
+// URL
+define('BW_URL_BASE', str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']));
 define('BW_URL_BASE2', 'http://'. $_SERVER['HTTP_HOST'] . BW_URL_BASE);
 define('BW_URL_TEMPLATES', BW_URL_BASE . '/templates');
 define('BW_URL_MEDIA', BW_URL_BASE . '/media');
