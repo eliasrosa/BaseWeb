@@ -173,8 +173,11 @@ class bwRouter
 
         $query = http_build_query($query);
         $query = !$query ? $query : "?$query";
-
-        $url = BW_URL_BASE2 . "/{$alias}.html{$query}";
+        
+        if(!preg_match('#^adm\/#', $alias))
+            $alias .= '.html';
+    
+        $url = BW_URL_BASE2 . "/{$alias}{$query}";
 
         return $url;
     }
