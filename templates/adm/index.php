@@ -42,16 +42,18 @@ defined('BW') or die("Acesso negado!");
             </div>
         
             <div id="menu">
-            <?        
-                foreach(bwAdm::getInstance()->getMenuPrincipal() as $c)
+            <?   
+                $com = bwRequest::getVar('com', '');
+                foreach(bwComponent::getInstance()->getAll() as $c)
                 {
-                    if($c['visivel'])
+                    if($c['adm_visivel'])
                     {
-                        $active = $c['active'] ? ' active' : '';
+                    
+                        $active = ($com == $c['id']) ? ' active' : '';
                         $class = "{$c['com']}{$active}";
                         echo sprintf('<div class="programas %s"><a href="%s">%s</a></div>',
                             $class,
-                            $c['link'],
+                            bwRouter::_($c['adm_url_default']),
                             $c['nome']
                         );
                     }
