@@ -20,7 +20,7 @@ define('BW_PATH_ADM_LOGIN', BW_PATH_ADM . DS . 'login');
 
 
 // URL
-define('BW_URL_BASE', str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']));
+define('BW_URL_BASE', bwConfig::$url_base);
 define('BW_URL_BASE2', 'http://'. $_SERVER['HTTP_HOST'] . BW_URL_BASE);
 define('BW_URL_TEMPLATES', BW_URL_BASE . '/templates');
 define('BW_URL_MEDIA', BW_URL_BASE . '/media');
