@@ -26,12 +26,29 @@ class bwRouter
     {
         parse_str($query_string, $query);
 
-        $query = array_merge(array(
+            //$_url = ;
+            //$_url_itemid = ;
+            //$_query_itemid = ;
+            //;
+        
+        if(isset($query['itemid']) && $query['itemid'] > 0)
+        {
+            $url = bwMenu::getInstance()->getId($query['itemid']);
+            $url = bwRouter::parseUrl($url['link']);
+            $query = array_merge(
+                bwRouter::parseQuery($url['query']),
+                $query
+            );
+        }
+        else
+        {
+            $query = array_merge(array(
                     'com' => null,
                     'view' => null,
                     'itemid' => 0
-                        ), $query);
-
+            ), $query);
+        }
+        
         return $query;
     }
 
