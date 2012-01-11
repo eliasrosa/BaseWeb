@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -40,6 +40,15 @@
 			$this->color = $color;
 		}
 		
+		/**
+		 * Writes text onto an image
+		 * 
+		 * @param WideImage_Image $image
+		 * @param mixed $x smart coordinate
+		 * @param mixed $y smart coordinate
+		 * @param string $text
+		 * @param int $angle Angle in degrees clockwise
+		 */
 		function writeText($image, $x, $y, $text, $angle = 0)
 		{
 			if ($image->isTrueColor())

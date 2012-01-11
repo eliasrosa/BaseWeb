@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -47,13 +47,8 @@
 			
 			for ($x = 0; $x < $width; $x++)
 			{
-				imagecopy(
-					$new->getHandle(), 
-					$image->getHandle(), 
-					$x, 0, $width - $x - 1, 0, 
-					1, 
-					$height 
-				);
+				if (!imagecopy($new->getHandle(), $image->getHandle(), $x, 0, $width - $x - 1, 0, 1, $height)) 
+					throw new WideImage_GDFunctionResultException("imagecopy() returned false");
 			}
 			return $new;
 		}

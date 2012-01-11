@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -41,7 +41,7 @@
 			$this->color = $color;
 		}
 		
-		function writeText($image, $x, $y, $text, $angle = 0)
+		function writeText($image, $x, $y, $text)
 		{
 			imagestring($image->getHandle(), $this->font, $x, $y, $text, $this->color);
 		}

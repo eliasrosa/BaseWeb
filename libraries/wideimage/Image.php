@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -28,6 +28,13 @@
 	 * @package Exceptions
 	 */
 	class WideImage_InvalidImageDimensionException extends WideImage_Exception {}
+	
+	/**
+	 * Thrown when an image can't be saved (returns false by the mapper)
+	 * 
+	 * @package Exceptions
+	 */
+	class WideImage_UnknownErrorWhileMappingException extends WideImage_Exception {}
 	
 	/**
 	 * Base class for images
@@ -145,15 +152,16 @@
 		 * $image->saveToFile('image.jpg');
 		 * </code>
 		 * 
-		 * @param string $uri The file locator (can be url)
-		 * @return mixed Whatever the mapper returns
+		 * @param string $uri File location
 		 */
 		function saveToFile($uri)
 		{
 			$mapper = WideImage_MapperFactory::selectMapper($uri, null);
 			$args = func_get_args();
 			array_unshift($args, $this->getHandle());
-			return call_user_func_array(array($mapper, 'save'), $args);
+			$res = call_user_func_array(array($mapper, 'save'), $args);
+			if (!$res)
+				throw new WideImage_UnknownErrorWhileMappingException(get_class($mapper) . " returned an invalid result while saving to $uri");
 		}
 		
 		/**
@@ -172,7 +180,9 @@
 			array_unshift($args, $this->getHandle());
 			
 			$mapper = WideImage_MapperFactory::selectMapper(null, $format);
-			call_user_func_array(array($mapper, 'save'), $args);
+			$res = call_user_func_array(array($mapper, 'save'), $args);
+			if (!$res)
+				throw new WideImage_UnknownErrorWhileMappingException(get_class($mapper) . " returned an invalid result while writing the image data");
 			
 			return ob_get_clean();
 		}
@@ -193,6 +203,11 @@
 		 * 
 		 * Sets headers Content-length and Content-type, and echoes the image in the specified format.
 		 * All other headers (such as Content-disposition) must be added manually. 
+		 * 
+		 * Example:
+		 * <code>
+		 * WideImage::load('image1.png')->resize(100, 100)->output('gif');
+		 * </code>
 		 * 
 		 * @param string $format Image format
 		 */
@@ -255,6 +270,8 @@
 		}
 		
 		/**
+		 * Sets the current transparent color index. Only makes sense for palette images (8-bit).
+		 * 
 		 * @param int $color Transparent color index
 		 */
 		function setTransparentColor($color)
@@ -263,22 +280,17 @@
 		}
 		
 		/**
+		 * Returns a RGB array of the transparent color or null if none.
+		 * 
 		 * @return mixed Transparent color RGBA array
 		 */
 		function getTransparentColorRGB()
 		{
-			#return $this->getColorRGB($this->getTransparentColor());
-			
 			$total = imagecolorstotal($this->handle);
 			$tc = $this->getTransparentColor();
-			#print_r($tc);
 			
 			if ($tc >= $total && $total > 0)
-			{
-			#	echo " $tc is over $total, still ... ";
-			#	print_r($this->getColorRGB($tc));
 				return null;
-			}
 			else
 				return $this->getColorRGB($tc);
 		}
@@ -470,7 +482,7 @@
 		 * @param mixed $height The new height (smart coordinate), or null.
 		 * @param string $fit 'inside', 'outside', 'fill'
 		 * @param string $scale 'down', 'up', 'any'
-		 * @return WideImage_Image resized image
+		 * @return WideImage_Image The resized image
 		 */
 		function resize($width = null, $height = null, $fit = 'inside', $scale = 'any')
 		{
@@ -545,38 +557,44 @@
 		}
 		
 		/**
-		 * Resizes the canvas of the image, but doesn't stretch the image content
+		 * Resizes the canvas of the image, but doesn't scale the content of the image
 		 * 
-		 * This operation creates an empty canvas with dimensions $width x $height, filled with background color $bg_color 
-		 * and draws the original image onto it at position $pos_x, $pos_y.
+		 * This operation creates an empty canvas with dimensions $width x $height, filled with 
+		 * background color $bg_color and draws the original image onto it at position [$pos_x, $pos_y].
 		 * 
-		 * Hint: $width, $height, $pos_x and $pos_y are all smart coordinates. $width and $height are 
-		 * relative to the current image size, $pos_x and $pos_y are relative to the newly calculated canvas size. This can
-		 * be confusing, but it makes sense. See the example below.
+		 * Arguments $width, $height, $pos_x and $pos_y are all smart coordinates. $width and $height are 
+		 * relative to the current image size, $pos_x and $pos_y are relative to the newly calculated
+		 * canvas size. This can be confusing, but it makes sense. See the example below.
 		 * 
-		 * The example below loads a 100x150 image and then resizes its canvas to 200% x 100%+20 (which evaluates to 200x170).
-		 * The image is placed at position 10,center+20, which evaluates to 10,30.
+		 * The example below loads a 100x150 image and then resizes its canvas to 200% x 100%+20 
+		 * (which evaluates to 200x170). The image is placed at position [10, center+20], which evaluates to [10, 30].
 		 * <code>
 		 * $image = WideImage::load('someimage.jpg'); // 100x150
 		 * $white = $image->allocateColor(255, 255, 255);
 		 * $image->resizeCanvas('200%', '100% + 20', 10, 'center+20', $white);
 		 * </code>
 		 * 
-		 * You can set the $scale parameter to limit when to resize the canvas. For example, if you want to resize the canvas
-		 * only if the image is smaller than the new size, but leave the image intact if it's larger, set it to 'up'. Likewise,
-		 * if you want to shrink the canvas, but don't want to change images that are already smaller, set it to 'down'. 
+		 * The parameter $merge defines whether the original image should be merged onto the new canvas.
+		 * This means it blends transparent color and alpha colors into the background color. If set to false,
+		 * the original image is just copied over, preserving the transparency/alpha information.
+		 * 
+		 * You can set the $scale parameter to limit when to resize the canvas. For example, if you want 
+		 * to resize the canvas only if the image is smaller than the new size, but leave the image intact 
+		 * if it's larger, set it to 'up'. Likewise, if you want to shrink the canvas, but don't want to 
+		 * change images that are already smaller, set it to 'down'. 
 		 * 
 		 * @param mixed $width Width of the new canvas (smart coordinate, relative to current image width)
 		 * @param mixed $height Height of the new canvas (smart coordinate, relative to current image height)
 		 * @param mixed $pos_x x-position of the image (smart coordinate, relative to the new width)
 		 * @param mixed $pos_y y-position of the image (smart coordinate, relative to the new height)
-		 * @param int $bg_color Background color (created with allocateColor or allocateColorAlpha)
+		 * @param int $bg_color Background color (created with allocateColor or allocateColorAlpha), defaults to null (tries to use a transparent color)
 		 * @param string $scale Possible values: 'up' (enlarge only), 'down' (downsize only), 'any' (resize precisely to $width x $height). Defaults to 'any'.
+		 * @param bool $merge Merge the original image (flatten alpha channel and transparency) or copy it over (preserve). Defaults to false.
 		 * @return WideImage_Image The resulting image with resized canvas
 		 */
-		function resizeCanvas($width, $height, $pos_x, $pos_y, $bg_color, $scale = 'any')
+		function resizeCanvas($width, $height, $pos_x, $pos_y, $bg_color = null, $scale = 'any', $merge = false)
 		{
-			return $this->getOperation('ResizeCanvas')->execute($this, $width, $height, $pos_x, $pos_y, $bg_color, $scale);
+			return $this->getOperation('ResizeCanvas')->execute($this, $width, $height, $pos_x, $pos_y, $bg_color, $scale, $merge);
 		}
 		
 		/**
@@ -584,7 +602,7 @@
 		 * 
 		 * You can either set the corners' color or set them transparent.
 		 * 
-		 * Note on smoothness: 1 means jagged edges, 2 is much better, more than 4 doesn't noticeably improve the quality.
+		 * Note on $smoothness: 1 means jagged edges, 2 is much better, more than 4 doesn't noticeably improve the quality.
 		 * Rendering becomes increasingly slower if you increase smoothness.
 		 * 
 		 * Example:
@@ -596,7 +614,7 @@
 		 * WideImage::SIDE_TOP_LEFT, WideImage::SIDE_TOP,
 		 * WideImage::SIDE_TOP_RIGHT, WideImage::SIDE_RIGHT,
 		 * WideImage::SIDE_BOTTOM_RIGHT, WideImage::SIDE_BOTTOM, 
-		 * WideImage::SIDE_BOTTOM_LEFT, WideImage::SIDE_LEFT.
+		 * WideImage::SIDE_BOTTOM_LEFT, WideImage::SIDE_LEFT, and WideImage::SIDE_ALL.
 		 * You can specify any combination of corners with a + operation, see example below.
 		 * 
 		 * Example:
@@ -609,7 +627,7 @@
 		 * @param int $radius Radius of the corners
 		 * @param int $color The color of corners. If null, corners are rendered transparent (slower than using a solid color).
 		 * @param int $smoothness Specify the level of smoothness. Suggested values from 1 to 4.
-		 * @param int $corners Specify which corners to draw (defaults to all corners)
+		 * @param int $corners Specify which corners to draw (defaults to WideImage::SIDE_ALL = all corners)
 		 * @return WideImage_Image The resulting image with round corners
 		 */
 		function roundCorners($radius, $color = null, $smoothness = 2, $corners = 255)
@@ -725,30 +743,7 @@
 		 */
 		function asNegative()
 		{
-			if ($this instanceof WideImage_PaletteImage && $this->isTransparent())
-			{
-				$trgb = $this->getTransparentColorRGB();
-				$trgbi = $this->getTransparentColor();
-			}
-			else
-			{
-				$trgb = null;
-				$trgbi = -1;
-			}
-			
-			$img = $this->getOperation('ApplyFilter')->execute($this, IMG_FILTER_NEGATE);
-			
-			if ($this instanceof WideImage_PaletteImage && $trgbi >= 0)
-			{
-				$img = $img->asPalette();
-				if ($trgb)
-				{
-					$irgb = array('red' => 255 - $trgb['red'], 'green' => 255 - $trgb['green'], 'blue' => 255 - $trgb['blue'], 'alpha' => 127);
-					$tci = $img->getClosestColor($irgb);
-					$img->setTransparentColor($tci);
-				}
-			}
-			return $img;
+			return $this->getOperation('AsNegative')->execute($this);
 		}
 		
 		/**
@@ -807,6 +802,20 @@
 		}
 		
 		/**
+		 * Adds noise to the image
+		 * 
+		 * @author Tomasz Kapusta
+		 * 
+		 * @param int $amount Number of noise pixels to add
+		 * @param string $type Type of noise 'salt&pepper', 'color' or 'mono'
+		 * @return WideImage_Image Image with noise added
+		 **/
+		function addNoise($amount, $type)
+		{
+			return $this->getOperation('AddNoise')->execute($this, $amount, $type);
+		}
+		
+		/**
 		 * Used internally to execute operations
 		 *
 		 * @param string $name
@@ -834,7 +843,7 @@
 		}
 		
 		/**
-		 * Returns a copy of the image
+		 * Returns a copy of the image object
 		 * 
 		 * @return WideImage_Image The copy
 		 **/
@@ -855,7 +864,8 @@
 		 **/
 		function copyTo($dest, $left = 0, $top = 0)
 		{
-			imageCopy($dest->getHandle(), $this->handle, $left, $top, 0, 0, $this->getWidth(), $this->getHeight());
+			if (!imagecopy($dest->getHandle(), $this->handle, $left, $top, 0, 0, $this->getWidth(), $this->getHeight()))
+				throw new WideImage_GDFunctionResultException("imagecopy() returned false");
 		}
 		
 		/**
@@ -865,12 +875,14 @@
 		 * 
 		 * Examples:
 		 * <code>
+		 * $img = WideImage::load('pic.jpg);
 		 * $canvas = $img->getCanvas();
-		 * $canvas->setFont(new WideImage_Font_TTF('arial.ttf', 15, $img->allocateColor(200, 220, 255)));
+		 * $canvas->useFont('arial.ttf', 15, $img->allocateColor(200, 220, 255));
 		 * $canvas->writeText(10, 50, "Hello world!");
 		 * 
 		 * $canvas->filledRectangle(10, 10, 80, 40, $img->allocateColor(255, 127, 255));
 		 * $canvas->line(60, 80, 30, 100, $img->allocateColor(255, 0, 0));
+		 * $img->saveToFile('new.png');
 		 * </code>
 		 * 
 		 * @return WideImage_Canvas The Canvas object
@@ -943,7 +955,10 @@
 		 */
 		function __wakeup()
 		{
-			$this->handle = imagecreatefromstring($this->sdata);
+			$temp_image = WideImage::loadFromString($this->sdata);
+			$temp_image->releaseHandle();
+			$this->handle = $temp_image->handle;
+			$temp_image = null;
 			$this->sdata = null;
 		}
 	}

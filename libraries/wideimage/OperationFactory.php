@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -41,13 +41,13 @@
 			$lcname = strtolower($operationName);
 			if (!isset(self::$cache[$lcname]))
 			{
-				$opClassName = "WideImage_Operation_" . $operationName;
+				$opClassName = "WideImage_Operation_" . ucfirst($operationName);
 				if (!class_exists($opClassName, false))
 				{
 					$fileName = WideImage::path() . 'Operation/' . ucfirst($operationName) . '.php';
 					if (file_exists($fileName))
 						require_once $fileName;
-					else
+					elseif (!class_exists($opClassName))
 						throw new WideImage_UnknownImageOperationException("Can't load '{$operationName}' operation.");
 				}
 				self::$cache[$lcname] = new $opClassName();

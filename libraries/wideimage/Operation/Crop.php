@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -71,17 +71,15 @@
 			if ($img->isTransparent() || $img instanceof WideImage_PaletteImage)
 			{
 				$new->copyTransparencyFrom($img);
-				imagecopyresized(
-					$new->getHandle(), $img->getHandle(), 0, 0, $left, $top, $width, $height, $width, $height
-					);
+				if (!imagecopyresized($new->getHandle(), $img->getHandle(), 0, 0, $left, $top, $width, $height, $width, $height))
+					throw new WideImage_GDFunctionResultException("imagecopyresized() returned false");
 			}
 			else
 			{
 				$new->alphaBlending(false);
 				$new->saveAlpha(true);
-				imagecopyresampled(
-					$new->getHandle(), $img->getHandle(), 0, 0, $left, $top, $width, $height, $width, $height
-					);
+				if (!imagecopyresampled($new->getHandle(), $img->getHandle(), 0, 0, $left, $top, $width, $height, $width, $height))
+					throw new WideImage_GDFunctionResultException("imagecopyresampled() returned false");
 			}
 			return $new;
 		}

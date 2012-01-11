@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -41,12 +41,13 @@
 		 * @param smart_coordinate $top
 		 * @param int $color
 		 * @param string $scale 'up', 'down', 'any'
+		 * @param boolean $merge
 		 * @return WideImage_Image
 		 */
-		function execute($img, $width, $height, $left, $top, $color, $scale)
+		function execute($img, $width, $height, $left, $top, $color, $scale, $merge)
 		{
 			$new_width = WideImage_Coordinate::fix($width, $img->getWidth());
-			$new_height = WideImage_Coordinate::fix($width, $img->getHeight());
+			$new_height = WideImage_Coordinate::fix($height, $img->getHeight());
 			
 			if ($scale == 'down')
 			{
@@ -69,14 +70,17 @@
 			{
 				imagepalettecopy($new->getHandle(), $img->getHandle());
 				
+				if ($img->isTransparent())
+				{
+					$new->copyTransparencyFrom($img);
+					$tc_rgb = $img->getTransparentColorRGB();
+					$t_color = $new->allocateColorAlpha($tc_rgb);
+				}
+				
 				if ($color === null)
 				{
 					if ($img->isTransparent())
-					{
-						$new->copyTransparencyFrom($img);
-						$tc_rgb = $img->getTransparentColorRGB();
-						$color = $new->allocateColorAlpha($tc_rgb);
-					}
+						$color = $t_color;
 					else
 						$color = $new->allocateColorAlpha(255, 0, 127, 127);
 					
@@ -85,8 +89,18 @@
 			}
 			$new->fill(0, 0, $color);
 			
+			
 			$x = WideImage_Coordinate::fix($left, $new->getWidth(), $img->getWidth());
 			$y = WideImage_Coordinate::fix($top, $new->getHeight(), $img->getHeight());
+			
+			// blending for truecolor images
+			if ($img->isTrueColor())
+				$new->alphaBlending($merge);
+			
+			// not-blending for palette images
+			if (!$merge && !$img->isTrueColor() && isset($t_color))
+				$new->getCanvas()->filledRectangle($x, $y, $x + $img->getWidth(), $y + $img->getHeight(), $t_color);
+			
 			$img->copyTo($new, $x, $y);
 			return $new;
 		}

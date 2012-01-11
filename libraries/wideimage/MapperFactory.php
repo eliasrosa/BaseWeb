@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -37,14 +37,14 @@
 	abstract class WideImage_MapperFactory
 	{
 		static protected $mappers = array();
+		static protected $customMappers = array();
 		
 		static protected $mimeTable = array(
 			'image/jpg' => 'JPEG', 
 			'image/jpeg' => 'JPEG', 
 			'image/pjpeg' => 'JPEG', 
 			'image/gif' => 'GIF', 
-			'image/png' => 'PNG',
-			'image/bmp' => 'BMP'
+			'image/png' => 'PNG'
 			);
 		
 		/**
@@ -62,6 +62,7 @@
 				return self::$mappers[$format];
 			
 			$mapperClassName = 'WideImage_Mapper_' . $format;
+			
 			if (!class_exists($mapperClassName, false))
 			{
 				$mapperFileName = WideImage::path() . 'Mapper/' . $format . '.php';
@@ -69,13 +70,24 @@
 					require_once $mapperFileName;
 			}
 			
-			if (class_exists($mapperClassName, false))
+			if (class_exists($mapperClassName))
 			{
 				self::$mappers[$format] = new $mapperClassName();
 				return self::$mappers[$format];
 			}
 			
 			throw new WideImage_UnsupportedFormatException("Format '{$format}' is not supported.");
+		}
+		
+		static function registerMapper($mapper_class_name, $mime_type, $extension)
+		{
+			self::$customMappers[$mime_type] = $mapper_class_name;
+			self::$mimeTable[$mime_type] = $extension;
+		}
+		
+		static function getCustomMappers()
+		{
+			return self::$customMappers;
 		}
 		
 		static function determineFormat($uri, $format = null)

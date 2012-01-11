@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -48,8 +48,15 @@
 	class WideImage_InvalidImageSourceException extends WideImage_Exception {}
 	
 	/**
-	 * The gateway class for loading images and core library functions
+	 * @package Exceptions
 	 * 
+	 * Class for invalid GD function calls result (for example those that return bool)
+	 */
+	class WideImage_GDFunctionResultException extends WideImage_Exception {}
+	
+	/**
+	 * The gateway class for loading images and core library functions
+	 *
 	 * @package WideImage
 	 */
 	class WideImage
@@ -64,21 +71,22 @@
 		const SIDE_LEFT = 128;
 		const SIDE_ALL = 255;
 		
+		/**
+		 * @var string Path to the library base directory
+		 */
 		protected static $path = null;
 		
 		/**
 		 * Returns the library version
-		 * 
 		 * @return string The library version
 		 */
 		static function version()
 		{
-			return '10.07.31';
+			return '11.02.19';
 		}
 		
 		/**
 		 * Returns the path to the library
-		 *
 		 * @return string
 		 */
 		static function path()
@@ -89,25 +97,62 @@
 		}
 		
 		/**
-		 * Loads an image from a file, URL, upload field, binary string, or a valid image handle. This function
-		 * analyzes the input and decides whether to use WideImage::loadFromHandle(),
-		 * WideImage::loadFromFile(), WideImage::loadFromUpload() or WideImage::loadFromString().
+		 * Checks whether the gd library is loaded, and throws an exception otherwise
+		 */
+		static function checkGD()
+		{
+			if (!extension_loaded('gd'))
+				throw new WideImage_Exception("WideImage requires the GD extension, but it's apparently not loaded.");
+		}
+		
+		/**
+		 * Registers a custom mapper for image loading and saving
+		 * 
+		 * Example:
+		 * <code>
+		 * 	WideImage::registerCustomMapper('WideImage_Mapper_TGA', 'image/tga', 'tga');
+		 * </code>
+		 * 
+		 * @param string $mapper_class_name
+		 * @param string $mime_type
+		 * @param string $extension
+		 */
+		static function registerCustomMapper($mapper_class_name, $mime_type, $extension)
+		{
+			WideImage_MapperFactory::registerMapper($mapper_class_name, $mime_type, strtoupper($extension));
+		}
+		
+		/**
+		 * Loads an image from a file, URL, HTML input file field, binary string, or a valid image handle.
+		 * The image format is auto-detected. 
+		 * 
+		 * Currently supported formats: PNG, GIF, JPG, BMP, TGA, GD, GD2.
+		 * 
+		 * This function analyzes the input and decides whether to use WideImage::loadFromHandle(),
+		 * WideImage::loadFromFile(), WideImage::loadFromUpload() or WideImage::loadFromString(),
+		 * all of which you can also call directly to spare WideImage some guessing.
+		 * 
+		 * Arrays are supported for upload fields; it returns an array of loaded images. 
+		 * To load only a single image from an array field, use WideImage::loadFromUpload('img', $i), 
+		 * where $i is the index of the image you want to load.
 		 * 
 		 * <code>
 		 * $img = WideImage::load('http://url/image.png'); // image URL
 		 * $img = WideImage::load('/path/to/image.png'); // local file path
 		 * $img = WideImage::load('img'); // upload field name
-		 * $img = WideImage::load($image_resource); // a GD resource
-		 * $img = WideImage::load($string); // binary string containing image data
+		 * $img = WideImage::load(imagecreatetruecolor(10, 10)); // a GD resource
+		 * $img = WideImage::load($image_data); // binary string containing image data
 		 * </code>
 		 * 
-		 * @param mixed $source File name, url, upload field name, binary string, or a GD image resource
-		 * @param string $format *DEPRECATED* Hint for image format
+		 * @param mixed $source File name, url, HTML file input field name, binary string, or a GD image resource
 		 * @return WideImage_Image WideImage_PaletteImage or WideImage_TrueColorImage instance
 		 */
-		static function load($source, $format = null)
+		static function load($source)
 		{
 			$predictedSourceType = '';
+			
+			if ($source == '')
+				$predictedSourceType = 'String';
 			
 			// Creating image via a valid resource
 			if (!$predictedSourceType && self::isValidImageHandle($source))
@@ -136,26 +181,47 @@
 			if (!$predictedSourceType)
 				$predictedSourceType = 'File';
 			
-			return call_user_func(array('WideImage', 'loadFrom' . $predictedSourceType), $source, $format);
-		}			
+			return call_user_func(array('WideImage', 'loadFrom' . $predictedSourceType), $source);
+		}
 		
 		/**
-		 * Create and load an image from a file or URL. You can override the file 
-		 * format by specifying the second parameter.
+		 * Create and load an image from a file or URL. The image format is auto-detected.
 		 * 
 		 * @param string $uri File or url
-		 * @param string $format *DEPRECATED* Format hint, usually not needed
 		 * @return WideImage_Image WideImage_PaletteImage or WideImage_TrueColorImage instance
 		 */
-		static function loadFromFile($uri, $format = null)
+		static function loadFromFile($uri)
 		{
 			$data = file_get_contents($uri);
 			$handle = @imagecreatefromstring($data);
 			if (!self::isValidImageHandle($handle))
 			{
-				$mapper = WideImage_MapperFactory::selectMapper($uri, $format);
-				$handle = $mapper->load($uri);
+				try
+				{
+					// try to find a mapper first
+					$mapper = WideImage_MapperFactory::selectMapper($uri);
+					if ($mapper)
+						$handle = $mapper->load($uri);
+				}
+				catch (WideImage_UnsupportedFormatException $e)
+				{
+					// mapper not found
+				}
+				
+				// try all custom mappers
+				if (!self::isValidImageHandle($handle))
+				{
+					$custom_mappers = WideImage_MapperFactory::getCustomMappers();
+					foreach ($custom_mappers as $mime_type => $mapper_class)
+					{
+						$mapper = WideImage_MapperFactory::selectMapper(null, $mime_type);
+						$handle = $mapper->loadFromString($data);
+						if (self::isValidImageHandle($handle))
+							break;
+					}
+				}
 			}
+			
 			if (!self::isValidImageHandle($handle))
 				throw new WideImage_InvalidImageSourceException("File '{$uri}' appears to be an invalid image source.");
 			
@@ -170,7 +236,22 @@
 		 */
 		static function loadFromString($string)
 		{
-			$handle = imagecreatefromstring($string);
+			if (strlen($string) < 128)
+				throw new WideImage_InvalidImageSourceException("String doesn't contain image data.");
+			
+			$handle = @imagecreatefromstring($string);
+			if (!self::isValidImageHandle($handle))
+			{
+				$custom_mappers = WideImage_MapperFactory::getCustomMappers();
+				foreach ($custom_mappers as $mime_type => $mapper_class)
+				{
+					$mapper = WideImage_MapperFactory::selectMapper(null, $mime_type);
+					$handle = $mapper->loadFromString($string);
+					if (self::isValidImageHandle($handle))
+						break;
+				}
+			}
+			
 			if (!self::isValidImageHandle($handle))
 				throw new WideImage_InvalidImageSourceException("String doesn't contain valid image data.");
 			
@@ -207,19 +288,39 @@
 		}
 		
 		/**
-		 * This method loads a file from the $_FILES array.
+		 * This method loads a file from the $_FILES array. The image format is auto-detected.
 		 * 
-		 * You only have to pass the field name as the parameter.
+		 * You only have to pass the field name as the parameter. For array fields, this function will
+		 * return an array of image objects, unless you specify the $index parameter, which will
+		 * load the desired image.
 		 * 
 		 * @param $field_name Name of the key in $_FILES array
+		 * @param int $index The index of the file to load (if the input field is an array)
 		 * @return WideImage_Image The loaded image
 		 */
-		static function loadFromUpload($field_name)
+		static function loadFromUpload($field_name, $index = null)
 		{
-			if (!array_key_exists($field_name, $_FILES) || !file_exists($_FILES[$field_name]['tmp_name']))
-				throw new WideImage_InvalidImageSourceException("Upload field '{$field_name}' or file doesn't exist.");
+			if (!array_key_exists($field_name, $_FILES))
+				throw new WideImage_InvalidImageSourceException("Upload field '{$field_name}' doesn't exist.");
 			
-			return self::loadFromFile($_FILES[$field_name]['tmp_name'], $_FILES[$field_name]['type']);
+			if (is_array($_FILES[$field_name]['tmp_name']))
+			{
+				if (isset($_FILES[$field_name]['tmp_name'][$index]))
+					$filename = $_FILES[$field_name]['tmp_name'][$index];
+				else
+				{
+					$result = array();
+					foreach ($_FILES[$field_name]['tmp_name'] as $idx => $tmp_name)
+						$result[$idx] = self::loadFromFile($tmp_name);
+					return $result;
+				}
+			}
+			else
+				$filename = $_FILES[$field_name]['tmp_name'];
+			
+			if (!file_exists($filename))
+				throw new WideImage_InvalidImageSourceException("Uploaded file doesn't exist.");
+			return self::loadFromFile($filename);
 		}
 		
 		/**
@@ -227,6 +328,7 @@
 		 * 
 		 * @param int $width
 		 * @param int $height
+		 * @return WideImage_PaletteImage
 		 */
 		static function createPaletteImage($width, $height)
 		{
@@ -238,6 +340,7 @@
 		 * 
 		 * @param int $width
 		 * @param int $height
+		 * @return WideImage_TrueColorImage
 		 */
 		static function createTrueColorImage($width, $height)
 		{
@@ -266,3 +369,9 @@
 				throw new WideImage_InvalidImageHandleException("{$handle} is not a valid image handle.");
 		}
 	}
+	
+	WideImage::checkGD();
+	
+	WideImage::registerCustomMapper('WideImage_Mapper_BMP', 'image/bmp', 'bmp');
+	WideImage::registerCustomMapper('WideImage_Mapper_TGA', 'image/tga', 'tga');
+	

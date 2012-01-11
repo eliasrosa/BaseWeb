@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -204,53 +204,5 @@
 				}
 			}
 			return $value;
-			
-			if ($coord['type'] === 'abs')
-			{
-				$result = self::evaluate($coord['value'], $dim, $sec_dim);
-			}
-			elseif ($coord['type'] === 'cal')
-			{
-				$p = self::evaluate($coord['pivot'], $dim, $sec_dim);
-				$v = self::evaluate($coord['value'], $dim, $sec_dim);
-				$result = $p + $v;
-			}
-			
-			if ($clip)
-			{
-				if ($result < 0)
-					return 0;
-				elseif ($result >= $dim)
-					return $dim;
-			}
-			return $result;
-		}
-		
-		/**
-		 * Fix a coordinate for a resize (limits by image weight and height)
-		 * 
-		 * @param WideImage_Image $img
-		 * @param int $width Width of the image
-		 * @param int $height Height of the image
-		 * @return array An array(width, height), fixed for resizing
-		 */
-		static function fixForResize($img, $width, $height)
-		{
-			if ($width === null && $height === null)
-				return array($img->getWidth(), $img->getHeight());
-			
-			if ($width !== null)
-				$width = self::fix($width, $img->getWidth());
-			
-			if ($height !== null)
-				$height = self::fix($height, $img->getHeight());
-			
-			if ($width === null)
-				$width = floor($img->getWidth() * $height / $img->getHeight());
-			
-			if ($height === null)
-				$height = floor($img->getHeight() * $width / $img->getWidth());
-			
-			return array($width, $height);
 		}
 	}

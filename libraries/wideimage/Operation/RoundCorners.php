@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -94,7 +94,7 @@
 				
 				$result = $image->copy();
 				if ($corners & WideImage::SIDE_TOP_LEFT || $corners & WideImage::SIDE_LEFT || $corners & WideImage::SIDE_TOP)
-					$result = $image->merge($corner, -1, -1, 100);
+					$result = $result->merge($corner, -1, -1, 100);
 				
 				$corner = $corner->rotate(90);
 				if ($corners & WideImage::SIDE_TOP_RIGHT || $corners & WideImage::SIDE_TOP || $corners & WideImage::SIDE_RIGHT)

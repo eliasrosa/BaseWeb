@@ -1,7 +1,7 @@
 <?php
 	/**
  * @author Gasper Kozak
- * @copyright 2007-2010
+ * @copyright 2007-2011
 
     This file is part of WideImage.
 		
@@ -108,7 +108,8 @@
 			$new = WideImage::createTrueColorImage($width, $height);
 			if ($this->isTransparent())
 				$new->copyTransparencyFrom($this);
-			imageCopy($new->getHandle(), $this->handle, 0, 0, 0, 0, $width, $height);
+			if (!imageCopy($new->getHandle(), $this->handle, 0, 0, 0, 0, $width, $height))
+				throw new WideImage_GDFunctionResultException("imagecopy() returned false");
 			return $new;
 		}
 		
