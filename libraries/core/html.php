@@ -34,7 +34,7 @@ class bwHtml
 
     function setDescription($value, $len = 160)
     {
-        $value = substr($value, 0, $len);
+        $value = bwUtil::truncate($value, $len);
         bwHtml::setMetaData('description', $value);
     }
 
