@@ -10,8 +10,8 @@ defined('BW') or die("Acesso negado!");
  * Todos os arquivos de imagens enviados(updados) ao servidor,
  * deverão estar com a seguinte estrutura de pastas:
  * 
- * /media/[componente]/[subcomponente]/[id].jpg
- * /cache/[componente]/[subcomponente]/[id]/files.jpg
+ * /[componente]/media/[subpasta]/[id].jpg
+ * /cache/[componente]/[subpasta]/[id]/files.jpg
  * 
  */
 
@@ -52,11 +52,11 @@ class bwImagem extends bwObject
     public function configurarCaminhos($com, $sub, $id)
     {
         // path arquivo original
-        $this->_pathFolder = BW_PATH_MEDIA . DS . $com . DS . $sub;
+        $this->_pathFolder = BW_PATH_COMPONENTS . DS . $com . DS . 'media' . DS . $sub;
         $this->_path = $this->_pathFolder . DS . $id . $this->_ext;
 
         // url arquivo original
-        $this->_urlFolder = BW_URL_MEDIA . '/' . $com . '/' . $sub;
+        $this->_urlFolder = BW_URL_COMPONENTS . '/' . $com . '/media/' . $sub;
         $this->_url = $this->_urlFolder . '/' . $id . $this->_ext;
 
         // path arquivo cache
@@ -75,7 +75,7 @@ class bwImagem extends bwObject
         if (!bwFile::exists($this->getPath()))
         {
             $this->_erro404 = true;
-            $this->configurarCaminhos('baseweb', 'imagens', 404);
+            $this->configurarCaminhos('sistema', 'imagens', 404);
         }
     }
 
@@ -151,7 +151,7 @@ class bwImagem extends bwObject
     function upload($nameInputFile = 'file', $ext = '/jpg/')
     {
         // remove o erro
-        $this->_erro404 = true;
+        $this->_erro404 = false;
 
         // configura/reseta com caminho orginais
         $this->configurarCaminhos($this->_com, $this->_sub, $this->_id);
@@ -160,7 +160,7 @@ class bwImagem extends bwObject
         if(!$_FILES[$nameInputFile]['size'] > 0)
             return;
 
-        // apaga o arquivo anterior
+        // apaga o arquivo anterior e o cache
         $this->remover();
 
         // envia o arquivo

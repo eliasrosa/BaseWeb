@@ -38,10 +38,10 @@ class bwPluginResizeImageHelper
     function _($tag)
     {
         $cache = bwCache::get($tag, 'resizeimage');
-
-        if (!$cache)
+        
+        if (!$cache || bwCore::getConfig()->getValue('cache.resizeimage'))
         {
-            
+        
             $file = bwPluginResizeImageHelper::getAttr($tag, 'href|src', false);
             $w = bwPluginResizeImageHelper::getAttr($tag, 'width', NULL);
             $h = bwPluginResizeImageHelper::getAttr($tag, 'height', NULL);
@@ -94,7 +94,9 @@ class bwPluginResizeImageHelper
                         }
                     }
 
-                    $cache = bwCache::set($tag, $newTag, 'resizeimage');
+                    // salva cache
+                    if(bwCore::getConfig()->getValue('cache.resizeimage'))
+                        $cache = bwCache::set($tag, $newTag, 'resizeimage');
 
                     return $newTag;
                 }
@@ -109,8 +111,6 @@ class bwPluginResizeImageHelper
 
     function resize($file, $w, $h, $f = 'inside', $s = 'any', $rule = false, $rule_params = NULL)
     {
-        //echo print_r(func_get_args(), 1);
-    
         $file_original = $file;
 
         // limpa o caminho, absoluto ou relativo
@@ -124,22 +124,24 @@ class bwPluginResizeImageHelper
         $file_type = strtolower(array_pop(explode('.', $file_nameFull)));
         $file_name = str_replace(".$file_type", '', $file_nameFull);
         $fileMedia = str_replace(BW_PATH_MEDIA . DS, '', $file);
+        $fileMedia = str_replace(BW_PATH_COMPONENTS . DS, '', $fileMedia);
         $fileMedia = str_replace(':', '', $fileMedia);
 
         // se a imagem original não existir ou for menor/igual que zero o seu tamanho
         if (!file_exists($file) || !filesize($file))
             return $file_original;
     
-        // instacia com a class/core
-        list($com, $sub, $file_nameFull) = explode(DS, $fileMedia);
-        
         // nome do arquivo de cache
         $cache_file_name = substr(sha1(print_r(func_get_args(), 1)), 0, 10) . '.' . $file_type;
         
+        //return count(explode(DS, $fileMedia));
+        
         // se a imagem for de algum componente/media
-        if(count(explode(DS, $fileMedia)) == 3)
+        if(count(explode(DS, $fileMedia)) == 4)
         {
-            $img = bwImagem::getInstance($com, $sub, basename($file));
+            // instacia com a class/core
+            list($com, $media, $sub, $file_nameFull) = explode(DS, $fileMedia);
+            $img = bwImagem::getInstance($com, $sub, bwFile::getName($file, false));
             
             // dados do cache
             $cache_file_url = $img->getUrlCacheFolder() . '/' . $cache_file_name;
@@ -157,7 +159,7 @@ class bwPluginResizeImageHelper
 
         // se a não existir, cria a pasta cache do arquivo
         if (!bwFolder::is($cache_folder_path))
-            bwFolder::create($cache_folder_path);   
+            bwFolder::create($cache_folder_path, 0774, true);   
 
         // se o arquivo cache não existir
         if (!bwFile::exists($cache_file_path))
@@ -184,7 +186,7 @@ class bwPluginResizeImageHelper
             // redimenciona a imagem
             $img = $img->resize($w, $h, $f, $s);
             
-            // verifiica se existe uma regra custimizada para esta imagem
+            // verifica se existe uma regra custimizada para esta imagem
             if($rule !== false)
             {
                 $rule_class = 'bwPluginResizeImageRule'.ucfirst(strtolower($rule));

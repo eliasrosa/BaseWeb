@@ -75,6 +75,7 @@ INSERT INTO `bw_configuracoes` (`var`, `value`, `default`, `tipo`, `params`, `ti
 ('core.adm.offline.mensagem', 'No momento o sistema está em manutenção, por favor aguarde!', 'No momento o sistema está em manutenção, por favor aguarde!', 'textarea', '', 'Modo off-line (mensagem)', 0, 0, 'Mensagem de aviso, caso o sistema esteja offline.'),
 ('core.adm.offline', '0', '0', 'bool', '', 'Modo off-line', 0, 0, 'Ativa/Desativa o modo offline, somente usuários do grupo de administradores poderão entrar o sistema.'),
 ('core.cache.url', '0', '0', 'bool', '', 'URL', 0, 0, 'Ativa/Desativa o cache das URL geradas pelo bwRouter.'),
+('core.cache.resizeimage', '1', '1', 'bool', '', 'Imagens', 0, 0, 'Ativa/Desativa o cache das URL geradas pelo Plugin ResizeImage.'),
 ('core.cache.configuracoes', '0', '0', 'bool', '', 'Configurações', 0, 0, 'Ativa/Desativa o cache das configurações cadastradas no banco de dados.'),
 ('core.cache.modulos', '0', '0', 'bool', '', 'Módulos', 0, 0, 'Ativa/Desativa o cache dos módulos do sistema.'),
 ('core.debug.status', '0', '0', 'bool', '', 'Status', 0, 0, 'Ativa/Desativa o debug no rodapé das páginas.'),
