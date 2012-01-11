@@ -63,6 +63,10 @@ class bwHtml
 
         // meta tags
         $head .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
+        $head .= '<meta http-equiv="Content-Language" content="pt-br, pt" />' . "\n";
+        $head .= '<meta name="rating" content="general">' . "\n";
+        $head .= '<meta name="generator" content="BaseWeb 2.0">' . "\n";
+        $head .= '<meta name="author" content="Elias da Rosa - http://www.eliasdarosa.com.br/">' . "\n";
 
         $meta = isset($GLOBALS['bw.html.meta']) && is_array($GLOBALS['bw.html.meta']) ? $GLOBALS['bw.html.meta'] : array();
         foreach ($meta as $k => $v)
