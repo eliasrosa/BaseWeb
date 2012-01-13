@@ -14,9 +14,6 @@ class bwComponent extends bwObject
     public function __construct()
     {
         parent::__construct();
-
-        // carrega as configurações do componente
-        $this->loadConfig();
     }
 
     public function getItemid()
@@ -265,70 +262,17 @@ class bwComponent extends bwObject
         return $r;
     }
     
-    function getConfig($var, $getCol = 'value')
-    {   
-        if(count($this->config))
-        {
-            return $this->config[$var][$getCol];
-        }
-    }
-
-    function setConfig($var, $value, $getCol = 'value')
-    {   
-        if(count($this->config))
-        {
-            return $this->config[$var][$getCol] = $value;
-        }
-    }    
-    
-    function saveConfig()
-    {   
-        $a = array();
-        $a[] = $this->configHead;
-        
-        if(count($this->config))
-        {
-            $a = array_merge($a, $this->config);
-        }
-        
-        $r = '';
-        foreach($a as $v)
-            $r .= bwUtil::array2csv($v);
-
-        bwFile::setConteudo($this->configFile, $r);
-        
-        return;
-    }   
-    
-    function loadConfig()
+    public function getConfig($prefix)
     {
-        $r = array();
-        $this->configFile = BW_PATH_COMPONENTS . DS . $this->id . DS . 'config.conf';
-        $this->configHead = array('var', 'value', 'default', 'tipo', 'params', 'titulo', 'protegido', 'oculto', 'desc');
-        
-        $csv = bwFile::getConteudo($this->configFile); 
-        $configs = bwUtil::csv2array($csv);
-
-        if(count($configs) > 1)
+        if(is_null($this->get('_config')))
         {
-            $h = $this->configHead;
-            unset($configs[0]);
-            
-            foreach($configs as $conf)
-            {
-                $i = array();
-                foreach($conf as $k=>$v)
-                {
-                    $i[$h[$k]] = $v;
-                }
-                $r[$conf[0]] = $i;
-            }
+            $c = new bwConfigDB();
+            $c->setPrefix('component.'.$this->id);
+
+            $this->set('_config', $c);
         }
-        else
-            $r = array();
 
-        $this->config = $r;
+        return $this->get('_config');
     }
-
 }
 ?>
