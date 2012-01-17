@@ -89,6 +89,27 @@ img.status { width: 20px; }
 
 
 
+/* bwGrid
+ ***************************************/
+.bwGrid { width: 100%; margin-bottom: 15px; position: relative; }
+.bwGrid table { width: 100%; margin: 10px 0; }
+.bwGrid table thead th { padding: 5px; background: #6688EE; font-size: 12px; font-weight: bold; color: #FFF; }
+.bwGrid table thead th.asc a { background: url(../img/orderby-asc.png) no-repeat 5px center; padding-left: 18px;  }
+.bwGrid table thead th.desc a { background: url(../img/orderby-desc.png) no-repeat 5px center; padding-left: 18px;  }
+.bwGrid table thead th a { color: #FFF; font-weight: bold; }
+.bwGrid table tbody tr td { padding: 5px; border-bottom: 1px solid #CCC; }
+.bwGrid table tbody tr.hover td { background: #E3E9FF; }
+.bwGrid .limit { width: 250px; float: left; }
+.bwGrid .resultados { width: 250px; float: left; }
+.bwGrid .busca { width: 350px; float: right; text-align: right; }
+.bwGrid .busca .text { width: 250px; font-size: 12px; border: 1px solid #CCC; margin-right: 10px; padding: 4px; }
+.bwGrid .busca .text:focus { background: #FFFFCC; }
+.bwGrid .busca .submit { width: 50px; border: none; padding: 3px; font-size: 12px; background: #6688EE; color: #FFF; }
+.bwGrid .paginacao { width: 380px; float: right; text-align: right; }
+.bwGrid .paginacao a { padding: 5px; margin: 3px; }
+
+
+
 /* Forms
  ***************************************/
 form { position: relative; }
@@ -121,7 +142,6 @@ form .campo.erro { background: #FFF; border: none; }
 form .campo.erro input { border: 1px solid #F33; }
 form .campo.erro select { border: 1px solid #F33; }
 form .campo.erro textarea { border: 1px solid #F33; }
-
 form .button.salvar { }
 form .button.remover { float: right; }
 
