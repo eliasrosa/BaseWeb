@@ -159,7 +159,7 @@ class bwPluginResizeImageHelper
 
         // se a não existir, cria a pasta cache do arquivo
         if (!bwFolder::is($cache_folder_path))
-            bwFolder::create($cache_folder_path, 0774, true);   
+            bwFolder::create($cache_folder_path, 0777, true);   
 
         // se o arquivo cache não existir
         if (!bwFile::exists($cache_file_path))
