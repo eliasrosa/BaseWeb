@@ -25,22 +25,26 @@
          * });
          */
         var defaults = {
-            container: '#cycle',    // Selector for element (ul) container (selector)
-            prev: '#cycle-prev',    // Selector to scroll previous (selector)
-            next: '#cycle-next',    // Selector to scroll next (selector)
-            speed: 500,             // Speed to scroll elements (int)
-            containerSize: false,   // Override default size (int, px)
-            show: 4,                // Items to show from the list (int)
-            start: false,           // Override the start with a defined value (int)
-            jumpTo: false,          // Selectors to use as jump list
-            vertical: false,        // Whether Scroll is for vertical
-            scrollCount: 1,         // How many elements to scroll when clicking next / prev,
-            element: "li",          // Element which is cycled. Update this and parent (selector)
-            parent: "ul"            // Parent element which contains the elements (selector)
+            container: '#cycle',        // Selector for element (ul) container (selector)
+            prev: '#cycle-prev',        // Selector to scroll previous (selector)
+            next: '#cycle-next',        // Selector to scroll next (selector)
+            speed: 500,                 // Speed to scroll elements (int)
+            containerSize: false,       // Override default size (int, px)
+            show: 4,                    // Items to show from the list (int)
+            start: false,               // Override the start with a defined value (int)
+            jumpTo: false,              // Selectors to use as jump list
+            vertical: false,            // Whether Scroll is for vertical
+            scrollCount: 1,             // How many elements to scroll when clicking next / prev,
+            element: "li",              // Element which is cycled. Update this and parent (selector)
+            parent: "ul",               // Parent element which contains the elements (selector)
+            
+            // by Elias da Rosa - http://www.eliasdarpsa.com.br
+            autoScroll: false,          // autoScroll
+            autoScrollInterval: 2500    // autoScroll
         };
         
         var opts = $.extend(defaults, opts);
-                
+
         return this.each(function() {
             var self = $(this);
             
@@ -196,6 +200,67 @@
                     e.preventDefault();
                 });
             }
+            
+            // autoScroll
+            if(opts.autoScroll){
+                
+                //
+                var autoScrollId = false;
+                var autoScrollDir = 'next';
+    
+                //
+                var autoScrollPlay = function(){
+                    if(!autoScrollId){
+                        autoScrollId = setInterval(function(){
+                            //console.log('ID:' + autoScrollId + ' | D:' + autoScrollDir + ' | L:' + lowerIndex +' | U:' + upperIndex + ' | M:' + maxIndex);
+    
+                            if(autoScrollDir == 'next' && upperIndex <= maxIndex){
+                                $(opts.next).click();
+                            }else{
+                                autoScrollDir = 'prev';
+
+                                if(autoScrollDir == 'prev' && lowerIndex != 0){
+                                    $(opts.prev).click();                            
+                                }else{
+                                    autoScrollDir = 'next';
+                                    $(opts.next).click();
+                                }
+                            }
+                                                    
+                        }, opts.autoScrollInterval);
+                    }
+                };
+                
+                //
+                var autoScrollStop = function(){
+                    clearInterval(autoScrollId);
+                    autoScrollId = false;
+                }; 
+                
+                //
+                self.mouseenter(function(){
+                    autoScrollStop();
+                });
+                
+                //
+                self.mouseleave(function(){
+                    autoScrollPlay();
+                });
+                
+                //
+                $(window).focus(function(){
+                    autoScrollPlay();
+                });
+
+                //
+                $(window).blur(function(){
+                    autoScrollStop();
+                });                
+                
+                //
+                autoScrollPlay();
+            }
+            
         }); 
     }
 })(jQuery);
