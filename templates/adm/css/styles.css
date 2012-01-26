@@ -138,7 +138,7 @@ form .campo select:focus { background: #FFFFCC; }
 form .campo input.radio { margin-right: 2px; border: none; }
 form .campo input.radio { margin-right: 2px; border: none; }
 form .campo p.erro { margin: 3px 0; margin-left: 155px; color: #FF0000; background: #FFF; border: none; padding: 0; }
-form .campo.erro { background: #FFF; border: none; }
+form .campo.erro { background: #FFF; border: none; padding: 0; }
 form .campo.erro input { border: 1px solid #F33; }
 form .campo.erro select { border: 1px solid #F33; }
 form .campo.erro textarea { border: 1px solid #F33; }
