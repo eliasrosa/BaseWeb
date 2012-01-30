@@ -183,7 +183,7 @@ class bwForm
 
         // get value
         $valueGet = bwRequest::getVar($config['campoName'], false, 'get');
-        if($config['value'] == '' && $valueGet !== false && !$this->isEdit)
+        if($config['value'] == '' && $valueGet !== false)
         {
             $config['value'] = $valueGet;
         }
