@@ -337,5 +337,17 @@ class bwUtil
         
         return($csv);
     }
+
+
+    
+    /**
+     * Verifica se a string é um e-mail
+     * ********************************************* */        
+    public function isEmail($string)
+    {
+        //return preg_match('/^([\w]+)(\.[\w]+)*@([\w\-]+)(\.[\w]{2,7})(\.[a-z]{2})?$/', $email);
+        return filter_var($string, FILTER_VALIDATE_EMAIL);
+    }    
+    
 }
 ?>
