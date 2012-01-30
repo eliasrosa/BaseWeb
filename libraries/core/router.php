@@ -26,11 +26,6 @@ class bwRouter
     {
         parse_str($query_string, $query);
 
-            //$_url = ;
-            //$_url_itemid = ;
-            //$_query_itemid = ;
-            //;
-        
         if(isset($query['itemid']) && $query['itemid'] > 0)
         {
             $url = bwMenu::getInstance()->getId($query['itemid']);
@@ -95,16 +90,9 @@ class bwRouter
         {
             $alias = array();
             $componentSegments = array();
-
-            $componentSegments[] = 'component';
             $componentSegments[] = $_query['com'];
             $componentSegments[] = $_query['view'];
-            ;
-
             $segments = array_merge($componentSegments, $segments);
-
-            $token = bwRouter::getToken($_query['com'], $_query['view']);
-            $_query[$token] = 1;
         }
 
         // se adm true
@@ -138,19 +126,6 @@ class bwRouter
             bwCache::set($url, $newUrl, 'url');
 
         return $newUrl;
-    }
-
-    function getToken($com, $view)
-    {
-        return sha1(sha1("/component/{$com}/{$view}.html?") . bwRequest::getToken() . '=1');
-    }
-
-    function checkToken($com, $view)
-    {
-        $token = bwRouter::getToken($com, $view);
-
-        if (!bwRequest::getVar($token, false, 'get'))
-            bwError::show("Token inválido!", "Acesso negado!");
     }
 
     function getAlias($itemid)
@@ -236,13 +211,6 @@ class bwRouter
                 bwRequest::setVar('view', $alias[2] . '.' . $alias[3]);
             }
         }
-        elseif ($alias[0] == 'component')
-        {
-            bwRouter::checkToken($alias[1], $alias[2]);
-
-            bwRequest::setVar('com', $alias[1]);
-            bwRequest::setVar('view', $alias[2]);
-        }
         else
         {
             // encontra o menu
@@ -286,7 +254,17 @@ class bwRouter
                     bwRouter::loadVarsMenus($itemid, $segments);
                 else
                     bwRouter::loadVarsMenus($lastMenu->id, $segments);
+                
+                return;
             }
+            
+            if(count($alias) == 2)
+            {
+                bwRequest::setVar('com', $alias[0]);
+                bwRequest::setVar('view', $alias[1]);
+                return;
+            }
+            
         }
 
         return;

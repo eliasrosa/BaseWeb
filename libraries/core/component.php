@@ -67,6 +67,10 @@ class bwComponent extends bwObject
         $com = ($com == '__bwRequest__') ? bwRequest::getVar('com', '') : $com;
         $file = BW_PATH_COMPONENTS . DS . $com . DS . 'index.php';
 
+        $custom = bwTemplate::getInstance()->getPathHtml() . DS . 'com_' . $com . DS . 'index.php';
+        if (bwFile::exists($custom) && !BW_ADM)
+            return $custom;
+
         if (bwFile::exists($file))
             return $file;
 
@@ -95,7 +99,7 @@ class bwComponent extends bwObject
             return $file;
 
         else
-            bwError::show("View '{$file}' não foi encontrado!");
+            bwError::show("<h3>Erro view:</h3>{$file} <strong>OU</strong><br />{$custom}");
     }
 
     function openById($table, $id)
