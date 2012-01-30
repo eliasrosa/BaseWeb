@@ -14,7 +14,7 @@ $form->addH2('Informações do usuário');
 $form->addInputID();
 $form->addInput('nome');
 
-$status = ($id != $login['id']) ? true : false;
+$status = ($id != $login->id) ? true : false;
 $form->addStatus('status', array('edit' => $status));
 
 $form->addH2('Informações do grupo');
@@ -38,7 +38,7 @@ $form->addInputsPassword('pass');
 $form->addBottonSalvar('usuarioSalvar');
 
 
-if($id != $login['id'])
+if($id != $login->id)
     $form->addBottonRemover('usuarioRemover');
 
 $form->show();

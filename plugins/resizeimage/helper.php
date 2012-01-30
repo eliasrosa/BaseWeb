@@ -37,7 +37,7 @@ class bwPluginResizeImageHelper
 
     function _($tag)
     {
-        $cache = bwCache::get($tag, 'resizeimage');
+        $cache = bwCache::get($tag, false);
         
         if (!$cache || bwCore::getConfig()->getValue('cache.resizeimage'))
         {
@@ -96,7 +96,7 @@ class bwPluginResizeImageHelper
 
                     // salva cache
                     if(bwCore::getConfig()->getValue('cache.resizeimage'))
-                        $cache = bwCache::set($tag, $newTag, 'resizeimage');
+                        $cache = bwCache::set($tag, $newTag);
 
                     return $newTag;
                 }

@@ -37,7 +37,6 @@ else
     $logo = BW_URL_LOGO;
 
 $logo = bwUtil::resizeImage("[image width='300' height='150' src='{$logo}']");
-
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -60,7 +59,6 @@ $logo = bwUtil::resizeImage("[image width='300' height='150' src='{$logo}']");
         <? if($login->mostrarMensagem()): ?>
             <p class="erro"><?= $login->mostrarMensagem(); ?></p>
         <? endif; ?>
-
         <form class="login" action="<?= BW_URL_ADM_LOGIN_FILE ?>" method="post">
             <label>Nome de usuário</label>
             <input type="input" class="txt user" name="user" title="Usuário" value="<?= bwRequest::getVar('user', ''); ?>" />
@@ -69,10 +67,19 @@ $logo = bwUtil::resizeImage("[image width='300' height='150' src='{$logo}']");
             <input type="password" class="txt pass" name="pass" title="Senha" value="" />
 
             <input type="submit" value="Entrar" />
-            <input type="hidden" name="redirect" value="<?= bwRequest::getVar('redirect', BW_URL_ADM); ?>" />               
+            <input type="hidden" name="redirect" value="<?= bwRequest::getVar('redirect', NULL); ?>" />               
             <input type="hidden" name="<?= bwRequest::getToken(); ?>" value="1" />              
         </form>
         
+        <?
+        if(bwCore::getConfig()->getValue('debug.status'))
+        {
+            echo base64_decode(bwRequest::getVar('redirect', NULL));
+            echo '<div style="text-align: left;">';
+            bwDebug::show();
+            echo '</div>';
+        }
+        ?>
     </body>
 </html>
 

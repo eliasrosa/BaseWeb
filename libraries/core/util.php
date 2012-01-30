@@ -349,5 +349,29 @@ class bwUtil
         return filter_var($string, FILTER_VALIDATE_EMAIL);
     }    
     
+
+    /**
+     * Convert Array para Object
+     * ********************************************* */  
+    function array2object($array) {
+        if(!is_array($array)) {
+            return $array;
+        }
+        
+        $object = new stdClass();
+        if (is_array($array) && count($array) > 0) {
+          foreach ($array as $name=>$value) {
+             $name = trim($name);
+             if (!empty($name)) {
+                $object->$name = bwUtil::array2object($value);
+             }
+          }
+          return $object;
+        }
+        else {
+          return FALSE;
+        }
+    }    
+    
 }
 ?>

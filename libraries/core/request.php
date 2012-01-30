@@ -4,7 +4,6 @@ defined('BW') or die("Acesso negado!");
 
 class bwRequest
 {
-
     static $request = array();
 
     function getAll()
@@ -27,20 +26,19 @@ class bwRequest
 
     function setVarTemp($n, $v)
     {
-        bwSession::set($n, $v, 'temp');
-
+        bwSession::set('tmp.'.$n, $v);
         return $v;
     }
 
-    function getVarTemp($n, $v = false)
+    function getVarTemp($n, $v = NULL)
     {
-        $value = bwSession::get($n, $v, 'temp');
-        bwSession::del($n, 'temp');
+        $value = bwSession::get('tmp.'.$n, $v);
+        bwSession::del('tmp.'.$n);
 
         return $value;
     }
 
-    function getVar($var, $default = null, $method = '', $type = 'string')
+    function getVar($var, $default = NULL, $method = '', $type = 'string')
     {
         if (isset(bwRequest::$request[$var]))
             return bwRequest::$request[$var];
@@ -55,8 +53,6 @@ class bwRequest
 
         else
             return $default;
-            
-        
     }
 
     function strip_magic_quotes($str)

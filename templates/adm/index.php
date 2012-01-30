@@ -31,9 +31,7 @@ defined('BW') or die("Acesso negado!");
     <body>
     
         <div id="page">
-                
-            <? if(bwLogin::getInstance()->isLogin()): ?>
-        
+
             <div id="top">
                 <h1><?= bwCore::getConfig()->getValue('site.titulo'); ?></h1>
                 <div><a href="<?= BW_URL_ADM_LOGOFF_FILE; ?>">Sair</a></div>
@@ -68,8 +66,6 @@ defined('BW') or die("Acesso negado!");
             <div id="rodape">
                 <p>BaseWeb 2.0 - Desenvolvido por Elias da Rosa - <a href="http://www.eliasdarosa.com.br" target="_blank">http://www.eliasdarosa.com.br</a></p>
             </div>
-            
-            <? endif; ?>
             
         </div>      
     </body>

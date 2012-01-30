@@ -30,7 +30,7 @@ class bwModule
             return '';
 
         $cacheID = "{$module}::" . print_r($params, 1);
-        $cache = bwCache::get($cacheID, 'mod');
+        $cache = bwCache::get($cacheID, false);
 
         // verifica se tem o mod custumizado no template
         $custom = bwTemplate::getInstance()->getPathHtml() . DS . 'mod_' . $module . DS . 'index.php';
@@ -69,7 +69,7 @@ class bwModule
         $html = ob_get_clean();
 
         if ($params['cache'])
-            bwCache::set($cacheID, $html, 'mod');
+            bwCache::set($cacheID, $html);
 
         return $html;
     }

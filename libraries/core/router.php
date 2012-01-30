@@ -51,7 +51,7 @@ class bwRouter
     {
         if (bwCore::getConfig()->getValue('cache.url') && $cached)
         {
-            $cache = bwCache::get($url, 'url');
+            $cache = bwCache::get($url, false);
             if ($cache)
                 return $cache;
         }
@@ -123,7 +123,7 @@ class bwRouter
         $newUrl = bwUtil::ampReplace($newUrl);
 
         if (bwCore::getConfig()->getValue('cache.url') && $cached)
-            bwCache::set($url, $newUrl, 'url');
+            bwCache::set($url, $newUrl);
 
         return $newUrl;
     }

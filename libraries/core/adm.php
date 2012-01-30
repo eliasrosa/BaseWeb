@@ -18,48 +18,14 @@ class bwAdm
         bwRequest::setVar('template', BW_ADM ? bwCore::getConfig()->getValue('adm.template') : bwCore::getConfig()->getValue('site.template'));
         define('BW_URL_TEMPLATE', BW_URL_TEMPLATES . '/' . bwRequest::getVar('template'));
 
-        // abre o adm sem efetuar login
-        // bwCore::init();
-        // exit();
-
         if (BW_ADM)
         {
             bwHtml::setTitle(bwCore::getConfig()->getValue('adm.titulo'));
+            bwLogin::getInstance()->restrito(true);
 
-            $urlEntrar = new bwUrl(BW_URL_ADM_LOGIN_FILE);
-            $urlEntrar->setVar('redirect', $urlAtual->toString());
-
-            if (!bwLogin::getInstance()->isLogin() && $urlAtual->getPath() != $urlEntrar->getPath())
-                header('Location: ' . $urlEntrar->toString());
-            else
-            {
-                $usuario = bwLogin::getInstance()->getSession();
-                $dql = Doctrine_Query::create()
-                                ->from('Usuario u')
-                                ->innerJoin('u.Grupo g')
-                                ->where('u.status = 1 AND u.id = ? AND u.user = ? AND u.pass = ? AND u.lastIp = ? AND u.lastSessionId = ? AND u.idgrupo = ?', array($usuario['id'], $usuario['user'], $usuario['pass'], $usuario['lastIp'], $usuario['lastSessionId'], $usuario['idgrupo']))
-                                ->fetchOne();
-
-                if (!$dql && $urlAtual->getPath() != $urlEntrar->getPath())
-                {
-                    header('Location: ' . $urlEntrar->toString());
-                    exit();
-                }
-
-                // update log
-                if ($dql)
-                {
-                    $dql->dataLastVisit = date("Y-m-d H:i:s");
-                    $dql->lastIp = $_SERVER['REMOTE_ADDR'];
-                    $dql->save();
-
-                    // session
-                    bwLogin::getInstance()->setSession($dql->toArray());
-                }
-
+            if(bwLogin::getInstance()->isLogin())
                 bwCore::init();
-            }
-
+            
             exit();
         }
     }
@@ -165,7 +131,5 @@ class bwAdm
 
         return $menu;
     }
-
-    
 }
 ?>

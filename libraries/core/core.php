@@ -21,6 +21,9 @@ class bwCore
 
     function init()
     {   
+        // inicia a session
+        bwSession::init();
+
         // verifica todas as licenças
         //bwLicense::getInstance()->verificarTodas();
 

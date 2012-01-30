@@ -183,8 +183,8 @@ class bwImagem extends bwObject
         // remove pasta cache do arquivo
         bwFolder::remove($this->getPathCacheFolder());
 
-        // limpa o cache da sessão
-        bwSession::set('resizeimage', false, 'cache');
+        // limpa o cache
+        bwCache::destroy();
     }
 
 }
