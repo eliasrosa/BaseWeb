@@ -3,40 +3,37 @@ defined('BW') or die("Acesso negado!");
 
 class bwCache
 {
+    static $name = 'bw.cache';
+
     function get($var, $default = NULL)
     {
-        $cache = bwSession::get('cache', array());
         $var = sha1($var);
-                
-        if(isset($cache[$var]))
-            return $cache[$var];
+        if(isset($_SESSION[bwCache::$name][$var]))
+            return base64_decode($_SESSION[bwCache::$name][$var]);
             
         return $default;
     }
 
     function set($var, $value)
-    {
-        $cache = bwSession::get('cache', array());
+    {        
         $var = sha1($var);
-        $cache[$var] = $value;
+        $_SESSION[bwCache::$name][$var] = base64_encode($value);
         
-        bwSession::set('cache', $cache);
         return $value;
     }
 
     function del($var)
     {
-        $cache = bwSession::get('cache', array());
         $var = sha1($var);
+        unset($_SESSION[bwCache::$name][$var]);
         
-        unset($cache[$var]);
-        
-        return bwSession::set('cache', $cache);
+        return;
     }
 
     function destroy()
     {
-        return bwSession::set('cache', array());
+        $_SESSION[bwCache::$name] = array();
+        return ;
     }
 }
 ?>
