@@ -3,68 +3,62 @@ defined('BW') or die("Acesso negado!");
 
 class bwGrid
 {
-    // parâmetro id
-    private $id = NULL; 
-
-    // parâmetro class
-    private $class = NULL; 
-
-    // colunas 
-    private $cols = array();
-
-    // buscas 
-    private $wheres = array();
-
-    // DQL Principal
-    private $dql = NUll;
- 
-    // limits permitidos
-    private $limits = array(10, 25, 50);
-
-    //
-    function __construct($id = NULL, $class = 'bwGrid')
-    {
-        $this->id = (is_null($id)) ? 'grid' : $id;
-        $this->class = $class;
-    }
+    private
+        $_id = NULL,
+        $_dql = NUll,
+        $_class = NULL,
+        $_cols = array(),
+        $_buscas = array(),
+        $_limits = array();
     
-    // pega var GET
-    function getVar($var, $default = NULL)
-    {
-        return bwRequest::getVar($this->getVarName($var), $default);
-    }
+    // paineis
+    var
+        $painelBuscar = true,
+        $painelLimit = true,
+        $painelPaginacao = true,
+        $painelResultados = true;
 
-    // pega nome da var GET
-    function getVarName($var)
+    // string / custom
+    var
+        $strBusca = 'Buscar',
+        $strLimits = 'Exibir %s registros por página',
+        $strResults = 'Exibindo %s de %s em %s registro%s';
+
+    // init()
+    function __construct($dql = NULL, $id = NULL, $class = 'bwGrid')
     {
-        return "{$this->id}_{$var}";
-    }
-    
-    // pega limit
-    function getLimit()
-    {
-        $i = (int) $this->getVar('limit', 0);
-        $i = (isset($this->limits[$i])) ? $i : 0;
+        $this->_id = $id;
+        $this->_class = $class;
+        $this->setLimits(array(10,25,50));
         
-        return $this->limits[$i];
+        if(!is_null($dql))
+            $this->setQuery($dql);
     }
-    
-    // seta limits ex: array(10, 25, 50, 100)
-    function setLimit($array)
+
+        
+    // set limits ex: array(10, 25, 50, 100)
+    function setLimits($limits, $painel = true)
     {
-        $this->limits = $array;
+        if(is_array($limits))
+            $this->_limits = $limits;
+        else
+            $this->_limits = array($limits);
+            
+        $this->painelLimit = $painel;
     }
+
 
     // seta query
     function setQuery(Doctrine_Query $dql)
     {
-        $this->dql = $dql;
+        $this->_dql = $dql;
     }
+
 
     // adiciona nova coluna
     function addCol($titulo, $order = NULL, $class = NULL, $width = NULL, $style = NULL)
     {
-        $this->cols[] = array(
+        $this->_cols[] = array(
             'titulo' => $titulo,
             'order' => $order,
             'class' => $class,
@@ -73,54 +67,98 @@ class bwGrid
         );
         
         if(!is_null($order))
-            $this->wheres[] = $order;
+            $this->_buscas[] = $order;
     }
+
 
     // adiciona campo de busca
     function addBusca()
     {
-        $args = func_get_args(); 
-        $this->wheres = array_merge($this->wheres, $args);
+        $args = func_get_args();
+        $this->_buscas = array_merge($this->_buscas, $args);
     }
 
-    //
-    private function executeDql()
+
+    // pega var GET
+    private function _getVar($var, $default = NULL)
     {
-        $query = $this->dql;
-        
-        // cria where
-        if(count($this->wheres))
-        {
-            $where = $this->wheres;
-            foreach($where as $k=>$w)
-                $where[$k] = "{$w} LIKE :busca";
-            
-            $busca = $this->getVar('buscar', '');
-            $query->addWhere(join(' OR ', $where), array(':busca' => "%{$busca}%"));
-        }
-        
-        $limit = $this->getLimit();
-        $paginaAtual = $this->getVar('pagina', 1);    
+        return bwRequest::getVar($this->_getVarName($var), $default);
+    }
+
+    // pega nome da var GET
+    private function _getVarName($var)
+    {
+        return "{$this->_id}_{$var}";
+    }
+
     
-        $ordercol = $this->getVar('ordercol', 0);
-        if(isset($this->cols[$ordercol]['order']))
+    // pega limit
+    private function _getLimit()
+    {
+        $i = (int) $this->_getVar('limit', 0);
+        $i = (isset($this->_limits[$i])) ? $i : 0;
+        
+        return $this->_limits[$i];
+    }
+
+
+    // adiciona a query de buscas
+    private function _addBusca()
+    {
+        $busca = $this->_getVar('buscar', false);
+        if(count($this->_buscas) && $this->painelBuscar && $busca)
         {
-            $dir = $this->getVar('orderdir');
-            $dir = ($dir == 'asc') ? 'ASC' : 'DESC';
-            $ord = $this->cols[$ordercol]['order'];
-            
-            $query->orderBy("{$ord} {$dir}");
+            $wheres = $params = array();
+            foreach($this->_buscas as $k=>$w)
+            {
+                $wheres[] = "{$w} LIKE ?";
+                $params[] = "%{$busca}%";
+            }
+            $this->_dql->addWhere(join(' OR ', $wheres), $params);
         }
+    }
 
+    
+    // adiciona a query ORDER BY
+    private function _addOrderBy()
+    {
+        $ordercol = $this->_getVar('ordercol', 0);
+        if(isset($this->_cols[$ordercol]['order']))
+        {
+            $dir = $this->_getVar('orderdir');
+            $dir = ($dir == 'asc') ? 'ASC' : 'DESC';
+            $ord = $this->_cols[$ordercol]['order'];
+            
+            $this->_dql->orderBy("{$ord} {$dir}");
+        }
+    }
+    
+
+    // executa a query
+    private function _executeQuery()
+    {
+        // modify DQL
+        $this->_addBusca();
+        $this->_addOrderBy();
+        
+        // debug / test
+        //echo $this->_dql->getSqlQuery();
+
+        // URL atual
         $url = new bwUrl();
-        $url->setVar($this->getVarName('pagina'), '{%page_number}');
+        $url->setVar($this->_getVarName('pagina'), '{%page_number}');
 
-        $this->pager = new Doctrine_Pager($query, $paginaAtual, $limit);
+        // pager
+        $this->pager = new Doctrine_Pager(
+            $this->_dql,
+            $this->_getVar('pagina', 1),
+            $this->_getLimit()
+        );
+        
+        // pager layout
         $this->pagerLayout = new Doctrine_Pager_Layout(
             $this->pager,
-            new Doctrine_Pager_Range_Sliding(array(
-                'chunk' => 5
-            )),
+            new Doctrine_Pager_Range_Sliding(array('chunk' => 5 )),
             $url->toString()
         );
 
@@ -129,12 +167,12 @@ class bwGrid
     }
     
     
-    //
+    // retorna o html
     function show($retorno = false)
     {
         // monta o head
         $h = '';
-        foreach($this->cols as $k=>$c)
+        foreach($this->_cols as $k=>$c)
         {
             $titulo = $c['titulo'];
             $class = !is_null($c['class']) ? " {$c['class']}" : "";
@@ -143,20 +181,20 @@ class bwGrid
             
             if(!is_null($c['order']))
             {
-                $dir = $this->getVar('orderdir');
+                $dir = $this->_getVar('orderdir');
                 $dirInvertido = ($dir == 'asc') ? 'desc' : 'asc';
              
                 $url = new bwUrl();
-                $url->delVar($this->getVarName('pagina'));
-                $url->setVar($this->getVarName('ordercol'), $k);
-                $url->setVar($this->getVarName('orderdir'), $dirInvertido);
+                $url->delVar($this->_getVarName('pagina'));
+                $url->setVar($this->_getVarName('ordercol'), $k);
+                $url->setVar($this->_getVarName('orderdir'), $dirInvertido);
                 
                 $titulo = sprintf('<a href="%s">%s</a>',
                     $url->toString(),
                     $titulo
                 );
 
-                if($this->getVar('ordercol') == $k)
+                if($this->_getVar('ordercol') == $k)
                     $class = " {$dir}{$class}";
             }
             
@@ -173,11 +211,11 @@ class bwGrid
         
         // monta o tbody
         $corpo .= '<tbody>';
-        $this->executeDql();
+        $this->_executeQuery();
         foreach($this->pager->execute() as $r)
         {
             $corpo .= '<tr>';
-            foreach($this->cols as $k => $c)
+            foreach($this->_cols as $k => $c)
             {
                 $class = !is_null($c['class']) ? " {$c['class']}" : "";
                 $width = !is_null($c['width']) ? " width=\"{$c['width']}\"" : "";
@@ -186,46 +224,58 @@ class bwGrid
                 $attr = "";
                 $attr = "class=\"col{$k}{$class}\"{$style}{$width}";
             
+                $func_name = "col{$k}";
+                
+                if(method_exists($this, $func_name))
+                    $conteudo = call_user_func(array($this, $func_name), $r);
+                else
+                {
+                    $id = is_null($this->_id) ? 'grid' : $this->_id;
+                    $conteudo = call_user_func("{$id}_{$func_name}", $r);
+                }
+            
                 $corpo .= sprintf('<td %s>%s</td>',
                     $attr,
-                    call_user_func("{$this->id}_col{$k}", $r)
+                    $conteudo
                 );
-            }            
+            }
             $corpo .= '</tr>';
         }
         $corpo .= '</tbody>';
         
         
-        // monta top
-        $select = '<select onchange="window.location.href=this.options[this.selectedIndex].value">';
-        foreach($this->limits as $k=>$l)
+        if($this->painelLimit)
         {
-            $url = new bwUrl();
-            $url->setVar($this->getVarName('pagina'), 1);
-            $url->setVar($this->getVarName('limit'), $k);
-            
-            $selected = ($this->getVar('limit', 0) == $k) ? ' selected="selected"' : '';
-            $select .= sprintf('<option value="%s"%s>%s</option>', $url->toString(), $selected, $l); 
+            // monta top
+            $select = '<select onchange="window.location.href=this.options[this.selectedIndex].value">';
+            foreach($this->_limits as $k=>$l)
+            {
+                $url = new bwUrl();
+                $url->setVar($this->_getVarName('pagina'), 1);
+                $url->setVar($this->_getVarName('limit'), $k);
+                
+                $selected = ($this->_getVar('limit', 0) == $k) ? ' selected="selected"' : '';
+                $select .= sprintf('<option value="%s"%s>%s</option>', $url->toString(), $selected, $l);
+            }
+            $select .= '</select>';
+            $top .= sprintf('<div class="limit">'.$this->strLimits.'</div>', $select);
         }
-        $select .= '</select>';
-        $top .= sprintf('<div class="limit">Exibir %s registros por página</div>', $select);
         
         // cria form de busca
-        if(count($this->wheres))
+        if(count($this->_buscas) && $this->painelBuscar)
         {
             $url = new bwUrl();
             $top .= sprintf('<form class="busca" method="get" action="%s">', $url->toString());
-            $top .= sprintf('<input class="text" type="text" name="%s" value="%s" />', $this->getVarName('buscar'), $this->getVar('buscar'));
-            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->getVarName('limit'), $this->getVar('limit', 0));
-            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->getVarName('ordercol'), $this->getVar('ordercol', 0));
-            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->getVarName('orderdir'), $this->getVar('orderdir', 'asc'));
-            $top .= '<input class="submit" type="submit" value="Buscar"/>';
-            $top .= '</form>';
+            $top .= sprintf('<input class="text" type="text" name="%s" value="%s" />', $this->_getVarName('buscar'), $this->_getVar('buscar'));
+            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->_getVarName('limit'), $this->_getVar('limit', 0));
+            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->_getVarName('ordercol'), $this->_getVar('ordercol', 0));
+            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->_getVarName('orderdir'), $this->_getVar('orderdir', 'asc'));
+            $top .= sprintf('<input class="submit" type="submit" value="%s"/></form>', $this->strBusca);
         }
 
         // monta rodape
         $rodape = '<div class="resultados">';
-        $rodape .= sprintf('Exibindo %s de %s em %s registro%s',
+        $rodape .= sprintf($this->strResults,
             $this->pager->getFirstIndice(),
             $this->pager->getLastIndice(),
             $this->pager->getNumResults(),
@@ -234,9 +284,9 @@ class bwGrid
         $rodape .= '</div>';
         $rodape .= '<div class="paginacao">';
         
+        //
         $url = new bwUrl();
-        
-        $url->setVar($this->getVarName('pagina'), $this->pager->getPreviousPage());
+        $url->setVar($this->_getVarName('pagina'), $this->pager->getPreviousPage());
         if($this->pager->getPage() > 1)
             $rodape .= sprintf('<a href="%s"><< Página anterior</a>', $url->toString());
         
@@ -244,17 +294,17 @@ class bwGrid
         $this->pagerLayout->display();
         $rodape .= ob_get_clean();
         
-        $url->setVar($this->getVarName('pagina'), $this->pager->getNextPage());
+        $url->setVar($this->_getVarName('pagina'), $this->pager->getNextPage());
         if($this->pager->getPage() != $this->pager->getLastPage())
             $rodape .= sprintf('<a href="%s">Próxima página >></a>', $url->toString());
         
         $rodape .= '</div>';
 
         // monta table
-        $class = !is_null($this->class) ? " class=\"{$this->class}\"" : '';
+        $class = !is_null($this->_class) ? " class=\"{$this->_class}\"" : '';
         $html = sprintf('<div%s id="%s">%s<br class="clearfix" /><table>%s</table>%s<br class="clearfix" /></div>',
             $class,
-            $this->id,
+            $this->_id,
             $top,
             $corpo,
             $rodape
