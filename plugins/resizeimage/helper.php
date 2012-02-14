@@ -193,7 +193,7 @@ class bwPluginResizeImageHelper
                 $rule_file = bwTemplate::getInstance()->getPath() . DS . 'rules' . DS . 'resize-image' . DS . strtolower($rule) . '.php';
                 if(bwFile::exists($rule_file))
                 {
-                    require($rule_file);
+                    require_once($rule_file);
                     $rule_object = new $rule_class();
                     $img = $rule_object->exec($img, $w, $h, $rule_params);
                 }    
