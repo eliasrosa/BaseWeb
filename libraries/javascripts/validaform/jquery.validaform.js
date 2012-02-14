@@ -20,13 +20,13 @@ jQuery.fn.extend({
             type: ''
         };
 
-		var form = $(this);
+        var form = $(this);
         var op = jQuery.extend(options, parametros);
-		
-		// evento para desabiidar as validação
-		$(form).bind("validaFormDisable", function(){
-			op.enabled = false;
-		});
+        
+        // evento para desabilitar as validação
+        $(form).bind("validaFormDisable", function(){
+            op.enabled = false;
+        });
 
         var caracterObrigatorio = '_';
         var camposErrados = new Array();
@@ -42,7 +42,7 @@ jQuery.fn.extend({
         var isObrigatorio = function(campo) {
             var rel = $(campo).attr('rel');
             var val = $(campo).val();
-			
+            
             if(rel.substr(rel.length -1) == caracterObrigatorio || val != ''){
                 return true;
             }
@@ -51,9 +51,12 @@ jQuery.fn.extend({
         };
 
         var validar = function(campo, exp) {
-            var  name = $(campo).attr('name');
+            var name = $(campo).attr('name');
+            var deft = $(campo).attr('default-value');
             var value = $(campo).val();
-            if(!exp.test(value)) camposErrados.push(campo);
+            if(!exp.test(value) || deft == value){
+                camposErrados.push(campo);
+            }
         };
 
         return this.each(function(){
@@ -132,7 +135,7 @@ jQuery.fn.extend({
                             break;
                             
                         case 'htmlSimples':
-							var _ID = 'nicedit_' + parseInt(Math.random() * 10000);
+                            var _ID = 'nicedit_' + parseInt(Math.random() * 10000);
                             $(this).attr('id', _ID);
                             new nicEditor().panelInstance(_ID);
                             break;
@@ -141,113 +144,111 @@ jQuery.fn.extend({
             }
 
             $(form).unbind("submit");
-            
             $(form).bind("submit", function(){
-				
-				if(op.enabled)
-				{
+                
+                if(op.enabled)
+                {
+                    camposErrados = new Array();
 
-					camposErrados = new Array();
+                    op.callstart.call(form);
 
-					op.callstart.call(form);
+                    // Busca todos os campos input text
+                    $(":input[rel]", form).each(function() {
 
-					// Busca todos os campos input text
-					$(":input[rel]", form).each(function() {
+                        switch (tipo(this)) {
 
-						switch (tipo(this)) {
+                            case 'email':
+                                if(isObrigatorio(this))
+                                    validar(this, /^([\w]+)(\.[\w]+)*@([\w\-]+)(\.[\w]{2,7})(\.[a-z]{2})?$/i);
+                                break;
 
-							case 'email':
-								if(isObrigatorio(this))
-									validar(this, /^([\w]+)(\.[\w]+)*@([\w\-]+)(\.[\w]{2,7})(\.[a-z]{2})?$/i);
-								break;
+                            case 'date':
+                                if(isObrigatorio(this))
+                                    validar(this, /^\d{2}\/\d{2}\/\d{4}$/);
+                                break;
 
-							case 'date':
-								if(isObrigatorio(this))
-									validar(this, /^\d{2}\/\d{2}\/\d{4}$/);
-								break;
+                            case 'datetime':
+                                if(isObrigatorio(this))
+                                    validar(this, /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+                                break;
 
-							case 'datetime':
-								if(isObrigatorio(this))
-									validar(this, /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
-								break;
+                            case 'htmlSimples':
+                                var $tm = $(this).parents('.editor');
+                                var html = $('.nicEdit-main', $tm).html();
+                                
+                                var text = html.replace(/<\/?[^>]+(>|$)/g, "");
+                                
+                                $('textarea', $tm).val(text);
+                            
+                                if(isObrigatorio(this))
+                                    validar(this, /\S+/);
+                    
+                                $('textarea', $tm).val(html);
+                                break;
 
-							case 'htmlSimples':
-								var $tm = $(this).parents('.editor');
-								var html = $('.nicEdit-main', $tm).html();
-								
-								var text = html.replace(/<\/?[^>]+(>|$)/g, "");
-								
-								$('textarea', $tm).val(text);
-							
-								if(isObrigatorio(this))
-									validar(this, /\S+/);
-					
-								$('textarea', $tm).val(html);
-								break;
+                            case 'text':
+                                if(isObrigatorio(this))
+                                    validar(this, /\S+/);
+                                break;
 
-							case 'text':
-								if(isObrigatorio(this))
-									validar(this, /\S+/);
-								break;
+                            case 'cpf':
+                                if(isObrigatorio(this))
+                                    validar(this, /^\d{3}\.\d{3}\.\d{3}\-\d{2}$/);
+                                break;
 
-							case 'cpf':
-								if(isObrigatorio(this))
-									validar(this, /^\d{3}\.\d{3}\.\d{3}\-\d{2}$/);
-								break;
+                            case 'cnpj':
+                                if(isObrigatorio(this))
+                                    validar(this, /^\d{2}.\d{3}\.\d{3}\/\d{4}\-\d{2}$/);
+                                break;
 
-							case 'cnpj':
-								if(isObrigatorio(this))
-									validar(this, /^\d{2}.\d{3}\.\d{3}\/\d{4}\-\d{2}$/);
-								break;
+                            case 'cep':
+                                if(isObrigatorio(this))
+                                    validar(this, /(^\d{5}-\d{3}$)/);
+                                break;
 
-							case 'cep':
-								if(isObrigatorio(this))
-									validar(this, /(^\d{5}-\d{3}$)/);
-								break;
+                            case 'phone':
+                                if(isObrigatorio(this))
+                                    validar(this, /^\(?\d{2}\)?[\s-]?\d{4}-?\d{4}$/);
+                                break;
 
-							case 'phone':
-								if(isObrigatorio(this))
-									validar(this, /^\(?\d{2}\)?[\s-]?\d{4}-?\d{4}$/);
-								break;
+                            case 'integer':
+                                //numero inteiro, negativo ou positivo
+                                if(isObrigatorio(this))
+                                    validar(this, /^-?\d+$/);
+                                break;
 
-							case 'integer':
-								//numero inteiro, negativo ou positivo
-								if(isObrigatorio(this))
-									validar(this, /^-?\d+$/);
-								break;
+                            case 'int':
+                                //numero inteiro, negativo ou positivo
+                                if(isObrigatorio(this))
+                                    validar(this, /^-?\d+$/);
+                                break;
 
-							case 'int':
-								//numero inteiro, negativo ou positivo
-								if(isObrigatorio(this))
-									validar(this, /^-?\d+$/);
-								break;
+                            case 'integerp':
+                                //numero inteiro, somente positivo
+                                if(isObrigatorio(this))
+                                    validar(this, /^\d+$/);
+                                break;
 
-							case 'integerp':
-								//numero inteiro, somente positivo
-								if(isObrigatorio(this))
-									validar(this, /^\d+$/);
-								break;
+                            case 'moeda':
+                                if(isObrigatorio(this))
+                                    validar(this, /^(\d{1,3})|(\.)(\,\d{2})$/);
+                                break;
 
-							case 'moeda':
-								if(isObrigatorio(this))
-									validar(this, /^(\d{1,3})|(\.)(\,\d{2})$/);
-								break;
+                            case 'float':
+                                if(isObrigatorio(this))
+                                    validar(this, /^((\d*)|(\d*\.\d{2}))$/);
+                                break;
 
-							case 'float':
-								if(isObrigatorio(this))
-									validar(this, /^((\d*)|(\d*\.\d{2}))$/);
-								break;
+                            case 'password':
+                                if(isObrigatorio(this))
+                                    validar(this, /\S{5}/);
+                                break;
 
-							case 'password':
-								if(isObrigatorio(this))
-									validar(this, /\S{5}/);
-								break;
+                        }
 
-						}
-
-					});
-				}
-				
+                    });
+                }
+                
                 //finalizando
                 if(camposErrados.length == 0 ){
 
@@ -288,7 +289,7 @@ jQuery.fn.extend({
                                     $.globalEval(resposta);
 
                                 op.success.call(form, resposta);
-								
+                                
                                 // limpa o formulário
                                 var form_id = $(form).attr('id');
                             //document.getElementById(form_id).reset();
