@@ -94,10 +94,10 @@ class bwLogin extends bwObject
                     if ($dql->Grupo->isAdm && $this->config->getValue('core.adm.offline'))
                         return $this->setMsg('adm.offline');
 
-                    // pega a session ID
-                    $dql->lastSessionId = bwSession::getToken();
-                    
                     // atualiza o banco
+                    $dql->lastSessionId = bwSession::getToken();
+                    $dql->dataLastVisit = bwUtil::dataNow();
+                    $dql->lastIp = bwUtil::getIpReal();
                     $dql->save();
                     
                     // salva session
@@ -210,7 +210,7 @@ class bwLogin extends bwObject
                 bwUtil::redirect($urlLogin->toString(), false);
             
             // dados da session
-            $ip = $_SERVER['REMOTE_ADDR'];
+            $ip = bwUtil::getIpReal();
             $session = bwSession::getToken();
             
             $dql = Doctrine_Query::create()
@@ -233,8 +233,6 @@ class bwLogin extends bwObject
             if ($dql)
             {
                 $dql->dataLastVisit = bwUtil::dataNow();
-                $dql->lastSessionId = $session;
-                $dql->lastIp = $ip;
                 $dql->save();
             }
         }    
