@@ -62,6 +62,14 @@ class bwHtml
     {
         $head = "\n";
 
+        // setDescription default
+        if(!isset($GLOBALS['bw.html.meta']['description']) || empty($GLOBALS['bw.html.meta']['description']))
+            bwHtml::setDescription(bwCore::getConfig()->getValue('seo.description'));
+                
+        // setKeywords
+        if(!isset($GLOBALS['bw.html.meta']['keywords']) || empty($GLOBALS['bw.html.meta']['keywords']))
+            bwHtml::setKeywords(bwCore::getConfig()->getValue('seo.keywords'));
+
         // meta tags
         $head .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
         $head .= '<meta http-equiv="Content-Language" content="pt-br, pt" />' . "\n";
@@ -88,9 +96,8 @@ class bwHtml
         else
             $tit = bwCore::getConfig()->getValue('site.titulo.formato');
 
-        // corrige deacordo com o formato
+        // corrige de acordo com o formato
         $tit = str_replace('%title%', bwCore::getConfig()->getValue('site.titulo'), $tit);
-
         $head .= "<title>{$tit}</title>\n";
 
         return $head;

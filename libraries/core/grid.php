@@ -11,26 +11,41 @@ class bwGrid
         $_buscas = array(),
         $_limits = array();
     
+    private
+        $_orderCol = NULL,
+        $_orderDir = NULL;
+    
     // paineis
     var
         $painelBuscar = true,
         $painelLimit = true,
         $painelPaginacao = true,
-        $painelResultados = true;
+        $painelResultados = true,
+        $limitDefault = 0,
+        $orderColDefault = 0,
+        $orderDirDefault = 'asc';
 
     // string / custom
     var
         $strBusca = 'Buscar',
         $strLimits = 'Exibir %s registros por página',
-        $strResults = 'Exibindo %s de %s em %s registro%s';
+        $strResults = 'Exibindo de %s a %s em %s registro%s',
+        $strResultsOff = 'Nenhum registro foi encontrado!';
 
     // init()
     function __construct($dql = NULL, $id = NULL, $class = 'bwGrid')
     {
+        //
         $this->_id = $id;
         $this->_class = $class;
         $this->setLimits(array(10,25,50));
-        
+
+        // get var request
+        $this->_orderCol = $this->_getVar('ordercol', $this->orderColDefault);
+        $this->_orderDir = $this->_getVar('orderdir', $this->orderDirDefault);
+        $this->_limit = $this->_getVar('limit', $this->limitDefault);
+          
+        //
         if(!is_null($dql))
             $this->setQuery($dql);
     }
@@ -82,8 +97,10 @@ class bwGrid
     // pega var GET
     private function _getVar($var, $default = NULL)
     {
-        return bwRequest::getVar($this->_getVarName($var), $default);
+        $value = bwRequest::getVar($this->_getVarName($var), $default);
+        return $value;
     }
+
 
     // pega nome da var GET
     private function _getVarName($var)
@@ -95,7 +112,7 @@ class bwGrid
     // pega limit
     private function _getLimit()
     {
-        $i = (int) $this->_getVar('limit', 0);
+        $i = (int) $this->_limit;
         $i = (isset($this->_limits[$i])) ? $i : 0;
         
         return $this->_limits[$i];
@@ -122,12 +139,10 @@ class bwGrid
     // adiciona a query ORDER BY
     private function _addOrderBy()
     {
-        $ordercol = $this->_getVar('ordercol', 0);
-        if(isset($this->_cols[$ordercol]['order']))
+        if(isset($this->_cols[$this->_orderCol]['order']))
         {
-            $dir = $this->_getVar('orderdir');
-            $dir = ($dir == 'asc') ? 'ASC' : 'DESC';
-            $ord = $this->_cols[$ordercol]['order'];
+            $dir = ($this->_orderDir == 'asc') ? 'ASC' : 'DESC';
+            $ord = $this->_cols[$this->_orderCol]['order'];
             
             $this->_dql->orderBy("{$ord} {$dir}");
         }
@@ -181,7 +196,7 @@ class bwGrid
             
             if(!is_null($c['order']))
             {
-                $dir = $this->_getVar('orderdir');
+                $dir = $this->_orderDir;
                 $dirInvertido = ($dir == 'asc') ? 'desc' : 'asc';
              
                 $url = new bwUrl();
@@ -194,7 +209,7 @@ class bwGrid
                     $titulo
                 );
 
-                if($this->_getVar('ordercol') == $k)
+                if($this->_orderCol == $k)
                     $class = " {$dir}{$class}";
             }
             
@@ -274,31 +289,45 @@ class bwGrid
         }
 
         // monta rodape
-        $rodape = '<div class="resultados">';
-        $rodape .= sprintf($this->strResults,
-            $this->pager->getFirstIndice(),
-            $this->pager->getLastIndice(),
-            $this->pager->getNumResults(),
-            ($this->pager->getNumResults() > 1) ? 's' : ''
-        );
-        $rodape .= '</div>';
-        $rodape .= '<div class="paginacao">';
-        
-        //
-        $url = new bwUrl();
-        $url->setVar($this->_getVarName('pagina'), $this->pager->getPreviousPage());
-        if($this->pager->getPage() > 1)
-            $rodape .= sprintf('<a href="%s"><< Página anterior</a>', $url->toString());
-        
-        ob_start();
-        $this->pagerLayout->display();
-        $rodape .= ob_get_clean();
-        
-        $url->setVar($this->_getVarName('pagina'), $this->pager->getNextPage());
-        if($this->pager->getPage() != $this->pager->getLastPage())
-            $rodape .= sprintf('<a href="%s">Próxima página >></a>', $url->toString());
-        
-        $rodape .= '</div>';
+        $rodape = '';
+        if($this->pager->getNumResults())
+        {
+            $rodape .= '<div class="resultados">';
+            $rodape .= sprintf($this->strResults,
+                $this->pager->getFirstIndice(),
+                $this->pager->getLastIndice(),
+                $this->pager->getNumResults(),
+                ($this->pager->getNumResults() > 1) ? 's' : ''
+            );
+            $rodape .= '</div>';
+
+            // paginação
+            if($this->pager->getLastPage() != 1)
+            {
+                $rodape .= '<div class="paginacao">';
+                
+                //
+                $url = new bwUrl();
+                $url->setVar($this->_getVarName('pagina'), $this->pager->getPreviousPage());
+                if($this->pager->getPage() > 1)
+                    $rodape .= sprintf('<a href="%s"><< Página anterior</a>', $url->toString());
+                
+                ob_start();
+                $this->pagerLayout->display();
+                $rodape .= ob_get_clean();
+                
+                $url->setVar($this->_getVarName('pagina'), $this->pager->getNextPage());
+                if($this->pager->getPage() != $this->pager->getLastPage())
+                    $rodape .= sprintf('<a href="%s">Próxima página >></a>', $url->toString());
+                
+                $rodape .= '</div>';
+            }
+
+        }
+        else
+        {
+            $rodape = $this->strResultsOff;
+        }
 
         // monta table
         $class = !is_null($this->_class) ? " class=\"{$this->_class}\"" : '';

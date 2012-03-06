@@ -12,6 +12,10 @@ $menu = array(
             'url' => 'adm.php?com=sistema&view=configuracoes&tab=core.adm',
             'tit' => 'Administração'
         ),
+        'core.seo' => array(
+            'url' => 'adm.php?com=sistema&view=configuracoes&tab=core.seo',
+            'tit' => 'SEO'
+        ),
         'plugins' => array(
             'url' => 'adm.php?com=sistema&view=configuracoes&tab=plugins',
             'tit' => 'Plugins'
