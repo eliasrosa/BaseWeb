@@ -632,7 +632,7 @@ class bwForm
     }   
 
     
-    function addInputsPassword($name)
+    function addInputsPassword($name = 'senha')
     {
         bwHtml::js('/passwordStrengthMeter.js', true);
 
@@ -658,6 +658,8 @@ class bwForm
             </script>";
 
             $this->addInput($name, 'password', array(
+                'findDB' => false,
+                'label' => 'Senha:',
                 'class' => 'w60 clearValOnSubimit',
                 'posInput' => "<span class=\"pass\"></span>"
             ));
