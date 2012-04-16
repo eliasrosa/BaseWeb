@@ -10,7 +10,8 @@ class bwPluginEditinsite
         if (preg_match_all('#.*{EDITINSITE (.*)}.*#', $buffer->getHtml(), $matches))
         {
             //print_r($matches);
-        
+            $login = bwLogin::getInstance();
+            
             foreach ($matches[1] as $file)
             {
                 // busca
@@ -18,10 +19,11 @@ class bwPluginEditinsite
                 $conteudo = bwEditInSite::getConteudo($fileFull);
                 $tipo = bwFile::getExt($file);
                 
+                
                 if(bwEditInSite::getPath($fileFull) !== false)
                 {
                     // verifica se esta logado                    
-                    if(bwLogin::getInstance()->isLogin())
+                    if($login->isLogin() && $login->getSession()->Grupo->isAdm)
                     {
                         bwHtml::css(BW_URL_JAVASCRIPTS . '/jquery/themes-1.8rc2/redmond/style.css');
                         bwHtml::js(BW_URL_JAVASCRIPTS . '/jquery/ui-1.8rc2.js');
