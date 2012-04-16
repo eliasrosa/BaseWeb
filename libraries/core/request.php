@@ -54,6 +54,16 @@ class bwRequest
         else
             return $default;
     }
+    
+    function getSafeVar($var, $customKey = NULL, $method = '')
+    {
+        $safeValue = bwRequest::getVar($var, NULL, $method);
+        
+        if(!is_null($safeValue))
+          return bwUtil::getSafeValue($safeValue, $customKey);
+        else
+          return NULL;
+    }
 
     function strip_magic_quotes($str)
     {

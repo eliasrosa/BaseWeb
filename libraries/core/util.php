@@ -5,6 +5,50 @@ defined('BW') or die("Acesso negado!");
 class bwUtil
 {
     /**
+     * Cria um valor visivel, mas seguro
+     * ********************************************* */
+    public function createSafeValue($value, $customKey = '', $randKey = NULL)
+    {    
+        //
+        if(is_null($randKey))
+            $randKey = strtoupper(substr(sha1(rand()), 0, 10));
+        
+        //
+        if(is_null($customKey))
+          $customKey = $randKey;
+  
+        //
+        $customKey = strtoupper(substr(sha1($customKey), 0, 10));
+        
+        
+        //
+        $sha1 = strtoupper(substr(sha1("SAFE::VALUE::$randKey::$value::$customKey"), 0, 10));
+        
+        //
+        $safeValue = sprintf('%s|%s|%s', $randKey, $sha1, $value);
+        
+       //echo "<br>Value: $value / Custom: $customKey / Rand: $randKey<br><br>";
+        //echo "$safeValue<br>";
+        
+        return $safeValue;
+    }
+    
+    
+    /**
+     * Pega o valor, se a chave for verdadeira
+     * retorna NULL caso a chave for false
+     * ********************************************* */
+    public function getSafeValue($safeValue, $customKey = NULL)
+    {
+        $a = explode('|', $safeValue);
+        $safeValue2 = bwUtil::createSafeValue($a[2], $customKey, $a[0]);
+
+        return ($safeValue == $safeValue2) ? $a[2] : NULL;
+    }
+    
+    
+
+    /**
      * Convert números BR para decimail para o MySql
      * Ex: 1.253,07 => 1253.07, 14.352 => 14352.00
      * ********************************************* */
