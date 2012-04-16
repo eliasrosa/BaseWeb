@@ -54,8 +54,8 @@ class Usuario extends bwRecord
             'primary' => false,
             'email' => true,
             'unique' => true,
-            'notnull' => true,
-            'notblank' => true,
+            'notnull' => false,
+            'notblank' => false,
             'autoincrement' => false,
         ));
         $this->hasColumn('user', 'string', 50, array(
