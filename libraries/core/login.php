@@ -213,6 +213,7 @@ class bwLogin extends bwObject
         
         if (!$this->isLogin() && $urlAtual->getPath() != $urlLogin->getPath())
         {
+            $this->sair();
             bwUtil::redirect($urlLogin->toString(), false);
         }    
         else
@@ -222,7 +223,10 @@ class bwLogin extends bwObject
 
             // mostra o login se o usuário tentar acessar o ADM e o grupo não for ADM
             if($isAdm && $u->Grupo->isAdm == 0)
-                bwUtil::redirect($urlLogin->toString(), false);
+            {
+              $this->sair();
+              bwUtil::redirect($urlLogin->toString(), false);
+            }
             
             // dados da session
             $ip = bwUtil::getIpReal();
@@ -242,7 +246,10 @@ class bwLogin extends bwObject
 
             //
             if (!$dql && $urlAtual->getPath() != $urlLogin->getPath())
+            {
+                $this->sair();
                 bwUtil::redirect($urlLogin->toString(), false);
+            }
 
             // update log
             if ($dql)
