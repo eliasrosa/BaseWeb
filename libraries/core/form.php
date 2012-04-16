@@ -47,7 +47,6 @@ class bwForm
         }
 
         // add hidden comuns
-        $this->addTask();
         $this->addToken();
         
         if($blockEdit && $this->isEdit)
@@ -379,7 +378,13 @@ class bwForm
             'form' => $this,
         ), $vars);      
         
-        $file = BW_PATH_COMPONENTS .DS. $com .DS. 'adm' .DS. 'views' .DS. $file;
+        
+        $custom = bwTemplate::getInstance()->getPathHtml() . DS . 'com_' . $com . DS . $file;
+        if(bwFile::exists($custom))
+            $file = $custom;
+        else
+            $file = BW_PATH_COMPONENTS .DS. $com .DS. 'adm' .DS. 'views' .DS. $file;
+        
         $this->html .= bwUtil::execPHP($file, $vars);
         
         return $this;
@@ -441,6 +446,8 @@ class bwForm
         if(!$this->blockEdit)
         {       
             $id = bwbutton::getId();
+            
+            $this->addTask();
         
             $this->html .= "
                 <a class=\"button submit salvar {$class}\" id=\"{$id}\">{$label}</a>
@@ -456,6 +463,18 @@ class bwForm
 
                     });
                 </script>\n";
+        }
+        
+        return $this;
+    }
+
+
+    function addSubmit($label = 'Salvar', $class = '')
+    {
+        if(!$this->blockEdit)
+        {   
+            $class = $class == '' ? '' : ' '.$class;
+            $this->html .= sprintf('<input value="%s" class="submit%s" type="submit" />', $label, $class);
         }
         
         return $this;
@@ -747,7 +766,7 @@ class bwForm
     }
     
     
-    function show()
+    function show($returnHtml = false)
     {
         $attr = '';
         foreach($this->formAttr as $a => $v)
@@ -759,7 +778,10 @@ class bwForm
         
         $this->createValidaForm();
         
-        echo $this->html;
+        if($returnHtml)
+          return $this->html;
+        else
+          echo $this->html;
     }
     
 
@@ -768,6 +790,8 @@ class bwForm
         if($this->isEdit && !$this->blockEdit)
         {
             $id = bwbutton::getId();
+            
+            $this->addTask();
 
             $this->html .= "
                 <a class=\"button remover\" id=\"{$id}\">{$nome}</a>
@@ -815,13 +839,11 @@ class bwForm
 
     function createValidaForm()
     {
-        $urlAtual = new bwUrl();
-        $urlAtual = $urlAtual->toString();
-        
         $this->html .= "
             <script type=\"text/javascript\">       
                 $(function() {
-                    var urlAtual = '{$urlAtual}'
+              
+                    var urlAtual = '{$this->formAttr['action']}'
                     var form = $('#{$this->formAttr['id']}');
                     $(form).validaForm({
                         upload: true,
