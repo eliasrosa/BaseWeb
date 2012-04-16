@@ -47,14 +47,10 @@ class bwComponent extends bwObject
         {
             ob_start();
 
-            echo '<div id="' . bwComponent::getTagID($com, $view) . '" class="component '.$com.'">';
-
             bwAdm::loadHead('2');
 
             require_once($cFile);
             require_once($vFile);
-
-            echo '</div>';
 
             $html = ob_get_clean();
         }
