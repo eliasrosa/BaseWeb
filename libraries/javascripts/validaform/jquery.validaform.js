@@ -231,7 +231,7 @@ jQuery.fn.extend({
 
                             case 'moeda':
                                 if(isObrigatorio(this))
-                                    validar(this, /^(\d{1,3})|(\.)(\,\d{2})$/);
+                                    validar(this, /^(\-)?(\d{1,3})|(\.)(\,\d{2})$/);
                                 break;
 
                             case 'float':

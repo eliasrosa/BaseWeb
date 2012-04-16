@@ -149,6 +149,7 @@ class bwComponent extends bwObject
             'upload' => 'Houve um erro ao tenta enviar o arquivo!',
             'nospace' => 'O valor não de conter espaços em branco!',
             'alias' => 'O valor informado não deve conter caracteres especiais!',
+            'notbezeroorsmaller' => 'O valor informado deve ser maior que zero!',
         );
 
         if ($isErros)

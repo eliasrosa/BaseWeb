@@ -5,6 +5,30 @@ defined('BW') or die("Acesso negado!");
 class bwUtil
 {
     /**
+     * Convert números BR para decimail para o MySql
+     * Ex: 1.253,07 => 1253.07, 14.352 => 14352.00
+     * ********************************************* */
+    public function stringToDecimal($str, $casas_decimais = 2)
+    {
+        $v = (float) str_replace(',', '.', str_replace('.', '', $str));
+        $v = number_format($v, $casas_decimais, '.', '');
+        
+        return $v;
+    }
+
+
+    /**
+     * Convert números float para formato R$ 0,00
+     * Ex: 1253.07 => 1.253,07, 14352.00 => 14.352,00
+     * ********************************************* */
+    public function floatToString($float, $casas_decimais = 2)
+    {
+        $v = number_format($float, $casas_decimais, ',', '.');
+        return $v;
+    }
+
+
+    /**
      * Converte acentos de uma string para html
      * ********************************************* */
     public function acentos2Html($str)

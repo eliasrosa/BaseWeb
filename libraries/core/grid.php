@@ -282,10 +282,20 @@ class bwGrid
             $url = new bwUrl();
             $top .= sprintf('<form class="busca" method="get" action="%s">', $url->toString());
             $top .= sprintf('<input class="text" type="text" name="%s" value="%s" />', $this->_getVarName('buscar'), $this->_getVar('buscar'));
-            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->_getVarName('limit'), $this->_getVar('limit', 0));
-            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->_getVarName('ordercol'), $this->_getVar('ordercol', 0));
-            $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $this->_getVarName('orderdir'), $this->_getVar('orderdir', 'asc'));
-            $top .= sprintf('<input class="submit" type="submit" value="%s"/></form>', $this->strBusca);
+
+            // apaga, para não repitir
+            $url->delVar($this->_getVarName('buscar'));
+
+            if(count($url->getQuery(true)))
+            {
+              foreach($url->getQuery(true) as $k => $v)
+              {
+                $top .= sprintf('<input type="hidden" name="%s" value="%s" />', $k, $v);
+              }
+            }
+            
+            $top .= sprintf('<input class="submit" type="submit" value="%s"/>', $this->strBusca);
+            $top .= sprintf('</form>');
         }
 
         // monta rodape
