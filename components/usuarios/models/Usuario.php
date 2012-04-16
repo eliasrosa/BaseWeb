@@ -128,11 +128,6 @@ class Usuario extends bwRecord
             'local' => 'idgrupo',
             'foreign' => 'id'
         ));
-
-        $this->hasMany('NewsletterEnvio as Envios', array(
-            'local' => 'id',
-            'foreign' => 'id_usuario'
-        ));
     }
 
 }
