@@ -156,9 +156,9 @@ class bwUtil
         @list($data, $hora) = explode(' ', $data);
 
         if (strpos($data, "/") === false)
-            $data = join("/", array_reverse(split("-", $data)));
+            $data = join("/", array_reverse(explode("-", $data)));
         else
-            $data = join("-", array_reverse(split("/", $data)));
+            $data = join("-", array_reverse(explode("/", $data)));
 
         if ($hora && $h)
             return "{$data} {$hora}";
