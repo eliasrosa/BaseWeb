@@ -189,12 +189,27 @@ class bwLogin extends bwObject
         return $this->mensagens[$this->mensagemID];
     }
 
+
+    // retorna o id do usuario logado
+    public function getId()
+    {
+        $session = $this->getSession();
+        $id = $session !== false ? $session->id : 0;
+        
+        return $id;
+    }
+
     //
-    function restrito($isAdm = false)
+    function restrito($isAdm = false, $loginUrl = NULL, $activeRedirect = true)
     {
         $urlAtual = new bwUrl();
-        $urlLogin = new bwUrl(BW_URL_ADM_LOGIN_FILE);
-        $urlLogin->setVar('redirect', $urlAtual->toBase64());
+        
+        // url login
+        $loginUrl = is_null($loginUrl) ? BW_URL_ADM_LOGIN_FILE : $loginUrl;
+        $urlLogin = new bwUrl($loginUrl);
+        
+        if($activeRedirect)
+          $urlLogin->setVar('redirect', $urlAtual->toBase64());
         
         if (!$this->isLogin() && $urlAtual->getPath() != $urlLogin->getPath())
         {
