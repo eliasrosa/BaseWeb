@@ -42,7 +42,7 @@ defined('BW') or die("Acesso negado!");
             <div id="menu">
             <?   
                 $com = bwRequest::getVar('com', '');
-                foreach(bwComponent::getInstance()->getAll() as $c)
+                foreach(bwComponent::getAll() as $c)
                 {
                     if($c['adm_visivel'])
                     {
