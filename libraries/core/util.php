@@ -14,21 +14,13 @@ class bwUtil
             $randKey = strtoupper(substr(sha1(rand()), 0, 10));
         
         //
-        if(is_null($customKey))
-          $customKey = $randKey;
-  
-        //
-        $customKey = strtoupper(substr(sha1($customKey), 0, 10));
-        
-        
+        $customKey = strtoupper(sha1($customKey));
+
         //
         $sha1 = strtoupper(substr(sha1("SAFE::VALUE::$randKey::$value::$customKey"), 0, 10));
         
         //
         $safeValue = sprintf('%s|%s|%s', $randKey, $sha1, $value);
-        
-       //echo "<br>Value: $value / Custom: $customKey / Rand: $randKey<br><br>";
-        //echo "$safeValue<br>";
         
         return $safeValue;
     }
@@ -42,7 +34,11 @@ class bwUtil
     {
         $a = explode('|', $safeValue);
         $safeValue2 = bwUtil::createSafeValue($a[2], $customKey, $a[0]);
-
+      
+        //echo "$safeValue<br>$safeValue2";
+        //var_dump($safeValue == $safeValue2); // ? $a[2] : NULL;
+        
+        //
         return ($safeValue == $safeValue2) ? $a[2] : NULL;
     }
     
