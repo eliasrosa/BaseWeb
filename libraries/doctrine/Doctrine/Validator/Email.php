@@ -9,6 +9,6 @@ class Doctrine_Validator_Email extends Doctrine_Validator_Driver
             return true;
         }
 
-        return filter_var($value, FILTER_VALIDATE_EMAIL);
+        return bwUtil::isEmail($value);
     }
 }

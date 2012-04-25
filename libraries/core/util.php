@@ -405,12 +405,12 @@ class bwUtil
 
     
     /**
-     * Verifica se a string é um e-mail
+     * Verifica se a string é um e-mail válido
      * ********************************************* */        
     public function isEmail($string)
     {
-        //return preg_match('/^([\w]+)(\.[\w]+)*@([\w\-]+)(\.[\w]{2,7})(\.[a-z]{2})?$/', $email);
-        return filter_var($string, FILTER_VALIDATE_EMAIL);
+        return preg_match('#^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@(([0-9a-zA-Z])+([-\w]*[0-9a-zA-Z])*\.)+[a-zA-Z]{2,9})$#', $string);
+        //return filter_var($string, FILTER_VALIDATE_EMAIL);
     }    
     
 
