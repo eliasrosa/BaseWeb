@@ -29,12 +29,8 @@ class bwUsuarios extends bwComponent
 
         // POST
         $id = (int) $dados['id'];
-        $pass1 = $dados['pass'];
+        $pass1 = bwRequest::getVar('pass', '', 'post');
         $pass2 = bwRequest::getVar('pass2', '', 'post');
-
-        // remove senha is empty
-        if ($pass1 == '')
-            unset($dados['pass']);
 
         // onInsert
         if (!$id)
