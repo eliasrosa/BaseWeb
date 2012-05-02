@@ -159,7 +159,7 @@ jQuery.fn.extend({
 
                             case 'email':
                                 if(isObrigatorio(this))
-                                    validar(this, /^([\w]+)(\.[\w]+)*@([\w\-]+)(\.[\w]{2,7})(\.[a-z]{2})?$/i);
+                                    validar(this, /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@(([0-9a-zA-Z])+([-\w]*[0-9a-zA-Z])*\.)+[a-zA-Z]{2,9})$/i);
                                 break;
 
                             case 'date':
