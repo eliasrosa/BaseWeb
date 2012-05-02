@@ -4,6 +4,8 @@ ini_set("display_errors", 1);
 
 defined('BW') or die("Acesso negado!");
 
+// set locate
+date_default_timezone_set('America/Sao_Paulo');
 
 // PATH
 define('BW_PATH_CACHE', BW_PATH .DS. 'cache');
