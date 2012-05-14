@@ -215,6 +215,28 @@ class bwUtil
     }
 
     /**
+     * Converte a data para o formato do mysql
+     * retorna false em caso de erro
+     * ********************************************* */
+    function dataToMysql($data)
+    {    
+      if (preg_match('#^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$#', $data))
+        return bwUtil::data($data, true);
+
+      elseif(preg_match('#^\d{2}\/\d{2}\/\d{4}$#', $data))
+        return bwUtil::data($data, false);
+
+      elseif(preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $data))
+        return $data;
+
+      elseif(preg_match('#^\d{4}-\d{2}-\d{2}$#', $data))
+        return $data;
+        
+      else
+        return false;
+    }
+
+    /**
      * Remove códigos Html da string
      * ********************************************* */
     public function removeHtml($s)
