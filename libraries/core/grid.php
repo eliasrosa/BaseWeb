@@ -93,6 +93,12 @@ class bwGrid
         $this->_buscas = array_merge($this->_buscas, $args);
     }
 
+    // remove campo de busca
+    function removeBusca($col)
+    {
+        unset($this->_buscas[$col]);
+    }
+
 
     // pega var GET
     private function _getVar($var, $default = NULL)
