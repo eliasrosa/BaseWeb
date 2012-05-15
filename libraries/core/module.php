@@ -12,16 +12,15 @@ class bwModule
 
         // parametros
         $params = array_merge(array(
-                    'cache' => bwCore::getConfig()->getValue('cache.modulos'),
-                    'visualizar' => array(),
-                    'naoVisualizar' => array()
-                        ), $params);
+            'cache' => bwCore::getConfig()->getValue('cache.modulos'),
+            'visualizar' => array(),
+            'naoVisualizar' => array()
+            ), $params);
 
 
         // se o parametro visualizar estiver vazio
         // o modulo será visivel para todos os itens de menu
-        if (count($params['visualizar']))
-        {
+        if (count($params['visualizar'])) {
             if (!in_array($itemid, $params['visualizar']))
                 return '';
         }
@@ -34,13 +33,10 @@ class bwModule
 
         // verifica se tem o mod custumizado no template
         $custom = bwTemplate::getInstance()->getPathHtml() . DS . 'mod_' . $module . DS . 'index.php';
-        if (bwFile::exists($custom))
-        {
+        if (bwFile::exists($custom)) {
             $path = bwTemplate::getInstance()->getPathHtml() . DS . 'mod_' . $module;
             $url = bwTemplate::getInstance()->getUrlHtml() . '/mod_' . $module;
-        }
-        else
-        {
+        } else {
             $path = BW_PATH_MODULOS . DS . $module;
             $url = BW_URL_MODULOS . '/' . $module;
         }
@@ -78,5 +74,7 @@ class bwModule
     {
         bwBuffer::getInstance()->addModule($pos, $mod, $params);
     }
+
 }
+
 ?>

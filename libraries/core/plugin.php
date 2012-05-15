@@ -52,5 +52,7 @@ class bwPlugin
         if (is_callable($f))
             call_user_func_array($f, array());
     }
+
 }
+
 ?>

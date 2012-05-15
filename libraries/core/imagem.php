@@ -17,6 +17,7 @@ defined('BW') or die("Acesso negado!");
 
 class bwImagem extends bwObject
 {
+
     // basico
     private $_com = null;
     private $_sub = null;
@@ -72,8 +73,7 @@ class bwImagem extends bwObject
 
     private function _checkExists()
     {
-        if (!bwFile::exists($this->getPath()))
-        {
+        if (!bwFile::exists($this->getPath())) {
             $this->_erro404 = true;
             $this->configurarCaminhos('sistema', 'imagens', 404);
         }
@@ -96,7 +96,6 @@ class bwImagem extends bwObject
         return $instance;
     }
 
-
     function getUrlResize($params)
     {
         parse_str($params, $dados);
@@ -105,14 +104,9 @@ class bwImagem extends bwObject
             'width' => null,
             'fit' => 'inside',
             'scale' => 'any',
-        ), $dados);
+            ), $dados);
 
-        $tag = sprintf("[image src='%s' height='%s' width='%s' fit='%s' scale='%s']",
-                $this->getUrl(),
-                $dados['height'],
-                $dados['width'],
-                $dados['fit'],
-                $dados['scale']
+        $tag = sprintf("[image src='%s' height='%s' width='%s' fit='%s' scale='%s']", $this->getUrl(), $dados['height'], $dados['width'], $dados['fit'], $dados['scale']
         );
 
         return bwUtil::resizeImage($tag);
@@ -155,9 +149,9 @@ class bwImagem extends bwObject
 
         // configura/reseta com caminho orginais
         $this->configurarCaminhos($this->_com, $this->_sub, $this->_id);
-        
+
         // verifica se existe novo upload
-        if(!$_FILES[$nameInputFile]['size'] > 0)
+        if (!$_FILES[$nameInputFile]['size'] > 0)
             return;
 
         // apaga o arquivo anterior e o cache
@@ -165,13 +159,12 @@ class bwImagem extends bwObject
 
         // envia o arquivo
         bwFile::upload($nameInputFile, $this->getPath(), array('ext.permitidas' => $ext));
-
     }
 
     function remover()
     {
         // verifica se a imagem e existe e se não é a imagem 404
-        if(bwFile::exists($this->getPath()) && !$this->isError404())
+        if (bwFile::exists($this->getPath()) && !$this->isError404())
             bwFile::remove($this->getPath());
 
         // limpar cache
@@ -188,4 +181,5 @@ class bwImagem extends bwObject
     }
 
 }
+
 ?>

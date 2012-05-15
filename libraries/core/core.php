@@ -4,11 +4,12 @@ defined('BW') or die("Acesso negado!");
 
 class bwCore
 {
+
     function getConexao()
     {
-        return Doctrine_Manager::getInstance()->getConnection('default');    
+        return Doctrine_Manager::getInstance()->getConnection('default');
     }
-    
+
     function __construct()
     {
         header('content-type: text/html; charset: utf-8');
@@ -20,13 +21,12 @@ class bwCore
     }
 
     function init()
-    {   
+    {
         // inicia a session
         bwSession::init();
 
         // verifica todas as licenças
         //bwLicense::getInstance()->verificarTodas();
-
         // modo offline
         if (bwCore::getConfig()->getValue('site.offline') && !bwLogin::getInstance()->isLogin())
             bwUtil::redirect(BW_URL_ADM_LOGIN);
@@ -66,8 +66,8 @@ class bwCore
 
         // mostra o debug
         bwDebug::getInstance()->show();
-    }   
-    
+    }
+
     public function getConfig()
     {
         // config
@@ -78,4 +78,5 @@ class bwCore
     }
 
 }
+
 ?>

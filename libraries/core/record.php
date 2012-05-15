@@ -4,13 +4,13 @@ defined('BW') or die("Acesso negado!");
 
 class bwRecord extends Doctrine_Record
 {
+
     public function postSave(Doctrine_Event $event)
     {
         // executa função herdada
         parent::postSave($event);
 
-        if (isset($event->getInvoker()->id))
-        {
+        if (isset($event->getInvoker()->id)) {
             // prega os dados
             $record = $this->getTable()->find($event->getInvoker()->id);
 
@@ -50,10 +50,11 @@ class bwRecord extends Doctrine_Record
      * Funções para o bwImagem
      *
      */
+
     private $_bwImagem = false;
     private $_bwImagemCom = null;
     private $_bwImagemSub = null;
-    
+
     public function setBwImagem($com, $sub)
     {
         $this->_bwImagem = true;
@@ -62,4 +63,5 @@ class bwRecord extends Doctrine_Record
     }
 
 }
+
 ?>

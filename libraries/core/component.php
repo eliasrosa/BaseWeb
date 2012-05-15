@@ -4,12 +4,13 @@ defined('BW') or die("Acesso negado!");
 
 class bwComponent extends bwObject
 {
+
     var $id = '';
     var $nome = '';
     var $versao = 0;
     var $adm_url_default = 'adm.php?com=xxxx&view=yyyy';
-    var $adm_visivel = true;  
-    
+    var $adm_visivel = true;
+
     //
     public function __construct()
     {
@@ -43,8 +44,7 @@ class bwComponent extends bwObject
         $cFile = bwComponent::check($com);
         $vFile = bwComponent::checkView($com, $view);
 
-        if ($cFile && $vFile)
-        {
+        if ($cFile && $vFile) {
             ob_start();
 
             bwAdm::loadHead('2');
@@ -113,21 +113,18 @@ class bwComponent extends bwObject
     function retorno($db, $retorno = array())
     {
         $retorno = array_merge(array(
-                    'retorno' => true,
-                    'redirect' => false,
-                    'labels' => array(),
-                    'camposErros' => array(),
-                        ), $retorno);
+            'retorno' => true,
+            'redirect' => false,
+            'labels' => array(),
+            'camposErros' => array(),
+            ), $retorno);
 
 
-        if (is_bool($db) && !$db && count($retorno['camposErros']))
-        {
+        if (is_bool($db) && !$db && count($retorno['camposErros'])) {
             $dados = array();
             $erros = array();
             $isErros = (!$retorno['retorno'] || count($retorno['camposErros'])) ? true : false;
-        }
-        else
-        {
+        } else {
             $dados = count($db->toArray()) ? $db->toArray() : array();
             $erros = $db->getErrorStack();
             $retorno['labels'] = $db->labels;
@@ -148,35 +145,27 @@ class bwComponent extends bwObject
             'notbezeroorsmaller' => 'O valor informado deve ser maior que zero!',
         );
 
-        if ($isErros)
-        {
+        if ($isErros) {
             $msg = "Os seguintes campos devem ser preenchidos corretamente:\n";
-            foreach ($erros as $campo => $errorCodes)
-            {
-                foreach ($errorCodes as $code)
-                {
+            foreach ($erros as $campo => $errorCodes) {
+                foreach ($errorCodes as $code) {
                     $codeMsg = isset($errosMsg[$code]) ? $errosMsg[$code] : $code;
                     $camposErros[$campo][] = $codeMsg;
                 }
             }
 
-            foreach ($retorno['camposErros'] as $campo => $errorCodes)
-            {
-                foreach ($errorCodes as $code)
-                {
+            foreach ($retorno['camposErros'] as $campo => $errorCodes) {
+                foreach ($errorCodes as $code) {
                     $codeMsg = isset($errosMsg[$code]) ? $errosMsg[$code] : $code;
                     $camposErros[$campo][] = $codeMsg;
                 }
             }
 
             //  print_r($retorno);
-            foreach ($camposErros as $k => $v)
-            {
+            foreach ($camposErros as $k => $v) {
                 $msg .= "\n- " . $retorno['labels'][$k];
             }
-        }
-        else
-        {
+        } else {
             $msg = 'Solicitação concluída com sucesso!';
         }
 
@@ -195,19 +184,15 @@ class bwComponent extends bwObject
     {
         $tb = Doctrine::getTable($table);
 
-        if (isset($dados[$primary]) && $dados[$primary])
-        {
+        if (isset($dados[$primary]) && $dados[$primary]) {
             $pc = $tb->find($dados[$primary]);
             $edit = $dados[$primary];
-        }
-        else
-        {
+        } else {
             $pc = $tb->create();
             $edit = false;
         }
 
-        try
-        {
+        try {
             unset($dados[$primary]);
             $pc->fromArray($dados);
 
@@ -218,14 +203,12 @@ class bwComponent extends bwObject
             $pc->save();
 
             $pc = $edit ? $pc : $tb->find($pc->$primary);
-        } catch (Doctrine_Validator_Exception $e)
-        {
+        } catch (Doctrine_Validator_Exception $e) {
             
         }
 
         return $pc;
     }
-
 
     function remover($table, $dados = array(), $primary = 'id', $rel = array())
     {
@@ -237,43 +220,41 @@ class bwComponent extends bwObject
             $db->unlink($alias, array(), true);
 
         $db->delete();
-        
+
         return $db;
     }
-
 
     function getAll()
     {
         $r = array();
         $components = bwFolder::listarConteudo(BW_PATH_COMPONENTS, false, true, false, false);
         sort($components);
-        
-        foreach($components as $com)
-        {
-            $file = BW_PATH_COMPONENTS .DS. $com . DS . 'api.php';
-            if(bwFile::exists($file))
-            {
-                $class = 'bw'.ucfirst(strtolower($com));
+
+        foreach ($components as $com) {
+            $file = BW_PATH_COMPONENTS . DS . $com . DS . 'api.php';
+            if (bwFile::exists($file)) {
+                $class = 'bw' . ucfirst(strtolower($com));
                 $api = call_user_func(array($class, 'getInstance'));
 
                 $r[] = $api->getPublicProperties();
             }
         }
-        
+
         return $r;
     }
-    
+
     public function getConfig($prefix)
     {
-        if(is_null($this->get('_config')))
-        {
+        if (is_null($this->get('_config'))) {
             $c = new bwConfigDB();
-            $c->setPrefix('component.'.$this->id);
+            $c->setPrefix('component.' . $this->id);
 
             $this->set('_config', $c);
         }
 
         return $this->get('_config');
     }
+
 }
+
 ?>

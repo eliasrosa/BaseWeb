@@ -1,8 +1,10 @@
 <?php
+
 defined('BW') or die("Acesso negado!");
 
 class bwBrowser extends bwObject
 {
+
     /**
      * Major version number.
      *
@@ -45,7 +47,7 @@ class bwBrowser extends bwObject
      */
     var $_accept = '';
 
-     /**
+    /**
      * Platform the browser is running on.
      *
      * @var string
@@ -120,26 +122,26 @@ class bwBrowser extends bwObject
      * @var array
      */
     var $_features = array(
-        'html'          => true,
-        'hdml'          => false,
-        'wml'           => false,
-        'images'        => true,
-        'iframes'       => false,
-        'frames'        => true,
-        'tables'        => true,
-        'java'          => true,
-        'javascript'    => true,
-        'dom'           => false,
-        'utf'           => false,
-        'rte'           => false,
-        'homepage'      => false,
-        'accesskey'     => false,
-        'optgroup'      => false,
-        'xmlhttpreq'    => false,
-        'cite'          => false,
-        'xhtml+xml'     => false,
-        'mathml'        => false,
-        'svg'           => false
+        'html' => true,
+        'hdml' => false,
+        'wml' => false,
+        'images' => true,
+        'iframes' => false,
+        'frames' => true,
+        'tables' => true,
+        'java' => true,
+        'javascript' => true,
+        'dom' => false,
+        'utf' => false,
+        'rte' => false,
+        'homepage' => false,
+        'accesskey' => false,
+        'optgroup' => false,
+        'xmlhttpreq' => false,
+        'cite' => false,
+        'xhtml+xml' => false,
+        'mathml' => false,
+        'svg' => false
     );
 
     /**
@@ -148,22 +150,22 @@ class bwBrowser extends bwObject
      * @var array
      */
     var $_quirks = array(
-        'avoid_popup_windows'           => false,
-        'break_disposition_header'      => false,
-        'break_disposition_filename'    => false,
-        'broken_multipart_form'         => false,
-        'cache_same_url'                => false,
-        'cache_ssl_downloads'           => false,
-        'double_linebreak_textarea'     => false,
-        'empty_file_input_value'        => false,
-        'must_cache_forms'              => false,
-        'no_filename_spaces'            => false,
-        'no_hidden_overflow_tables'     => false,
-        'ow_gui_1.3'                    => false,
-        'png_transparency'              => false,
-        'scrollbar_in_way'              => false,
-        'scroll_tds'                    => false,
-        'windowed_controls'             => false,
+        'avoid_popup_windows' => false,
+        'break_disposition_header' => false,
+        'break_disposition_filename' => false,
+        'broken_multipart_form' => false,
+        'cache_same_url' => false,
+        'cache_ssl_downloads' => false,
+        'double_linebreak_textarea' => false,
+        'empty_file_input_value' => false,
+        'must_cache_forms' => false,
+        'no_filename_spaces' => false,
+        'no_hidden_overflow_tables' => false,
+        'ow_gui_1.3' => false,
+        'png_transparency' => false,
+        'scrollbar_in_way' => false,
+        'scroll_tds' => false,
+        'windowed_controls' => false,
     );
 
     /**
@@ -173,7 +175,6 @@ class bwBrowser extends bwObject
      * @var array
      */
     var $_images = array('jpeg', 'gif', 'png', 'pjpeg', 'x-png', 'bmp');
-
 
     /**
      * Create a browser instance (Constructor).
@@ -215,7 +216,7 @@ class bwBrowser extends bwObject
         return $instances[$signature];
     }
 
-   /**
+    /**
      * Parses the user agent string and inititializes the object with
      * all the known features and quirks for the given browser.
      *
@@ -271,10 +272,10 @@ class bwBrowser extends bwObject
                 $this->setQuirk('avoid_popup_windows');
                 $this->_mobile = true;
             } elseif (preg_match('|Opera[/ ]([0-9.]+)|', $this->_agent, $version)) {
-                        $this->setBrowser('opera');
-                        list($this->_majorVersion, $this->_minorVersion) = explode('.', $version[1]);
-                        $this->setFeature('javascript', true);
-                        $this->setQuirk('no_filename_spaces');
+                $this->setBrowser('opera');
+                list($this->_majorVersion, $this->_minorVersion) = explode('.', $version[1]);
+                $this->setFeature('javascript', true);
+                $this->setQuirk('no_filename_spaces');
 
                 if ($this->_majorVersion >= 7) {
                     $this->setFeature('dom');
@@ -284,8 +285,8 @@ class bwBrowser extends bwObject
                     $this->setQuirk('double_linebreak_textarea');
                 }
             } elseif (strpos($this->_lowerAgent, 'elaine/') !== false ||
-                        strpos($this->_lowerAgent, 'palmsource') !== false ||
-                        strpos($this->_lowerAgent, 'digital paths') !== false) {
+                strpos($this->_lowerAgent, 'palmsource') !== false ||
+                strpos($this->_lowerAgent, 'digital paths') !== false) {
                 $this->setBrowser('palm');
                 $this->setFeature('images', false);
                 $this->setFeature('frames', false);
@@ -293,7 +294,7 @@ class bwBrowser extends bwObject
                 $this->setQuirk('avoid_popup_windows');
                 $this->_mobile = true;
             } elseif ((preg_match('|MSIE ([0-9.]+)|', $this->_agent, $version)) ||
-                        (preg_match('|Internet Explorer/([0-9.]+)|', $this->_agent, $version))) {
+                (preg_match('|Internet Explorer/([0-9.]+)|', $this->_agent, $version))) {
 
                 $this->setBrowser('msie');
                 $this->setQuirk('cache_ssl_downloads');
@@ -322,70 +323,70 @@ class bwBrowser extends bwObject
                 }
 
                 switch ($this->_majorVersion) {
-                case 7:
-                    $this->setFeature('javascript', 1.4);
-                    $this->setFeature('dom');
-                    $this->setFeature('iframes');
-                    $this->setFeature('utf');
-                    $this->setFeature('rte');
-                    $this->setFeature('homepage');
-                    $this->setFeature('accesskey');
-                    $this->setFeature('optgroup');
-                    $this->setFeature('xmlhttpreq');
-                    $this->setQuirk('scrollbar_in_way');
-                    break;
-
-                case 6:
-                    $this->setFeature('javascript', 1.4);
-                    $this->setFeature('dom');
-                    $this->setFeature('iframes');
-                    $this->setFeature('utf');
-                    $this->setFeature('rte');
-                    $this->setFeature('homepage');
-                    $this->setFeature('accesskey');
-                    $this->setFeature('optgroup');
-                    $this->setFeature('xmlhttpreq');
-                    $this->setQuirk('scrollbar_in_way');
-                    $this->setQuirk('broken_multipart_form');
-                    $this->setQuirk('windowed_controls');
-                    break;
-
-                case 5:
-                    if ($this->getPlatform() == 'mac') {
-                        $this->setFeature('javascript', 1.2);
-                        $this->setFeature('optgroup');
-                    } else {
-                        // MSIE 5 for Windows.
+                    case 7:
                         $this->setFeature('javascript', 1.4);
                         $this->setFeature('dom');
-                        $this->setFeature('xmlhttpreq');
-                        if ($this->_minorVersion >= 5) {
-                            $this->setFeature('rte');
-                            $this->setQuirk('windowed_controls');
-                        }
-                    }
-                    $this->setFeature('iframes');
-                    $this->setFeature('utf');
-                    $this->setFeature('homepage');
-                    $this->setFeature('accesskey');
-                    if ($this->_minorVersion == 5) {
-                        $this->setQuirk('break_disposition_header');
-                        $this->setQuirk('broken_multipart_form');
-                    }
-                    break;
-
-                case 4:
-                    $this->setFeature('javascript', 1.2);
-                    $this->setFeature('accesskey');
-                    if ($this->_minorVersion > 0) {
+                        $this->setFeature('iframes');
                         $this->setFeature('utf');
-                    }
-                    break;
+                        $this->setFeature('rte');
+                        $this->setFeature('homepage');
+                        $this->setFeature('accesskey');
+                        $this->setFeature('optgroup');
+                        $this->setFeature('xmlhttpreq');
+                        $this->setQuirk('scrollbar_in_way');
+                        break;
 
-                case 3:
-                    $this->setFeature('javascript', 1.5);
-                    $this->setQuirk('avoid_popup_windows');
-                    break;
+                    case 6:
+                        $this->setFeature('javascript', 1.4);
+                        $this->setFeature('dom');
+                        $this->setFeature('iframes');
+                        $this->setFeature('utf');
+                        $this->setFeature('rte');
+                        $this->setFeature('homepage');
+                        $this->setFeature('accesskey');
+                        $this->setFeature('optgroup');
+                        $this->setFeature('xmlhttpreq');
+                        $this->setQuirk('scrollbar_in_way');
+                        $this->setQuirk('broken_multipart_form');
+                        $this->setQuirk('windowed_controls');
+                        break;
+
+                    case 5:
+                        if ($this->getPlatform() == 'mac') {
+                            $this->setFeature('javascript', 1.2);
+                            $this->setFeature('optgroup');
+                        } else {
+                            // MSIE 5 for Windows.
+                            $this->setFeature('javascript', 1.4);
+                            $this->setFeature('dom');
+                            $this->setFeature('xmlhttpreq');
+                            if ($this->_minorVersion >= 5) {
+                                $this->setFeature('rte');
+                                $this->setQuirk('windowed_controls');
+                            }
+                        }
+                        $this->setFeature('iframes');
+                        $this->setFeature('utf');
+                        $this->setFeature('homepage');
+                        $this->setFeature('accesskey');
+                        if ($this->_minorVersion == 5) {
+                            $this->setQuirk('break_disposition_header');
+                            $this->setQuirk('broken_multipart_form');
+                        }
+                        break;
+
+                    case 4:
+                        $this->setFeature('javascript', 1.2);
+                        $this->setFeature('accesskey');
+                        if ($this->_minorVersion > 0) {
+                            $this->setFeature('utf');
+                        }
+                        break;
+
+                    case 3:
+                        $this->setFeature('javascript', 1.5);
+                        $this->setQuirk('avoid_popup_windows');
+                        break;
                 }
             } elseif (preg_match('|amaya/([0-9.]+)|', $this->_agent, $version)) {
                 $this->setBrowser('amaya');
@@ -410,7 +411,7 @@ class bwBrowser extends bwObject
                 $this->setBrowser('avantgo');
                 $this->_mobile = true;
             } elseif (preg_match('|Konqueror/([0-9]+)|', $this->_agent, $version) ||
-                        preg_match('|Safari/([0-9]+)\.?([0-9]+)?|', $this->_agent, $version)) {
+                preg_match('|Safari/([0-9]+)\.?([0-9]+)?|', $this->_agent, $version)) {
                 // Konqueror and Apple's Safari both use the KHTML
                 // rendering engine.
                 $this->setBrowser('konqueror');
@@ -430,7 +431,7 @@ class bwBrowser extends bwObject
                     $this->setFeature('iframes');
                     if ($this->_majorVersion > 125 ||
                         ($this->_majorVersion == 125 &&
-                         $this->_minorVersion >= 1)) {
+                        $this->_minorVersion >= 1)) {
                         $this->setFeature('accesskey');
                         $this->setFeature('xmlhttpreq');
                     }
@@ -442,11 +443,11 @@ class bwBrowser extends bwObject
                     // Konqueror.
                     $this->setFeature('javascript', 1.5);
                     switch ($this->_majorVersion) {
-                    case 3:
-                        $this->setFeature('dom');
-                        $this->setFeature('iframes');
-                $this->setFeature('xhtml+xml');
-                        break;
+                        case 3:
+                            $this->setFeature('dom');
+                            $this->setFeature('iframes');
+                            $this->setFeature('xhtml+xml');
+                            break;
                     }
                 }
             } elseif (preg_match('|Mozilla/([0-9.]+)|', $this->_agent, $version)) {
@@ -455,41 +456,41 @@ class bwBrowser extends bwObject
 
                 list($this->_majorVersion, $this->_minorVersion) = explode('.', $version[1]);
                 switch ($this->_majorVersion) {
-                case 5:
-                    if ($this->getPlatform() == 'win') {
-                        $this->setQuirk('break_disposition_filename');
-                    }
-                    $this->setFeature('javascript', 1.4);
-                    $this->setFeature('dom');
-                    $this->setFeature('accesskey');
-                    $this->setFeature('optgroup');
-                    $this->setFeature('xmlhttpreq');
-                    $this->setFeature('cite');
-                    if (preg_match('|rv:(.*)\)|', $this->_agent, $revision)) {
-                        if ($revision[1] >= 1) {
-                            $this->setFeature('iframes');
+                    case 5:
+                        if ($this->getPlatform() == 'win') {
+                            $this->setQuirk('break_disposition_filename');
                         }
-                        if ($revision[1] >= 1.3) {
-                            $this->setFeature('rte');
+                        $this->setFeature('javascript', 1.4);
+                        $this->setFeature('dom');
+                        $this->setFeature('accesskey');
+                        $this->setFeature('optgroup');
+                        $this->setFeature('xmlhttpreq');
+                        $this->setFeature('cite');
+                        if (preg_match('|rv:(.*)\)|', $this->_agent, $revision)) {
+                            if ($revision[1] >= 1) {
+                                $this->setFeature('iframes');
+                            }
+                            if ($revision[1] >= 1.3) {
+                                $this->setFeature('rte');
+                            }
+                            if ($revision[1] >= 1.5) {
+                                $this->setFeature('svg');
+                                $this->setFeature('mathml');
+                                $this->setFeature('xhtml+xml');
+                            }
                         }
-                        if ($revision[1] >= 1.5) {
-                            $this->setFeature('svg');
-                            $this->setFeature('mathml');
-                $this->setFeature('xhtml+xml');
-                        }
-                    }
-                    break;
+                        break;
 
-                case 4:
-                    $this->setFeature('javascript', 1.3);
-                    $this->setQuirk('buggy_compression');
-                    break;
+                    case 4:
+                        $this->setFeature('javascript', 1.3);
+                        $this->setQuirk('buggy_compression');
+                        break;
 
-                case 3:
-                default:
-                    $this->setFeature('javascript', 1);
-                    $this->setQuirk('buggy_compression');
-                    break;
+                    case 3:
+                    default:
+                        $this->setFeature('javascript', 1);
+                        $this->setQuirk('buggy_compression');
+                        break;
                 }
             } elseif (preg_match('|Lynx/([0-9]+)|', $this->_agent, $version)) {
                 $this->setBrowser('lynx');
@@ -507,8 +508,8 @@ class bwBrowser extends bwObject
                 $this->setBrowser('hotjava');
                 $this->setFeature('javascript', false);
             } elseif (strpos($this->_agent, 'UP/') !== false ||
-                        strpos($this->_agent, 'UP.B') !== false ||
-                        strpos($this->_agent, 'UP.L') !== false) {
+                strpos($this->_agent, 'UP.B') !== false ||
+                strpos($this->_agent, 'UP.L') !== false) {
                 $this->setBrowser('up');
                 $this->setFeature('html', false);
                 $this->setFeature('javascript', false);
@@ -553,11 +554,11 @@ class bwBrowser extends bwObject
                 $this->setFeature('wml');
                 $this->_mobile = true;
             } elseif (strpos($this->_lowerAgent, 'docomo') !== false ||
-                        strpos($this->_lowerAgent, 'portalmmm') !== false) {
+                strpos($this->_lowerAgent, 'portalmmm') !== false) {
                 $this->setBrowser('imode');
                 $this->setFeature('images', false);
                 $this->_mobile = true;
-        } elseif (strpos($this->_agent, 'BlackBerry') !== false) {
+            } elseif (strpos($this->_agent, 'BlackBerry') !== false) {
                 $this->setBrowser('blackberry');
                 $this->setFeature('html', false);
                 $this->setFeature('javascript', false);
@@ -578,7 +579,7 @@ class bwBrowser extends bwObject
         }
     }
 
-     /**
+    /**
      * Match the platform of the browser.
      *
      * This is a pretty simplistic implementation, but it's intended
@@ -601,7 +602,8 @@ class bwBrowser extends bwObject
      *
      * @return string  The user's platform.
      */
-    function getPlatform()   {
+    function getPlatform()
+    {
         return $this->_platform;
     }
 
@@ -610,7 +612,8 @@ class bwBrowser extends bwObject
      *
      * @param string $browser  The browser to set as current.
      */
-    function setBrowser($browser) {
+    function setBrowser($browser)
+    {
         $this->_browser = $browser;
     }
 
@@ -619,7 +622,8 @@ class bwBrowser extends bwObject
      *
      * @return string  The current browser.
      */
-    function getBrowser()    {
+    function getBrowser()
+    {
         return $this->_browser;
     }
 
@@ -628,7 +632,8 @@ class bwBrowser extends bwObject
      *
      * @return integer  The current browser's major version.
      */
-    function getMajor()  {
+    function getMajor()
+    {
         return $this->_majorVersion;
     }
 
@@ -636,7 +641,8 @@ class bwBrowser extends bwObject
      * Retrieve the current browser's minor version.
      * @return integer  The current browser's minor version.
      */
-    function getMinor()  {
+    function getMinor()
+    {
         return $this->_minorVersion;
     }
 
@@ -644,7 +650,8 @@ class bwBrowser extends bwObject
      * Retrieve the current browser's version.
      * @return string  The current browser's version.
      */
-    function getVersion()    {
+    function getVersion()
+    {
         return $this->_majorVersion . '.' . $this->_minorVersion;
     }
 
@@ -653,7 +660,8 @@ class bwBrowser extends bwObject
      *
      * @return string  The browser agent string.
      */
-    function getAgentString()    {
+    function getAgentString()
+    {
         return $this->_agent;
     }
 
@@ -678,7 +686,8 @@ class bwBrowser extends bwObject
      * @param string $quirk  The behavior to set.
      * @param string $value  Special behavior parameter.
      */
-    function setQuirk($quirk, $value = true) {
+    function setQuirk($quirk, $value = true)
+    {
         $this->_quirks[$quirk] = $value;
     }
 
@@ -688,11 +697,12 @@ class bwBrowser extends bwObject
      * @param string $quirk  The behavior to check.
      * @return boolean  Does the browser have the behavior set?
      */
-    function hasQuirk($quirk) {
+    function hasQuirk($quirk)
+    {
         return !empty($this->_quirks[$quirk]);
     }
 
-     /**
+    /**
      * Retrieve unique behavior for the current browser.
      *
      * @param string $quirk  The behavior to retrieve.
@@ -700,9 +710,7 @@ class bwBrowser extends bwObject
      */
     function getQuirk($quirk)
     {
-        return isset($this->_quirks[$quirk])
-                ? $this->_quirks[$quirk]
-                : null;
+        return isset($this->_quirks[$quirk]) ? $this->_quirks[$quirk] : null;
     }
 
     /**
@@ -711,17 +719,18 @@ class bwBrowser extends bwObject
      * @param string $feature  The capability to set.
      * @param string $value Special capability parameter.
      */
-    function setFeature($feature, $value = true) {
+    function setFeature($feature, $value = true)
+    {
         $this->_features[$feature] = $value;
     }
-
 
     /**
      * Check the current browser capabilities.
      * @param string $feature  The capability to check.
      * @return boolean  Does the browser have the capability set?
      */
-    function hasFeature($feature)    {
+    function hasFeature($feature)
+    {
         return !empty($this->_features[$feature]);
     }
 
@@ -731,10 +740,9 @@ class bwBrowser extends bwObject
      * @param string $feature  The capability to retrieve.
      * @return string  The value of the requested capability.
      */
-    function getFeature($feature)    {
-         return isset($this->_features[$feature])
-                ? $this->_features[$feature]
-                : null;
+    function getFeature($feature)
+    {
+        return isset($this->_features[$feature]) ? $this->_features[$feature] : null;
     }
 
     /**
@@ -760,18 +768,18 @@ class bwBrowser extends bwObject
                 if ($type != 'image') {
                     return true;
                 }
-             }
+            }
 
             /* image/jpeg and image/pjpeg *appear* to be the same
-            * entity, but Mozilla doesn't seem to want to accept the
-            * latter.  For our purposes, we will treat them the
-            * same.
-            */
-                if ($this->isBrowser('mozilla') &&
+             * entity, but Mozilla doesn't seem to want to accept the
+             * latter.  For our purposes, we will treat them the
+             * same.
+             */
+            if ($this->isBrowser('mozilla') &&
                 ($mimetype == 'image/pjpeg') &&
                 (strpos($this->_accept, 'image/jpeg') !== false)) {
-                    return true;
-                }
+                return true;
+            }
 
             if (!$wildcard_match) {
                 return false;
@@ -803,9 +811,9 @@ class bwBrowser extends bwObject
      */
     function isRobot()
     {
-         foreach ($this->_robots as $robot) {
-             if (strpos($this->_agent, $robot) !== false) {
-                 return true;
+        foreach ($this->_robots as $robot) {
+            if (strpos($this->_agent, $robot) !== false) {
+                return true;
             }
         }
         return false;
@@ -822,6 +830,7 @@ class bwBrowser extends bwObject
             ($_SERVER['HTTPS'] == 'on')) ||
             getenv('SSL_PROTOCOL_VERSION'));
     }
+
 }
 
 ?>

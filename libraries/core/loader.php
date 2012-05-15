@@ -9,8 +9,7 @@ class bwLoader
     {
         $paths = explode('.', $filePath);
 
-        if ($paths[0] == 'components')
-        {
+        if ($paths[0] == 'components') {
             $lib = '';
             $filePath .= '.api';
         }
@@ -23,10 +22,8 @@ class bwLoader
 
         $path = str_replace('.', DS, $libPath);
 
-        if ($verificar)
-        {
-            if (file_exists(BW_PATH . DS . $path . '.php'))
-            {
+        if ($verificar) {
+            if (file_exists(BW_PATH . DS . $path . '.php')) {
                 require_once(BW_PATH . DS . $path . '.php');
                 return true;
             }
@@ -60,15 +57,12 @@ class bwLoader
 
         $dir_handle = @opendir($path) or die("Unable to open $path");
 
-        while ($file = readdir($dir_handle))
-        {
-            if ($file != "." || $file != ".." || !is_dir($path . DS . $file))
-            {
+        while ($file = readdir($dir_handle)) {
+            if ($file != "." || $file != ".." || !is_dir($path . DS . $file)) {
                 $folder = $path . DS . $file;
                 $class = $folder . DS . 'models' . DS . $className . '.php';
 
-                if (file_exists($class))
-                {
+                if (file_exists($class)) {
                     require_once($class);
                     return;
                 }
@@ -93,4 +87,5 @@ class bwLoader
     }
 
 }
+
 ?>

@@ -4,12 +4,13 @@ defined('BW') or die("Acesso negado!");
 
 class bwAdm
 {
+
     function getInstance($class = false)
     {
         $class = $class ? $class : __CLASS__;
         return bwObject::getInstance($class);
     }
-    
+
     function init()
     {
         $urlAtual = new bwUrl();
@@ -18,14 +19,13 @@ class bwAdm
         bwRequest::setVar('template', BW_ADM ? bwCore::getConfig()->getValue('adm.template') : bwCore::getConfig()->getValue('site.template'));
         define('BW_URL_TEMPLATE', BW_URL_TEMPLATES . '/' . bwRequest::getVar('template'));
 
-        if (BW_ADM)
-        {
+        if (BW_ADM) {
             bwHtml::setTitle(bwCore::getConfig()->getValue('adm.titulo'));
             bwLogin::getInstance()->restrito(true);
 
-            if(bwLogin::getInstance()->isLogin())
+            if (bwLogin::getInstance()->isLogin())
                 bwCore::init();
-            
+
             exit();
         }
     }
@@ -33,13 +33,12 @@ class bwAdm
     static function msg($html, $error = false)
     {
         $class = $error ? 'erro' : 'ok';
-        return '<div id="admMsg" class="'.$class.'">'.$html.'</div>';
+        return '<div id="admMsg" class="' . $class . '">' . $html . '</div>';
     }
 
     static function loadHead($i)
     {
-        if (BW_ADM)
-        {
+        if (BW_ADM) {
             $com = bwRequest::getVar('com');
             $view = bwRequest::getVar('view');
 
@@ -63,8 +62,7 @@ class bwAdm
     static function execTask()
     {
         $task = bwRequest::getVar('task', false);
-        if (BW_ADM && $task)
-        {
+        if (BW_ADM && $task) {
             if (!bwRequest::checkToken())
                 die('Token inválido!');
 
@@ -84,7 +82,8 @@ class bwAdm
             return '<img class="status" src="' . BW_URL_MEDIA . '/baseweb/imagens/icos/remove.png" />';
     }
 
-    public function createHtmlSubMenu($activeID, $titulo = false, $menuFile = false, $com = false)
+    public function createHtmlSubMenu($activeID, $titulo = false,
+        $menuFile = false, $com = false)
     {
         // componente
         $com = ($com) ? $com : bwRequest::getVar('com');
@@ -104,12 +103,11 @@ class bwAdm
 
         // menu html
         $html = '<ul>';
-        foreach ($menu as $id => $m)
-        {
+        foreach ($menu as $id => $m) {
             $m = array_merge(array(
-                        'url' => '',
-                        'tit' => ''
-                            ), $m);
+                'url' => '',
+                'tit' => ''
+                ), $m);
 
             $class = '';
             $class = ($id == $activeID) ? ' active' : '';
@@ -131,5 +129,7 @@ class bwAdm
 
         return $menu;
     }
+
 }
+
 ?>

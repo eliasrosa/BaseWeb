@@ -10,14 +10,14 @@ class bwRouter
         $url = parse_url($url);
 
         $url = array_merge(array(
-                    'scheme' => '',
-                    'host' => '',
-                    'user' => '',
-                    'pass' => '',
-                    'path' => '',
-                    'query' => '',
-                    'fragment' => ''
-                        ), $url);
+            'scheme' => '',
+            'host' => '',
+            'user' => '',
+            'pass' => '',
+            'path' => '',
+            'query' => '',
+            'fragment' => ''
+            ), $url);
 
         return $url;
     }
@@ -26,31 +26,26 @@ class bwRouter
     {
         parse_str($query_string, $query);
 
-        if(isset($query['itemid']) && $query['itemid'] > 0)
-        {
+        if (isset($query['itemid']) && $query['itemid'] > 0) {
             $url = bwMenu::getInstance()->getId($query['itemid']);
             $url = bwRouter::parseUrl($url['link']);
             $query = array_merge(
-                bwRouter::parseQuery($url['query']),
-                $query
+                bwRouter::parseQuery($url['query']), $query
             );
-        }
-        else
-        {
+        } else {
             $query = array_merge(array(
-                    'com' => null,
-                    'view' => null,
-                    'itemid' => 0
-            ), $query);
+                'com' => null,
+                'view' => null,
+                'itemid' => 0
+                ), $query);
         }
-        
+
         return $query;
     }
 
     function _($url, $cached = true)
     {
-        if (bwCore::getConfig()->getValue('cache.url') && $cached)
-        {
+        if (bwCore::getConfig()->getValue('cache.url') && $cached) {
             $cache = bwCache::get($url, false);
             if ($cache)
                 return $cache;
@@ -74,20 +69,17 @@ class bwRouter
         $segments = array();
 
         $com = BW_PATH_COMPONENTS . DS . $_query['com'] . DS . 'router.php';
-        if (bwFile::exists($com))
-        {
+        if (bwFile::exists($com)) {
             require_once($com);
         }
 
-        if (bwFile::exists($com) && !$isAdm)
-        {
+        if (bwFile::exists($com) && !$isAdm) {
             $function = $_query['com'] . 'buildRoute';
             $segments = $function($_query);
         }
 
         // se não exitir o itemid e não for adm
-        if (isset($component))
-        {
+        if (isset($component)) {
             $alias = array();
             $componentSegments = array();
             $componentSegments[] = $_query['com'];
@@ -96,12 +88,10 @@ class bwRouter
         }
 
         // se adm true
-        if ($isAdm)
-        {
+        if ($isAdm) {
             $segments[] = $_query['com'];
 
-            if (isset($_query['sub']))
-            {
+            if (isset($_query['sub'])) {
                 $segments[] = $_query['sub'];
                 unset($_query['sub']);
             }
@@ -137,8 +127,7 @@ class bwRouter
         $alias = bwUtil::alias($menu['alias'], $menu['titulo']);
 
         $menus = array($alias);
-        if ($menu['idpai'] != 0)
-        {
+        if ($menu['idpai'] != 0) {
             $pai = bwRouter::getAlias($menu['idpai']);
             $menus = array_merge($pai, $menus);
         }
@@ -165,10 +154,10 @@ class bwRouter
 
         $query = http_build_query($query);
         $query = !$query ? $query : "?$query";
-        
-        if(!preg_match('#^adm\/#', $alias))
+
+        if (!preg_match('#^adm\/#', $alias))
             $alias .= '.html';
-    
+
         $url = BW_URL_BASE2 . "/{$alias}{$query}";
 
         return $url;
@@ -186,8 +175,7 @@ class bwRouter
 
         $alias = str_replace('.html', '', $alias);
 
-        if ($alias == '' || $alias == 'index.php')
-        {
+        if ($alias == '' || $alias == 'index.php') {
             $alias = array();
             bwRouter::loadVarsMenus(bwCore::getConfig()->getValue('site.pagina.inicial'), $alias);
             return;
@@ -195,29 +183,23 @@ class bwRouter
         else
             $alias = explode('/', $alias);
 
-        if ($alias[0] == 'adm')
-        {
+        if ($alias[0] == 'adm') {
             bwRequest::setVar('com', $alias[1]);
 
-            if (count($alias) == 3)
-            {
+            if (count($alias) == 3) {
                 bwRequest::setVar('sub', $alias[1]);
                 bwRequest::setVar('view', $alias[1] . '.' . $alias[2]);
             }
 
-            if (count($alias) == 4)
-            {
+            if (count($alias) == 4) {
                 bwRequest::setVar('sub', $alias[2]);
                 bwRequest::setVar('view', $alias[2] . '.' . $alias[3]);
             }
-        }
-        else
-        {
+        } else {
             // encontra o menu
             $i = -1;
             $lastMenu = false;
-            do
-            {
+            do {
                 $r = true;
                 $i++;
 
@@ -225,12 +207,11 @@ class bwRouter
                     break;
 
                 $menu = Doctrine_Query::create()
-                                ->from('MenuItem m')
-                                ->where('m.status = 1 AND alias = ?', $alias[$i])
-                                ->fetchOne();
+                    ->from('MenuItem m')
+                    ->where('m.status = 1 AND alias = ?', $alias[$i])
+                    ->fetchOne();
 
-                if ($menu)
-                {
+                if ($menu) {
                     unset($alias[$i]);
                     $lastMenu = $menu;
                 }
@@ -244,8 +225,7 @@ class bwRouter
                 $segments[] = $a;
 
 
-            if ($lastMenu)
-            {
+            if ($lastMenu) {
                 $url = bwRouter::parseUrl($lastMenu->link);
                 $query = bwRouter::parseQuery($url['query']);
                 $itemid = $query['itemid'];
@@ -254,17 +234,15 @@ class bwRouter
                     bwRouter::loadVarsMenus($itemid, $segments);
                 else
                     bwRouter::loadVarsMenus($lastMenu->id, $segments);
-                
+
                 return;
             }
-            
-            if(count($alias) == 2)
-            {
+
+            if (count($alias) == 2) {
                 bwRequest::setVar('com', $alias[0]);
                 bwRequest::setVar('view', $alias[1]);
                 return;
             }
-            
         }
 
         return;
@@ -276,8 +254,7 @@ class bwRouter
         $menu = bwMenu::getInstance();
         $menu = $menu->getId($itemid);
 
-        if (is_array($menu))
-        {
+        if (is_array($menu)) {
             $url = bwRouter::parseUrl($menu['link']);
             $query = bwRouter::parseQuery($url['query']);
             $query['itemid'] = $itemid;
@@ -285,8 +262,7 @@ class bwRouter
             $vars = array();
             $com = BW_PATH_COMPONENTS . DS . $query['com'] . DS . 'router.php';
 
-            if (file_exists($com))
-            {
+            if (file_exists($com)) {
                 $function = $query['com'] . 'parseRoute';
                 require_once($com);
                 $vars = $function($segments);
@@ -298,5 +274,7 @@ class bwRouter
         }
         return;
     }
+
 }
+
 ?>

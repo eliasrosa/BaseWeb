@@ -4,6 +4,7 @@ defined('BW') or die("Acesso negado!");
 
 class bwConfigDB
 {
+
     // getInstance
     function getInstance($class = false)
     {
@@ -12,6 +13,7 @@ class bwConfigDB
     }
 
     private $_prefix = '';
+
     public function setPrefix($prefix)
     {
         $this->_prefix = $prefix;
@@ -37,16 +39,15 @@ class bwConfigDB
     public function getVar($var)
     {
         $prefix = $this->getPrefix();
-        if ($prefix)
-        {
+        if ($prefix) {
             $var = str_replace("{$prefix}.", "", $var);
             $var = "{$prefix}.{$var}";
         }
-        
+
         $dql = Doctrine_Query::Create()
-                        ->from('Configuracao')
-                        ->where('var = ?', $var)
-                        ->fetchOne();
+            ->from('Configuracao')
+            ->where('var = ?', $var)
+            ->fetchOne();
 
         return $dql;
     }
@@ -72,8 +73,7 @@ class bwConfigDB
     {
         $db = $this->getVar($var);
 
-        if ($db)
-        {
+        if ($db) {
 
             $this->_form = new bwForm($db, bwRouter::_("adm.php?com=sistema&task=salvarConfig"), 'post', $db->protegido, 'var');
             $this->_form->addInputID();
@@ -87,7 +87,6 @@ class bwConfigDB
 
             //
             //$this->_form->addInput('tipo', 'text', array('edit' => false));
-
             //
             $this->_addBottonSalvar($db);
 
@@ -108,8 +107,7 @@ class bwConfigDB
         // atributos
         $attr = array();
 
-        switch ($db->tipo)
-        {
+        switch ($db->tipo) {
             case 'string':
                 $this->_form->addInput('value', 'text', $attr);
                 $this->_form->addInput('default', 'text', array('edit' => false));
@@ -157,8 +155,7 @@ class bwConfigDB
                 // loop nas pastas
                 if (!is_dir($path))
                     echo bwAdm::msg("<p>O diretório não existe!</p><p>Pasta: {$path}</p>", 1);
-                else
-                {
+                else {
                     // pega a lista de pasta e arquivos
                     $folders = scandir($path);
 
@@ -197,8 +194,7 @@ class bwConfigDB
                 // loop nas pastas
                 if (!is_dir($path))
                     echo bwAdm::msg("<p>O diretório não existe!</p><p>Pasta: {$path}</p>", 1);
-                else
-                {
+                else {
                     // pega a lista de pasta e arquivos
                     $files = scandir($path);
 
@@ -250,4 +246,5 @@ class bwConfigDB
     }
 
 }
+
 ?>

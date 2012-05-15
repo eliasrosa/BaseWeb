@@ -4,14 +4,15 @@ defined('BW') or die("Acesso negado!");
 
 class bwTemplate extends bwObject
 {
+
     // getInstance
     function getInstance($class = false)
     {
         $class = $class ? $class : __CLASS__;
         return bwObject::getInstance($class);
     }
- 
-     // nome da pasta
+
+    // nome da pasta
     private $nome;
     // path
     private $path;
@@ -53,7 +54,7 @@ class bwTemplate extends bwObject
 
     function getPathHtml()
     {
-        return $this->path .DS. 'html';
+        return $this->path . DS . 'html';
     }
 
     function getUrl()
@@ -78,5 +79,7 @@ class bwTemplate extends bwObject
         $buffer = bwBuffer::getInstance();
         $buffer->setHtml(ob_get_clean());
     }
+
 }
+
 ?>

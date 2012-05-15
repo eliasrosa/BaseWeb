@@ -27,13 +27,12 @@ class bwObject
 
     function __construct()
     {
-
+        
     }
 
-    function get($property, $default=null)
+    function get($property, $default = null)
     {
-        if (isset($this->$property))
-        {
+        if (isset($this->$property)) {
             return $this->$property;
         }
         return $default;
@@ -43,12 +42,9 @@ class bwObject
     {
         $vars = get_object_vars($this);
 
-        if ($public)
-        {
-            foreach ($vars as $key => $value)
-            {
-                if ('_' == substr($key, 0, 1))
-                {
+        if ($public) {
+            foreach ($vars as $key => $value) {
+                if ('_' == substr($key, 0, 1)) {
                     unset($vars[$key]);
                 }
             }
@@ -68,10 +64,8 @@ class bwObject
     {
         $properties = (array) $properties; //cast to an array
 
-        if (is_array($properties))
-        {
-            foreach ($properties as $k => $v)
-            {
+        if (is_array($properties)) {
+            foreach ($properties as $k => $v) {
                 $this->$k = $v;
             }
 
@@ -90,5 +84,7 @@ class bwObject
     {
         return $this->getProperties();
     }
+
 }
+
 ?>

@@ -4,13 +4,14 @@ defined('BW') or die("Acesso negado!");
 
 class bwBuffer extends bwObject
 {
+
     // getInstance
     function getInstance($class = false)
     {
         $class = $class ? $class : __CLASS__;
         return bwObject::getInstance($class);
     }
- 
+
     private $modules = array();
     private $html = null;
 
@@ -65,13 +66,10 @@ class bwBuffer extends bwObject
         for ($i = 0; $i < count($resultado[1]); $i++)
             $pos[strtolower($resultado[1][$i])] = $resultado[0][$i];
 
-        foreach ($pos as $k => $v)
-        {
+        foreach ($pos as $k => $v) {
             $html = '';
-            if (isset($this->modules[$k]) && count($this->modules[$k]))
-            {
-                foreach ($this->modules[$k] as $m)
-                {
+            if (isset($this->modules[$k]) && count($this->modules[$k])) {
+                foreach ($this->modules[$k] as $m) {
                     $html .= bwModule::getHtml($m['mod'], $m['params']);
                 }
             }
@@ -83,5 +81,7 @@ class bwBuffer extends bwObject
     {
         $this->html = str_replace('{BW HEAD}', bwHtml::head(), $this->html);
     }
+
 }
+
 ?>

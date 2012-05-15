@@ -57,17 +57,16 @@ class bwHtml
         $GLOBALS['bw.html.head']['title'] = $titulo;
     }
 
-
     function head()
     {
         $head = "\n";
 
         // setDescription default
-        if(!isset($GLOBALS['bw.html.meta']['description']) || empty($GLOBALS['bw.html.meta']['description']))
+        if (!isset($GLOBALS['bw.html.meta']['description']) || empty($GLOBALS['bw.html.meta']['description']))
             bwHtml::setDescription(bwCore::getConfig()->getValue('seo.description'));
-                
+
         // setKeywords
-        if(!isset($GLOBALS['bw.html.meta']['keywords']) || empty($GLOBALS['bw.html.meta']['keywords']))
+        if (!isset($GLOBALS['bw.html.meta']['keywords']) || empty($GLOBALS['bw.html.meta']['keywords']))
             bwHtml::setKeywords(bwCore::getConfig()->getValue('seo.keywords'));
 
         // meta tags
@@ -105,22 +104,20 @@ class bwHtml
 
     function getTituloMenu()
     {
-        if (bwRequest::getVar('itemid', false))
-        {
+        if (bwRequest::getVar('itemid', false)) {
             $tit = Doctrine_Query::create()
-                            ->from('MenuItem i')
-                            ->where('i.id = ?', bwRequest::getVar('itemid'))
-                            ->fetchOne();
+                ->from('MenuItem i')
+                ->where('i.id = ?', bwRequest::getVar('itemid'))
+                ->fetchOne();
 
             if (!BW_ADM)
                 bwHtml::setTitle($tit->titulo);
-        }else
-        {
+        }else {
             if (!BW_ADM)
                 bwHtml::setTitle(ucfirst(strtolower(bwRequest::getVar('com'))));
         }
     }
 
-
 }
+
 ?>

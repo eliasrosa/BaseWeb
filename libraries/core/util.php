@@ -4,28 +4,28 @@ defined('BW') or die("Acesso negado!");
 
 class bwUtil
 {
+
     /**
      * Cria um valor visivel, mas seguro
      * ********************************************* */
     public function createSafeValue($value, $customKey = '', $randKey = NULL)
-    {    
+    {
         //
-        if(is_null($randKey))
+        if (is_null($randKey))
             $randKey = strtoupper(substr(sha1(rand()), 0, 10));
-        
+
         //
         $customKey = strtoupper(sha1($customKey));
 
         //
         $sha1 = strtoupper(substr(sha1("SAFE::VALUE::$randKey::$value::$customKey"), 0, 10));
-        
+
         //
         $safeValue = sprintf('%s|%s|%s', $randKey, $sha1, $value);
-        
+
         return $safeValue;
     }
-    
-    
+
     /**
      * Pega o valor, se a chave for verdadeira
      * retorna NULL caso a chave for false
@@ -34,15 +34,12 @@ class bwUtil
     {
         $a = explode('|', $safeValue);
         $safeValue2 = bwUtil::createSafeValue($a[2], $customKey, $a[0]);
-      
+
         //echo "$safeValue<br>$safeValue2";
         //var_dump($safeValue == $safeValue2); // ? $a[2] : NULL;
-        
         //
         return ($safeValue == $safeValue2) ? $a[2] : NULL;
     }
-    
-    
 
     /**
      * Convert números BR para decimail para o MySql
@@ -52,10 +49,9 @@ class bwUtil
     {
         $v = (float) str_replace(',', '.', str_replace('.', '', $str));
         $v = number_format($v, $casas_decimais, '.', '');
-        
+
         return $v;
     }
-
 
     /**
      * Convert números float para formato R$ 0,00
@@ -66,7 +62,6 @@ class bwUtil
         $v = number_format($float, $casas_decimais, ',', '.');
         return $v;
     }
-
 
     /**
      * Converte acentos de uma string para html
@@ -134,7 +129,6 @@ class bwUtil
 
         return str_replace($acentos, $letras, $var);
     }
-
 
     function ampReplace($text)
     {
@@ -219,21 +213,21 @@ class bwUtil
      * retorna false em caso de erro
      * ********************************************* */
     function dataToMysql($data)
-    {    
-      if (preg_match('#^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$#', $data))
-        return bwUtil::data($data, true);
+    {
+        if (preg_match('#^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$#', $data))
+            return bwUtil::data($data, true);
 
-      elseif(preg_match('#^\d{2}\/\d{2}\/\d{4}$#', $data))
-        return bwUtil::data($data, false);
+        elseif (preg_match('#^\d{2}\/\d{2}\/\d{4}$#', $data))
+            return bwUtil::data($data, false);
 
-      elseif(preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $data))
-        return $data;
+        elseif (preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $data))
+            return $data;
 
-      elseif(preg_match('#^\d{4}-\d{2}-\d{2}$#', $data))
-        return $data;
-        
-      else
-        return false;
+        elseif (preg_match('#^\d{4}-\d{2}-\d{2}$#', $data))
+            return $data;
+
+        else
+            return false;
     }
 
     /**
@@ -251,7 +245,7 @@ class bwUtil
     {
         if ($router)
             $url = bwRouter::_($url);
-    
+
         header('Location: ' . $url);
         exit();
     }
@@ -259,7 +253,7 @@ class bwUtil
     /**
      * Converte float => R$ 999.999,99
      * ********************************************* */
-    public function float2rs($float, $decimals=2, $prefix='R$ ')
+    public function float2rs($float, $decimals = 2, $prefix = 'R$ ')
     {
         return $prefix . number_format($float, $decimals, ',', '.');
     }
@@ -293,8 +287,7 @@ class bwUtil
         if ($length == 0)
             return '';
 
-        if (strlen($string) > $length)
-        {
+        if (strlen($string) > $length) {
             if (!$break_words)
                 $string = preg_replace('/\s+?(\S+)?$/', '', substr($string, 0, $length + 1));
 
@@ -329,73 +322,69 @@ class bwUtil
      * ********************************************* */
     public function dataNow($mysql = true, $hora = true)
     {
-        if($hora)
+        if ($hora)
             $data = date("Y-m-d H:i:s");
         else
             $data = date("Y-m-d");
-        
-        if($mysql)
+
+        if ($mysql)
             return $data;
         else
             return bwUtil::data($data);
     }
-    
+
     /**
      * Executa um arquivo php e retorna o conteúdo
      * ********************************************* */
     public function execPHP($file, $vars = array())
     {
-        if (bwFile::exists($file))
-        {
+        if (bwFile::exists($file)) {
             ob_start();
 
             extract($vars);
 
             require($file);
-            
+
             return ob_get_clean();
         }
         else
             bwError::show("Arquivo '{$file}' não foi encontrado!");
     }
-    
 
     /**
      * Retorna o o IP real do usuário
-     * ********************************************* */    
+     * ********************************************* */
     public function getIpReal()
     {
         //check ip from share internet
         //if (!empty($_SERVER['HTTP_CLIENT_IP']))   
         //  $ip=$_SERVER['HTTP_CLIENT_IP'];
-        
         //to check ip is pass from proxy  
         //elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   
         //  $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
-          
         //else
-          $ip=$_SERVER['REMOTE_ADDR'];
-          
+        $ip = $_SERVER['REMOTE_ADDR'];
+
         return $ip;
-    }   
-    
+    }
+
     /**
      * Convert array para query_string
-     * ********************************************* */    
+     * ********************************************* */
     public function array2query($array)
     {
         return http_build_query($array, '', '&');
-    }       
+    }
 
     /**
      * Convert query_string para array
-     * ********************************************* */    
+     * ********************************************* */
     public function query2string($query)
     {
         parse_str($query, $array);
         return $array;
     }
-    
+
     public function array2csv($data)
     {
         $outstream = fopen("php://temp", 'r+');
@@ -409,10 +398,8 @@ class bwUtil
     public function csv2array($data)
     {
         $csv = array();
-        foreach(explode("\n", $data) as $data)
-        {
-            if(trim($data) != '')
-            {
+        foreach (explode("\n", $data) as $data) {
+            if (trim($data) != '') {
                 $instream = fopen("php://temp", 'r+');
                 fwrite($instream, $data);
                 rewind($instream);
@@ -420,44 +407,42 @@ class bwUtil
                 fclose($instream);
             }
         }
-        
+
         return($csv);
     }
 
-
-    
     /**
      * Verifica se a string é um e-mail válido
-     * ********************************************* */        
+     * ********************************************* */
     public function isEmail($string)
     {
         return preg_match('#^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@(([0-9a-zA-Z])+([-\w]*[0-9a-zA-Z])*\.)+[a-zA-Z]{2,9})$#', $string);
         //return filter_var($string, FILTER_VALIDATE_EMAIL);
-    }    
-    
+    }
 
     /**
      * Convert Array para Object
-     * ********************************************* */  
-    function array2object($array) {
-        if(!is_array($array)) {
+     * ********************************************* */
+    function array2object($array)
+    {
+        if (!is_array($array)) {
             return $array;
         }
-        
+
         $object = new stdClass();
         if (is_array($array) && count($array) > 0) {
-          foreach ($array as $name=>$value) {
-             $name = trim($name);
-             if (!empty($name)) {
-                $object->$name = bwUtil::array2object($value);
-             }
-          }
-          return $object;
+            foreach ($array as $name => $value) {
+                $name = trim($name);
+                if (!empty($name)) {
+                    $object->$name = bwUtil::array2object($value);
+                }
+            }
+            return $object;
+        } else {
+            return FALSE;
         }
-        else {
-          return FALSE;
-        }
-    }    
-    
+    }
+
 }
+
 ?>

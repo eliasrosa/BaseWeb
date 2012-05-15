@@ -4,6 +4,7 @@ defined('BW') or die("Acesso negado!");
 
 class bwLicense extends bwObject
 {
+
     // getInstance
     function getInstance($class = false)
     {
@@ -32,16 +33,14 @@ class bwLicense extends bwObject
         $serial = bwConfig::$serial;
         $isOk = false;
 
-        foreach(explode(';', $serial) as $s)
-        {
-            if($this->verificar(trim($s)))
+        foreach (explode(';', $serial) as $s) {
+            if ($this->verificar(trim($s)))
                 $isOk = true;
         }
 
         // verifica a licença
-        if(!$isOk)
+        if (!$isOk)
             bwError::show('Por favor entre em contato com o administrador do site e solicite sua licença.<br /><br />Obrigado!', 'Licença inválida!');
-
     }
 
     function verificar($serial)
@@ -61,8 +60,7 @@ class bwLicense extends bwObject
         $d = $s['data'];
         $s['data'] = "{$d{0}}{$d{1}}{$d{2}}{$d{3}}-{$d{4}}{$d{5}}-{$d{6}}{$d{7}}";
 
-        if ($serial == $this->create($s['tipo'], $s['key1'], $versao, $host, $ip, $s['data']))
-        {
+        if ($serial == $this->create($s['tipo'], $s['key1'], $versao, $host, $ip, $s['data'])) {
             $dataAtual = strtotime(date("Y-m-d"));
             $serialData = strtotime($s['data']);
 
@@ -76,4 +74,5 @@ class bwLicense extends bwObject
     }
 
 }
+
 ?>
