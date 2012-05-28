@@ -1,3 +1,3 @@
 <?php 
-header('Location: sistema/inicio.html');
+header('Location: login/index.php');
 ?>

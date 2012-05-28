@@ -21,12 +21,12 @@ class bwAdm
 
         if (BW_ADM) {
             bwHtml::setTitle(bwCore::getConfig()->getValue('adm.titulo'));
+
+            // login de administrador somente
             bwLogin::getInstance()->restrito(true);
 
-            if (bwLogin::getInstance()->isLogin())
-                bwCore::init();
-
-            exit();
+            // inicia o core
+            bwCore::init();
         }
     }
 

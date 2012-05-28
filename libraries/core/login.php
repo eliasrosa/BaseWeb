@@ -26,35 +26,18 @@ class bwLogin extends bwObject
         $this->mensagens['permissao'] = 'Você não tem permissão \'ADM!\'';
         $this->mensagens['invalido'] = 'Usuário ou senha inválido!';
         $this->mensagens['grupo'] = 'Usuário ou senha inválido, tente novamente!';
-        $this->mensagens['token'] = 'Token inválido!';
-        $this->mensagens['navegador'] = 'Navegador não suportado!';
     }
 
     // getInstance
-    function getInstance($class = false)
+    public function getInstance($class = false)
     {
         $class = $class ? $class : __CLASS__;
         return bwObject::getInstance($class);
     }
 
-    // ID da mensagem
-    var $mensagemID = false;
-
     // verifica login
-    public function entrar()
+    public function entrar($user, $pass, $auto_redirect = false)
     {
-        // check is post
-        if (bwRequest::getMethod() != 'POST')
-            return;
-
-        // check Token
-        if (!bwRequest::checkToken())
-            return $this->setMsg('token');
-
-        // user
-        $user = bwRequest::getVar('user', false);
-        $pass = bwRequest::getVar('pass', false);
-
         //
         if ($user && $pass) {
             // login pelo e-mail
@@ -67,8 +50,10 @@ class bwLogin extends bwObject
 
                 if ($dql)
                     $user = $dql->user;
-                else
-                    return $this->setMsg('invalido');
+                else {
+                    $this->setMsg('invalido');
+                    return false;
+                }
             }
 
             // cria o pass criptografada com user
@@ -85,9 +70,11 @@ class bwLogin extends bwObject
             if ($dql) {
                 // verifica se o grupo esta ativo
                 if ($dql->Grupo->status) {
+
                     // verifica se o adm esta em manutencão
-                    if ($dql->Grupo->isAdm && $this->config->getValue('core.adm.offline'))
+                    if ($dql->Grupo->isAdm && $this->config->getValue('core.adm.offline')) {
                         return $this->setMsg('adm.offline');
+                    }
 
                     // atualiza o banco
                     $dql->lastSessionId = bwSession::getToken();
@@ -99,39 +86,29 @@ class bwLogin extends bwObject
                     $this->setSession($dql);
 
                     // redireciona 
-                    $redirect = bwRequest::getVar('redirect');
-
-                    // NÃO tem premissão ao ADM
-                    if (!$dql->Grupo->isAdm && preg_match('#^' . BW_URL_ADM . '/.*#', base64_decode($redirect))) {
-                        return $this->setMsg('permissao');
-                    } elseif (!empty($redirect)) {
-                        bwUtil::redirect(base64_decode($redirect), false);
-                    } elseif (empty($redirect) && $dql->Grupo->isAdm) {
-                        bwUtil::redirect(BW_URL_ADM, false);
-                    } else {
-                        bwUtil::redirect(BW_URL_BASE2, false);
+                    if ($auto_redirect) {
+                        bwUtil::redirect($auto_redirect, true);
                     }
 
-                    return $this->setMsg('adm.offline');
-                }
-                else
-                    return $this->setMsg('grupo');
-            }
-            else
-                return $this->setMsg('invalido');
-        }
-        else
-            return $this->setMsg('invalido');
+                    return true;
+                } else
+                    $this->setMsg('grupo');
+            } else
+                $this->setMsg('invalido');
+        } else
+            $this->setMsg('invalido');
+
+        return false;
     }
 
     // grava session
-    public function setSession($u)
+    private function setSession($u)
     {
         return bwSession::set('login', $u->toArray());
     }
 
     // pega session
-    function getSession()
+    public function getSession()
     {
         if ($this->isLogin()) {
             $u = bwSession::get('login', false);
@@ -142,7 +119,7 @@ class bwLogin extends bwObject
     }
 
     // verifica se ta logado
-    function isLogin()
+    public function isLogin()
     {
         return count(bwSession::get('login', array())) ? true : false;
     }
@@ -154,7 +131,7 @@ class bwLogin extends bwObject
     }
 
     // gera a senha para o banco
-    public function gerarSenha($user, $pass)
+    private function gerarSenha($user, $pass)
     {
         $pass1 = "baseweb://{$user}:{$pass}";
         $pass2 = sha1(md5($pass1));
@@ -163,7 +140,7 @@ class bwLogin extends bwObject
     }
 
     // seta o erro
-    public function setMsg($id)
+    private function setMsg($id)
     {
         bwSession::del('login');
         $this->mensagemID = $id;
@@ -186,7 +163,7 @@ class bwLogin extends bwObject
     }
 
     //
-    function restrito($isAdm = false, $loginUrl = NULL, $activeRedirect = true)
+    public function restrito($isGrupoAdm = false, $loginUrl = NULL)
     {
         $urlAtual = new bwUrl();
 
@@ -194,18 +171,14 @@ class bwLogin extends bwObject
         $loginUrl = is_null($loginUrl) ? BW_URL_ADM_LOGIN_FILE : $loginUrl;
         $urlLogin = new bwUrl($loginUrl);
 
-        if ($activeRedirect)
-            $urlLogin->setVar('redirect', $urlAtual->toBase64());
+                
+        if ($this->isLogin()) {
 
-        if (!$this->isLogin() && $urlAtual->getPath() != $urlLogin->getPath()) {
-            $this->sair();
-            bwUtil::redirect($urlLogin->toString(), false);
-        } else {
             // pega o usuário
             $u = $this->getSession();
 
             // mostra o login se o usuário tentar acessar o ADM e o grupo não for ADM
-            if ($isAdm && $u->Grupo->isAdm == 0) {
+            if ($isGrupoAdm && $u->Grupo->isAdm == 0) {
                 $this->sair();
                 bwUtil::redirect($urlLogin->toString(), false);
             }
@@ -226,18 +199,17 @@ class bwLogin extends bwObject
                 ->andWhere('u.lastSessionId = ?', $session)
                 ->fetchOne();
 
-            //
-            if (!$dql && $urlAtual->getPath() != $urlLogin->getPath()) {
-                $this->sair();
-                bwUtil::redirect($urlLogin->toString(), false);
-            }
-
             // update log
             if ($dql) {
                 $dql->dataLastVisit = bwUtil::dataNow();
                 $dql->save();
             }
+            
+            return true;
         }
+
+        $this->sair();
+        bwUtil::redirect($urlLogin->toString(), false);
     }
 
 }
