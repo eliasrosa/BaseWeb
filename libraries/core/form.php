@@ -624,38 +624,18 @@ class bwForm
 
     function addSeo()
     {
-        $this->addInput('metatag_keywords', 'text', array(
+        $this->addInput('metatagalias', 'text', array(
+            'label' => 'Alias:'
+        ));
+
+        $this->addInput('metatagkeywords', 'text', array(
             'label' => 'Metatag (keywords):'
         ));
 
-        $this->addTextArea('metatag_description', array(
+        $this->addTextArea('metatagdescription', array(
             'limit' => '160',
             'label' => 'Metatag (description):'
         ));
-
-
-        /*
-          public function setAlias($v)
-          {
-          return $this->_set('alias', bwUtil::alias($v));
-          }
-
-          public function setMetatagkey($v)
-          {
-          $k = explode(',', trim($v));
-          foreach($k as $kk)
-          $kk = trim($kk);
-
-          $v = join(',', $k);
-
-          return $this->_set('metatagkey', $v);
-          }
-
-          public function setMetatagdescription($v)
-          {
-          return $this->_set('metatagdescription', trim(str_replace("\n", ' ', str_replace("\r\n", ' ', $v))));
-          }
-         */
 
         return $this;
     }
