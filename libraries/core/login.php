@@ -131,7 +131,7 @@ class bwLogin extends bwObject
     }
 
     // gera a senha para o banco
-    private function gerarSenha($user, $pass)
+    public function gerarSenha($user, $pass)
     {
         $pass1 = "baseweb://{$user}:{$pass}";
         $pass2 = sha1(md5($pass1));
@@ -171,7 +171,7 @@ class bwLogin extends bwObject
         $loginUrl = is_null($loginUrl) ? BW_URL_ADM_LOGIN_FILE : $loginUrl;
         $urlLogin = new bwUrl($loginUrl);
 
-                
+
         if ($this->isLogin()) {
 
             // pega o usuário
@@ -203,8 +203,11 @@ class bwLogin extends bwObject
             if ($dql) {
                 $dql->dataLastVisit = bwUtil::dataNow();
                 $dql->save();
+            } else {
+                $this->sair();
+                bwUtil::redirect($urlLogin->toString(), false);
             }
-            
+
             return true;
         }
 
