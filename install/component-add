@@ -38,7 +38,6 @@ if ($com_total) {
 
         $com_ok++;
         system($command, $retorno);
-        echo $retorno;
     }
 
     echo "\n\n";
