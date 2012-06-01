@@ -8,4 +8,3 @@ Disallow: /plugins/
 Disallow: /templates/
 Disallow: /material/
 Disallow: /install/
-Disallow: /install.php
