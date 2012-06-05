@@ -624,6 +624,8 @@ class bwForm
 
     function addSeo()
     {
+        $this->addH2('SEO - Otimização para motores de busca'.$info);
+        
         $this->addInput('metatagalias', 'text', array(
             'label' => 'Alias:'
         ));
