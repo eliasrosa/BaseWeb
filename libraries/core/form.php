@@ -191,7 +191,8 @@ class bwForm
             } elseif (preg_match('/password/', $type)) {
                 $input = "<input type=\"{$type}\" name=\"{$params['name']}\" value=\"\"{$attr}/>\n";
             } elseif ($type == 'imagem') {
-                $input = "<img src=\"{$params['resizeImage']}\"{$attr}/>\n";
+                $rand = rand();
+                $input = "<img src=\"{$params['resizeImage']}?&rand={$rand}\"{$attr}/>\n";
 
                 if ($params['linkFile'])
                     $input = "<a href=\"{$params['src']}\">{$input}</a>\n";
