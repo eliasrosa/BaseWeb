@@ -2,6 +2,10 @@
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set("display_errors", 1); 
 
+if (get_magic_quotes_gpc()) {
+    die("Error security risk: Set magic_quotes_gpc Off");
+}
+
 defined('BW') or die("Acesso negado!");
 
 // set locate
