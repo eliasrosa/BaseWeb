@@ -88,12 +88,20 @@ class bwGrid
         $args = func_get_args();
         $this->_buscas = array_merge($this->_buscas, $args);
     }
-
+ 
     // remove campo de busca
-    function removeBusca($col)
+    function removeBusca()
     {
-        unset($this->_buscas[$col]);
-    }
+        foreach($this->_buscas as $k=>$v)
+        {
+            foreach(func_get_args() as $arg)
+            {
+                if ($v == $arg) {
+                    unset($this->_buscas[$k]);
+                }
+            }    
+        }
+    }    
 
     // pega var GET
     private function _getVar($var, $default = NULL)
