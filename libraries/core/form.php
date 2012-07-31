@@ -7,16 +7,13 @@ class bwForm
 
     // dados
     var $html;
-    // valor dos campos
     var $attrName = 'dados[%s]';
-    // attributos do form
     var $formAttr = array();
     var $blockEdit = false;
     var $isEdit = false;
     private $_primary = null;
 
-    function __construct($db = false, $action = '', $method = 'post',
-        $blockEdit = false, $primary = 'id')
+    function __construct($db = false, $action = '', $method = 'delete', $blockEdit = false, $primary = 'id')
     {
         $method = ($method != 'get') ? 'post' : 'get';
 
@@ -64,7 +61,6 @@ class bwForm
 
     function createTemplate($params = array(), $campo = '')
     {
-
         // imput hydden
         if (!$params['template']) {
             $this->html .= $campo;
@@ -332,12 +328,6 @@ class bwForm
             'form' => $this,
             ), $vars);
 
-
-        $custom = bwTemplate::getInstance()->getPathHtml() . DS . 'com_' . $com . DS . $file;
-        if (bwFile::exists($custom))
-            $file = $custom;
-        else
-            $file = BW_PATH_COMPONENTS . DS . $com . DS . 'adm' . DS . 'views' . DS . $file;
 
         $this->html .= bwUtil::execPHP($file, $vars);
 
@@ -625,8 +615,8 @@ class bwForm
 
     function addSeo()
     {
-        $this->addH2('SEO - Otimização para motores de busca'.$info);
-        
+        $this->addH2('SEO - Otimização para motores de busca' . $info);
+
         $this->addInput('metatagalias', 'text', array(
             'label' => 'Alias:'
         ));

@@ -8,7 +8,6 @@ class bwPlugin
     function getAll()
     {
         $plugins = array(
-            'php',
             'updateyourbrowser',
             'slimbox2',
             'analytics',

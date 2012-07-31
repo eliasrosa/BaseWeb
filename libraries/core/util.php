@@ -241,11 +241,16 @@ class bwUtil
     /**
      * Redireciona a página
      * ********************************************* */
-    public function redirect($url, $router = true)
+    public function redirect($url, $router = true, $h301 = false)
     {
-        if ($router)
+        if ($router) {
             $url = bwRouter::_($url);
-
+        }
+        
+        if ($h301) {
+            header('HTTP/1.1 301 Moved Permanently');
+        }
+        
         header('Location: ' . $url);
         exit();
     }

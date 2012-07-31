@@ -20,21 +20,19 @@ class bwSession
 
     function getToken()
     {
-        $token = bwSession::get('token', false);
-
-        if ($token !== false)
-            return $token;
-        else {
-            $token = sha1(rand() . session_name() . session_id());
-            return bwSession::set('token', $token);
+        if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = sha1(rand() . BW_URL_BASE2);
         }
+        
+        return $_SESSION['token'];
     }
 
     function get($var, $default = NULL)
     {
+        $token = bwSession::getToken();
         $var = 'bw.' . $var;
-        if (isset($_SESSION[$var]))
-            return $_SESSION[$var];
+        if (isset($_SESSION[$token][$var]))
+            return $_SESSION[$token][$var];
 
         return $default;
     }
@@ -42,7 +40,8 @@ class bwSession
     function set($var, $value)
     {
         $var = 'bw.' . $var;
-        $_SESSION[$var] = $value;
+        $token = bwSession::getToken();
+        $_SESSION[$token][$var] = $value;
 
         return $value;
     }
@@ -50,8 +49,9 @@ class bwSession
     function del($var)
     {
         $var = 'bw.' . $var;
-        if (isset($_SESSION[$var]))
-            unset($_SESSION[$var]);
+        $token = bwSession::getToken();
+        if (isset($_SESSION[$token][$var]))
+            unset($_SESSION[$token][$var]);
     }
 
     function destroy()

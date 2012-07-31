@@ -15,8 +15,3 @@ bwLoader::import('core.functions');
 
 // carrega conexão com banco MySql
 bwLoader::import('core.conexao');
-
-// inicia o adm
-bwAdm::init();
-
-?>

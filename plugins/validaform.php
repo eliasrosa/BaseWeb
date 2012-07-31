@@ -12,8 +12,8 @@ class bwPluginValidaForm
             bwHtml::js(BW_URL_JAVASCRIPTS . '/validaform/jquery.meio.mask.min.js');
             bwHtml::js(BW_URL_JAVASCRIPTS . '/validaform/jquery.validaform.js');
             bwHtml::css(BW_URL_JAVASCRIPTS . '/validaform/jquery.datepicker.css');
-
-            if (BW_ADM)
+            
+            if (defined('BW_ADM'))
             {
                 bwHtml::js(BW_URL_JAVASCRIPTS . '/validaform/jquery-ui-timepicker-addon.js');
                 bwHtml::js(BW_URL_JAVASCRIPTS . '/nicEdit/nicEdit.js');

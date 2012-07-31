@@ -65,8 +65,9 @@ class bwConfigDB
 
     public function createHtmlPainel()
     {
+        $template = bwTemplate::getInstance();
         $prefix = $this->getPrefix();
-        require_once BW_PATH_COMPONENTS . DS . 'sistema' . DS . 'adm' . DS . 'inc' . DS . 'painel.configuracoes.php';
+        require_once $template->getPathHtml() . DS . 'config' . DS . 'painel.php';
     }
 
     public function createHtmlForm($var)
@@ -75,7 +76,7 @@ class bwConfigDB
 
         if ($db) {
 
-            $this->_form = new bwForm($db, bwRouter::_("adm.php?com=sistema&task=salvarConfig"), 'post', $db->protegido, 'var');
+            $this->_form = new bwForm($db, bwRouter::_("/config/save"), 'post', $db->protegido, 'var');
             $this->_form->addInputID();
 
 

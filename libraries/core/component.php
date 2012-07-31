@@ -4,11 +4,8 @@ defined('BW') or die("Acesso negado!");
 
 class bwComponent extends bwObject
 {
-
     var $id = '';
     var $nome = '';
-    var $versao = 0;
-    var $adm_url_default = 'adm.php?com=xxxx&view=yyyy';
     var $adm_visivel = true;
 
     //

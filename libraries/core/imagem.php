@@ -74,8 +74,21 @@ class bwImagem extends bwObject
     private function _checkExists()
     {
         if (!bwFile::exists($this->getPath())) {
+           
+            //
             $this->_erro404 = true;
-            $this->configurarCaminhos('sistema', 'imagens', 404);
+
+            // path arquivo original
+            $this->_pathFolder = BW_PATH_MEDIA;
+            $this->_path = $this->_pathFolder . DS . '404.jpg';
+
+            // url arquivo original
+            $this->_urlFolder = BW_URL_MEDIA;
+            $this->_url = $this->_urlFolder . '/404.jpg';
+
+            // path arquivo cache
+            $this->_pathCacheFolder = '';
+            $this->_urlCacheFolder = '';
         }
     }
 

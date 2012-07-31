@@ -4,8 +4,9 @@ defined('BW') or die("Acesso negado!");
 
 class bwTemplate extends bwObject
 {
+
     //
-    private $_name, $_path, $_url;
+        private $_name, $_path, $_url;
 
     // getInstance
     function getInstance($class = false)
@@ -32,17 +33,16 @@ class bwTemplate extends bwObject
         $url = new bwUrl();
         $view = str_replace(BW_URL_BASE, '', $url->getPath());
         $template = explode('/', $view);
+        $tpl_name = $template[1];
 
         if (isset($template[1])) {
-            $path = BW_PATH_TEMPLATES . DS . $template[1] . DS . 'html';
+            $path = BW_PATH_TEMPLATES . DS . $tpl_name . DS . 'html';
             if (bwFolder::is($path)) {
-                bwRequest::setVar('template', $template[1]);
-                unset($template[0], $template[1]);
-                bwRequest::setVar('view', '/' . join('/', $template));
+                bwRequest::setVar('template', $tpl_name);
             }
         }
 
-        $this->_name = bwRequest::getVar('template', bwCore::getConfig()->getValue('site.template'));
+        $this->_name = bwRequest::getVar('template', $this->getDefault());
     }
 
     private function setPath()
@@ -73,6 +73,19 @@ class bwTemplate extends bwObject
     function getUrl()
     {
         return $this->_url;
+    }
+    
+    function isDefault()
+    {
+        $t1 = $this->getDefault();
+        $t2 = bwRequest::getVar('template', $t1);
+        
+        return ($t1 == $t2);
+    }
+
+    function getDefault()
+    {
+        return bwCore::getConfig()->getValue('site.template');
     }
 
     function getUrlHtml()

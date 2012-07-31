@@ -10,10 +10,26 @@ class bwDebug extends bwObject
         return bwObject::getInstance($class);
     }
 
+    function is()
+    {
+        return bwCore::getConfig()->getValue('debug.status');
+    }
+
+    function addHeader($str)
+    {
+        if(bwDebug::is()){
+            header('bwDebug: '. $str);
+        }
+    }
+
     function show()
     {
-        if (bwCore::getConfig()->getValue('debug.status')) {
-            echo "<h2>:: Debug :: Sessions #" . session_id() . "</h2>";
+        if (bwDebug::is()) {
+            echo '<div id="bw-debug" style="text-align: left;">';
+            echo "<h2>:: Debug :: Headers</h2>";
+            echo "<pre>" . htmlspecialchars(print_r($_SERVER, 1)) . "</pre>";
+
+            echo "<h2>:: Debug :: Sessions #" . bwSession::getToken() . "</h2>";
             echo "<pre>" . htmlspecialchars(print_r($_SESSION, 1)) . "</pre>";
 
             $contants = get_defined_constants(true);
@@ -31,6 +47,8 @@ class bwDebug extends bwObject
                     'COOKIE' => $_COOKIE
                     //'INSTANCES' => bwObject::$_instances
                     ), 1)) . "</pre>";
+
+            echo '</div>';
         }
     }
 

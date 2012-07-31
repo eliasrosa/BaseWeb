@@ -87,7 +87,7 @@ class bwLogin extends bwObject
 
                     // redireciona 
                     if ($auto_redirect) {
-                        bwUtil::redirect($auto_redirect, true);
+                        bwUtil::redirect($auto_redirect);
                     }
 
                     return true;
@@ -131,7 +131,7 @@ class bwLogin extends bwObject
     }
 
     // gera a senha para o banco
-    public function gerarSenha($user, $pass)
+    private function gerarSenha($user, $pass)
     {
         $pass1 = "baseweb://{$user}:{$pass}";
         $pass2 = sha1(md5($pass1));
@@ -163,14 +163,15 @@ class bwLogin extends bwObject
     }
 
     //
-    public function restrito($isGrupoAdm = false, $loginUrl = NULL)
+    public function restrito($is_grupo_adm, $url_login)
     {
-        $urlAtual = new bwUrl();
+        $view = BW_URL_BASE2 . bwRequest::getVar('view');
+        $url_login = bwRouter::_($url_login);
 
-        // url login
-        $loginUrl = is_null($loginUrl) ? BW_URL_ADM_LOGIN_FILE : $loginUrl;
-        $urlLogin = new bwUrl($loginUrl);
-
+        if($view == $url_login){
+            $this->sair();
+            return;
+        }
 
         if ($this->isLogin()) {
 
@@ -178,9 +179,9 @@ class bwLogin extends bwObject
             $u = $this->getSession();
 
             // mostra o login se o usuário tentar acessar o ADM e o grupo não for ADM
-            if ($isGrupoAdm && $u->Grupo->isAdm == 0) {
+            if ($is_grupo_adm && $u->Grupo->isAdm == 0) {
                 $this->sair();
-                bwUtil::redirect($urlLogin->toString(), false);
+                bwUtil::redirect($url_login.'?m=noadm', false);
             }
 
             // dados da session
@@ -205,14 +206,14 @@ class bwLogin extends bwObject
                 $dql->save();
             } else {
                 $this->sair();
-                bwUtil::redirect($urlLogin->toString(), false);
+                bwUtil::redirect($url_login.'?m=expired', false);
             }
 
-            return true;
+            return;
         }
 
         $this->sair();
-        bwUtil::redirect($urlLogin->toString(), false);
+        bwUtil::redirect($url_login, false);
     }
 
 }

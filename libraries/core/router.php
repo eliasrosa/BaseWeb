@@ -11,9 +11,9 @@ class bwRouter
      * @param type $nome
      * @param type $i 
      */
-    public function _($nome, $i = array())
+    public function _($nome, $tpl_prefix = true, $i = array())
     {
-        return bwRouter::getUrl($nome, $i);
+        return bwRouter::getUrl($nome, $tpl_prefix, $i);
     }
 
     /**
@@ -22,43 +22,68 @@ class bwRouter
      * @param type $i
      * @return type 
      */
-    function getUrl($url, $i = array())
+    function getUrl($url, $tpl_prefix = true, $i = array())
     {
-        $rotas = bwRequest::getVar('bw.core.url', array());
+        $routes = bwRouter::getRoutes();
 
-        if (isset($rotas[$url]) && count($i)) {
-            $url = $rotas[$url]['url'];
+        if (isset($routes[$url]) && count($i)) {
+            $rota = $routes[$url];
+            $url = $rota['url'];
 
             preg_match_all('#(:([a-zA-Z1-9-_]+))#', $url, $result);
-            foreach ($result[2] as $key) {
-                $url = str_replace(":{$key}", bwUtil::alias($i[$key]), $url);
+
+            foreach ($result[2] as $k => $v) {
+                $c = $rota['campos'][$k];
+                $url = preg_replace("#:{$v}#", bwUtil::alias($i[$c]), $url, 1);
             }
         }
 
-        return BW_URL_BASE2 . $url;
+        if (!bwTemplate::getInstance()->isDefault() && $tpl_prefix == true) {
+            $template = '/' . bwRequest::getVar('template');
+            $url = "{$template}{$url}";
+        }
+
+        if (preg_match('#(https?|ftps?|ssh|git|rsync)://#', $url)) {
+            return $url;
+        } else {
+            return BW_URL_BASE2 . $url;
+        }
     }
 
     /**
      * addUrl
      * 
      * @param type $url
-     * @param type $name
      * @param type $conditions 
+     * @param type $type 
      */
-    function addUrl($url, $name = NULL, $conditions = array())
+    function addUrl($url, $campos = array(), $type = "view")
     {
-        $urls = bwRequest::getVar('bw.core.url', array());
+        $routes = bwRouter::getRoutes();
 
-        if (is_null($name)) {
+        if (count($campos)) {
+            $name = strstr($url, '/:', true);
+        } else {
             $name = $url;
         }
 
-        $urls[$name] = array(
+        $regexp = str_replace(':alias', '([\w\d-]+)', $url);
+        $regexp = str_replace(':id', '(\d+)', $regexp);
+
+        //
+        if (!bwTemplate::getInstance()->isDefault()) {
+            $template = '/' . bwRequest::getVar('template');
+            $regexp = "({$template})?{$regexp}";
+        }
+
+        $routes[$name] = array(
+            'type' => $type,
             'url' => $url,
-            'conditions' => $conditions
+            'regexp' => "#^{$regexp}/?$#",
+            'campos' => $campos,
         );
 
-        bwRequest::setVar('bw.core.url', $urls);
+        bwRouter::setRoutes($routes);
     }
 
     /**
@@ -67,6 +92,9 @@ class bwRouter
      */
     function load()
     {
+        // 404 defaut
+        //bwRouter::addUrl('/error/404', array(), 'static');
+
         // carrega todas as rotas 
         $components = bwFolder::listarConteudo(BW_PATH_COMPONENTS, false, true, false, false);
         foreach ($components as $com) {
@@ -78,40 +106,36 @@ class bwRouter
 
         // template
         $template = bwTemplate::getInstance();
+        $template_name = $template->getName();
 
         // carrega as rotas customizadas
         require_once $template->getPath() . DS . 'router.php';
 
-        // pega url atual
-        $url = new bwUrl();
-        $view = str_replace(BW_URL_BASE, '', $url->getPath());
-        $view = bwRequest::getVar('view', $view);
+        // carrega view      
+        $view = bwRequest::getVar('view');
 
         // is home#index
-        if ($view == '/') {
+        if ($view == '/' || $view == '' || (!$template->isDefault() && preg_match("#^/{$template_name}/?$#", $view))) {
             bwRequest::setVar('view', bwRouter::getRoot());
             return;
         }
 
-        $urls = bwRequest::getVar('bw.core.url', array());
+        //
+        $rotas = bwRouter::getRoutes();
+        foreach ($rotas as $k => $u) {
 
-        foreach ($urls as $k => $u) {
-            $url = $u['url'];
+            if (preg_match_all($u['regexp'], $view, $result)) {
 
-            foreach ($u['conditions'] as $c => $regexp) {
-                $url = str_replace($c, "($regexp)", $url);
-            }
-
-            if (preg_match_all("#$url#", $view, $result)) {
-
-                if (count($u['conditions'])) {
+                if (count($u['campos'])) {
                     bwRequest::setVar('view', $k);
 
                     unset($result[0]);
                     if (count($result)) {
-                        $i = 1;
-                        foreach ($u['conditions'] as $c => $regexp) {
-                            bwRequest::setVar(substr($c, 1), $result[$i][0]);
+                        // quando não o template padrao, é adicionado um grupo
+                        // a mais no regexp
+                        $i = (bwTemplate::getInstance()->isDefault()) ? 1 : 2;
+                        foreach ($u['campos'] as $nome) {
+                            bwRequest::setVar($nome, $result[$i][0]);
                             $i++;
                         }
                     }
@@ -123,27 +147,49 @@ class bwRouter
             }
         }
 
-        //
+        bwError::header404();
+        bwDebug::addHeader('Router not found!(' . $view . ')');
         bwRequest::setVar('view', '/error/404');
     }
 
     /**
      * setRoot
      * 
-     * @param type $view 
+     * @param string $view 
      */
     function setRoot($view)
     {
-        bwRequest::setVar('bw.rootview', $view);
+        bwRequest::setVar('view-root', $view);
     }
 
     /**
      * getRoot
      * 
+     * @return string 
      */
     function getRoot()
     {
-        return bwRequest::getVar('bw.rootview', '/index');
+        return bwRequest::getVar('view-root', '/index');
+    }
+
+    /**
+     * getRoutes
+     * 
+     * @return array()
+     */
+    function getRoutes()
+    {
+        return bwRequest::getVar('routes', array());
+    }
+
+    /**
+     * setRoutes
+     *
+     * @param array $routes 
+     */
+    function setRoutes($routes)
+    {
+        bwRequest::setVar('routes', $routes);
     }
 
 }

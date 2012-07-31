@@ -10,9 +10,9 @@ class bwCore
         return Doctrine_Manager::getInstance()->getConnection('default');
     }
 
-    function __construct()
+    function setUtf8()
     {
-        header('content-type: text/html; charset: utf-8');
+        header("Content-Type: text/html; charset=utf-8", true);
         mb_internal_encoding('UTF-8');
         mb_http_output('UTF-8');
         mb_http_input('UTF-8');
@@ -22,19 +22,26 @@ class bwCore
 
     function init()
     {
+        // set utf8
+        bwCore::setUtf8();
+        
         // inicia a session
         bwSession::init();
 
-        // modo offline
-        if (bwCore::getConfig()->getValue('site.offline') && !bwLogin::getInstance()->isLogin())
-            bwUtil::redirect(BW_URL_ADM_LOGIN);
+        // url atual
+        $url = new bwUrl();
+        $view = str_replace(BW_URL_BASE, '', $url->getPath());
+        bwRequest::setVar('view', $view);
 
-        // Carrega o template
-        bwTemplate::getInstance()->load();
-        
+        // Inicia a instancia do template
+        $template = bwTemplate::getInstance();
+
         // pega todas as rotas
         bwRouter::load();
-       
+
+        // Carrega o template para o buffer
+        $template->load();
+
         // carrega o componente para o buffer
         bwBuffer::getInstance()->loadView();
 
@@ -55,5 +62,3 @@ class bwCore
     }
 
 }
-
-?>

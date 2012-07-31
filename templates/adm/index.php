@@ -1,72 +1,68 @@
 <?
 defined('BW') or die("Acesso negado!");
+
+bwAdm::init('/login');
+
+//
+bwHtml::setTitle("Administração");
+
+$template = bwTemplate::getInstance();
+$login = bwLogin::getInstance();
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>              
-                
+
         <!-- jQuery e jQuery UI -->
         <link type="text/css" href="<?= BW_URL_JAVASCRIPTS ?>/jquery/themes-1.8rc2/redmond/style.css" rel="Stylesheet" />
-        <script type="text/javascript" src="<?= BW_URL_JAVASCRIPTS ?>/jquery/jquery-1.6.min.js"></script> 
+        <script type="text/javascript" src="<?= BW_URL_JAVASCRIPTS ?>/jquery/jquery-1.7.1.min.js"></script> 
         <script type="text/javascript" src="<?= BW_URL_JAVASCRIPTS ?>/jquery/ui-1.8rc2.js"></script> 
-        
-        <!-- dataTableSettings -->
-        <script type="text/javascript" src="<?= BW_URL_TEMPLATE ?>/js/dataTableSettings.js"></script>
-        <script type="text/javascript" src="<?= BW_URL_JAVASCRIPTS ?>/DataTables-1.7.6/media/js/jquery.dataTables.min.js"></script>
-        <link type="text/css" href="<?= BW_URL_JAVASCRIPTS ?>/DataTables-1.7.6/media/css/demo_table_jui.css" rel="Stylesheet" />
-        
-        <!-- plugins -->
+
         {BW HEAD}
-                
+
         <!-- Head da página -->
-        <link type="text/css" href="<?= BW_URL_TEMPLATE ?>/css/styles.css" rel="Stylesheet" />
-        <script type="text/javascript" src="<?= BW_URL_TEMPLATE ?>/js/comum.js"></script>       
+        <link type="text/css" href="<?= $template->getUrl() ?>/css/styles.css" rel="Stylesheet" />
+        <script type="text/javascript" src="<?= $template->getUrl() ?>/js/comum.js"></script>       
         
         <!--[if lte IE 8]>
-            <link type="text/css" href="<?= BW_URL_TEMPLATE ?>/css/style-ie.css" rel="Stylesheet" />
+            <link type="text/css" href="<?= $template->getUrl() ?>/css/style-ie.css" rel="Stylesheet" />
         <![endif]-->
-    
+
     </head>
     <body>
-    
+
         <div id="page">
 
             <div id="top">
                 <h1><?= bwCore::getConfig()->getValue('site.titulo'); ?></h1>
-                <div><a href="<?= BW_URL_ADM_LOGOFF_FILE; ?>">Sair</a></div>
-                <div><a href="<?= bwRouter::_('adm.php?com=sistema&view=configuracoes'); ?>">Configurações</a></div>
+                <div><a href="<?= bwRouter::_('/sair'); ?>">Sair</a></div>
+                <div><a href="<?= bwRouter::_('/config'); ?>">Configurações</a></div>
                 <div><a href="<?= BW_URL_BASE2 ?>" target="_blank">Visualizar site <?= bwCore::getConfig()->getValue('site.titulo'); ?></a></div>
             </div>
-        
+
             <div id="menu">
-            <?   
+                <?
                 $com = bwRequest::getVar('com', '');
-                foreach(bwComponent::getAll() as $c)
-                {
-                    if($c['adm_visivel'])
-                    {
-                    
+                foreach (bwComponent::getAll() as $c) {
+                    if ($c['adm_visivel']) {
                         $active = ($com == $c['id']) ? ' active' : '';
-                        $class = "{$c['com']}{$active}";
-                        echo sprintf('<div class="programas %s"><a href="%s">%s</a></div>',
-                            $class,
-                            bwRouter::_($c['adm_url_default']),
-                            $c['nome']
+                        $class = "{$c['id']}{$active}";
+                        echo sprintf('<div class="programas %s"><a href="%s">%s</a></div>', $class, bwRouter::_('/'.$c['id']), $c['nome']
                         );
                     }
                 }
-            ?>
+                ?>
             </div>
-            
+
             <div id="main">
-                {BW COMPONENT}
+                {BW VIEW}
             </div>
-            
+
             <div id="rodape">
                 <p>BaseWeb 2.0 - Desenvolvido por Elias da Rosa - <a href="http://www.eliasdarosa.com.br" target="_blank">http://www.eliasdarosa.com.br</a></p>
             </div>
-            
+
         </div>      
     </body>
 </html>
