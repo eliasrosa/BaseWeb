@@ -42,7 +42,7 @@ class bwRecord extends Doctrine_Record
 
         if ($this->_bwImagem && isset($dat['id']))
             $dat['bwImagem'] = bwImagem::getInstance($this->_bwImagemCom, $this->_bwImagemSub, $dat['id']);
-
+        
         $event->data = $dat;
     }
 
@@ -62,6 +62,11 @@ class bwRecord extends Doctrine_Record
         $this->_bwImagemSub = $sub;
     }
 
+
+    public function getUrl($nome){
+        $i = $this->data;
+        return bwRouter::getUrl($nome, $i);
+    }
 }
 
 ?>

@@ -1,10 +1,11 @@
 <?php
-
 defined('BW') or die("Acesso negado!");
 
 class bwBuffer extends bwObject
 {
-
+    //
+    private $html = null;
+    
     // getInstance
     function getInstance($class = false)
     {
@@ -12,69 +13,54 @@ class bwBuffer extends bwObject
         return bwObject::getInstance($class);
     }
 
-    private $modules = array();
-    private $html = null;
-
-    function addModule($pos, $mod, $params = array())
-    {
-        $this->modules[$pos][] = array(
-            'mod' => $mod,
-            'params' => $params
-        );
-    }
-
-    function getModules()
-    {
-        return $this->modules;
-    }
-
-    function setHtml($html)
+    public function setHtml($html)
     {
         $this->html = $html;
     }
 
-    function getHtml()
+    public function getHtml()
     {
         return $this->html;
     }
 
-    // carrega o componente para o buffer
-    function carregarHtmlComponente()
+    function loadView()
     {
-        $com = bwRequest::getVar('com');
+        $html = false;
         $view = bwRequest::getVar('view');
-        $itemid = bwRequest::getVar('itemid', 0);
+        $template = bwRequest::getVar('template', bwCore::getConfig()->getValue('site.template'));
+        $path = BW_PATH_TEMPLATES . DS . $template . DS . 'html';
 
-        $menu = bwMenu::getInstance();
-        $params = $menu->getParams($itemid);
-
-        $com = bwComponent::load($com, $view, $params);
-        $this->html = str_replace('{BW COMPONENT}', $com, $this->html);
-    }
-
-    // carrega os todos os modulos para buffer
-    function carregarHtmlModulos()
-    {
-        $file = bwTemplate::getInstance()->getPath() . DS . 'modules.php';
-
-        if (bwFile::exists($file))
-            require_once $file;
-
-        preg_match_all("#{BW MODULES (.*)}#i", $this->html, $resultado);
-
-        $pos = array();
-        for ($i = 0; $i < count($resultado[1]); $i++)
-            $pos[strtolower($resultado[1][$i])] = $resultado[0][$i];
-
-        foreach ($pos as $k => $v) {
-            $html = '';
-            if (isset($this->modules[$k]) && count($this->modules[$k])) {
-                foreach ($this->modules[$k] as $m) {
-                    $html .= bwModule::getHtml($m['mod'], $m['params']);
-                }
-            }
-            $this->html = str_replace($v, $html, $this->html);
+        
+        //
+        if (substr($view, -1) == '/') {
+            $file = $path . $view . DS . 'index.php';
+        } else {
+            $file = $path . $view . '.php';
         }
+
+       
+        //
+        if (bwFile::exists($file)) {
+            $html = bwUtil::execPHP($file);
+        } else {
+            // caso for uma pasta / redireciona
+            $folder = $path . $view;
+            
+            if (bwFolder::is($folder) && (substr($folder, -1) != '/')) {
+                header('HTTP/1.1 301 Moved Permanently');
+                header(sprintf('Location: %s%s/', BW_URL_BASE, $view));
+                exit();
+            }
+        }
+
+        //
+        if ($html == false) {
+            bwError::header404();
+            $file = $path . DS . 'error/404.php';
+            $html = bwUtil::execPHP($file);
+        }
+
+        $this->html = str_replace('{BW VIEW}', $html, $this->html);
     }
 
     function getHtmlHead()
@@ -83,5 +69,3 @@ class bwBuffer extends bwObject
     }
 
 }
-
-?>

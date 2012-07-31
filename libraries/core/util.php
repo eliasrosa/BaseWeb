@@ -338,17 +338,11 @@ class bwUtil
      * ********************************************* */
     public function execPHP($file, $vars = array())
     {
-        if (bwFile::exists($file)) {
-            ob_start();
+        ob_start();
+        extract($vars);
 
-            extract($vars);
-
-            require($file);
-
-            return ob_get_clean();
-        }
-        else
-            bwError::show("Arquivo '{$file}' não foi encontrado!");
+        require($file);
+        return ob_get_clean();
     }
 
     /**

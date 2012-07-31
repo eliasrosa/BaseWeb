@@ -15,7 +15,7 @@ class bwPluginEditinsite
             foreach ($matches[1] as $file)
             {
                 // busca
-                $fileFull = bwTemplate::getInstance()->getNome() . DS . 'edit-in-site' . DS . $file;
+                $fileFull = bwTemplate::getInstance()->getName() . DS . 'edit-in-site' . DS . $file;
                 $conteudo = bwEditInSite::getConteudo($fileFull);
                 $tipo = bwFile::getExt($file);
                 
