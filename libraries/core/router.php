@@ -2,7 +2,7 @@
 
 defined('BW') or die("Acesso negado!");
 
-class bwRouter
+abstract class bwRouter
 {
 
     /**
@@ -24,16 +24,21 @@ class bwRouter
      */
     function getUrl($url, $tpl_prefix = true, $i = array())
     {
+        // is absolute
+        if (preg_match('#^(https?|ftps?|ssh|git|rsync)://#', $url)) {
+            return $url;
+        }
+        
         $routes = bwRouter::getRoutes();
 
         if (isset($routes[$url]) && count($i)) {
-            $rota = $routes[$url];
-            $url = $rota['url'];
+            $route = $routes[$url];
+            $url = $route['url'];
 
             preg_match_all('#(:([a-zA-Z1-9-_]+))#', $url, $result);
 
             foreach ($result[2] as $k => $v) {
-                $c = $rota['campos'][$k];
+                $c = $route['fields'][$k];
                 $url = preg_replace("#:{$v}#", bwUtil::alias($i[$c]), $url, 1);
             }
         }
@@ -43,25 +48,52 @@ class bwRouter
             $url = "{$template}{$url}";
         }
 
-        if (preg_match('#(https?|ftps?|ssh|git|rsync)://#', $url)) {
-            return $url;
-        } else {
-            return BW_URL_BASE2 . $url;
+        return BW_URL_BASE2 . $url;
+    }
+
+    /**
+     * Retorna uma única rota
+     * 
+     * @param string $router
+     * @param string $type_return 'array' || 'object'
+     * @return array|object
+     */
+    function getRoute($router, $type_return = 'array')
+    {
+        $r = bwRouter::getRoutes($router);
+        if ($type_return == 'array') {
+            return $r[$router];
+        }
+
+        if ($type_return == 'object') {
+            return bwUtil::array2object($r[$router]);
         }
     }
 
     /**
      * addUrl
      * 
-     * @param type $url
-     * @param type $conditions 
-     * @param type $type 
+     * @param string $url
+     * @param array $params 
+     * 
+     * @return string $url
      */
-    function addUrl($url, $campos = array(), $type = "view")
+    function addUrl($url, $params = array())
     {
+        // sobreescreve os parametros
+        extract(array_merge(array(
+                'fields' => array(),
+                'type' => 'view',
+                'title' => '',
+                'keywords' => '',
+                'description' => '',
+                'alias' => '',
+                'redirect' => '',
+                ), $params));
+
         $routes = bwRouter::getRoutes();
 
-        if (count($campos)) {
+        if (count($fields)) {
             $name = strstr($url, '/:', true);
         } else {
             $name = $url;
@@ -80,10 +112,30 @@ class bwRouter
             'type' => $type,
             'url' => $url,
             'regexp' => "#^{$regexp}/?$#",
-            'campos' => $campos,
+            'title' => $title,
+            'keywords' => $keywords,
+            'description' => $description,
+            'redirect' => $redirect,
+            'fields' => $fields,
         );
 
+        //
         bwRouter::setRoutes($routes);
+
+        if (is_string($alias) && $alias != '') {
+            $alias = array($alias);
+        }
+
+        //
+        if (is_array($alias) && count($alias)) {
+
+            foreach ($alias as $a) {
+                bwRouter::addUrl($a, array(
+                    'type' => 'header301',
+                    'redirect' => $url
+                ));
+            }
+        }
     }
 
     /**
@@ -92,9 +144,6 @@ class bwRouter
      */
     function load()
     {
-        // 404 defaut
-        //bwRouter::addUrl('/error/404', array(), 'static');
-
         // carrega todas as rotas 
         $components = bwFolder::listarConteudo(BW_PATH_COMPONENTS, false, true, false, false);
         foreach ($components as $com) {
@@ -126,7 +175,7 @@ class bwRouter
 
             if (preg_match_all($u['regexp'], $view, $result)) {
 
-                if (count($u['campos'])) {
+                if (count($u['fields'])) {
                     bwRequest::setVar('view', $k);
 
                     unset($result[0]);
@@ -134,7 +183,7 @@ class bwRouter
                         // quando não o template padrao, é adicionado um grupo
                         // a mais no regexp
                         $i = (bwTemplate::getInstance()->isDefault()) ? 1 : 2;
-                        foreach ($u['campos'] as $nome) {
+                        foreach ($u['fields'] as $nome) {
                             bwRequest::setVar($nome, $result[$i][0]);
                             $i++;
                         }
@@ -173,13 +222,22 @@ class bwRouter
     }
 
     /**
-     * getRoutes
+     * Retorna todas as rotas correspodentes a expressão regular
      * 
+     * @param string $pattern
      * @return array()
      */
-    function getRoutes()
+    function getRoutes($filter = '.')
     {
-        return bwRequest::getVar('routes', array());
+        $routers = array();
+        foreach (bwRequest::getVar('routes', array()) as $subject => $v) {
+            $pattern = sprintf("#^%s#", $filter);
+            if (preg_match($pattern, $subject)) {
+                $routers[$subject] = $v;
+            }
+        }
+
+        return $routers;
     }
 
     /**

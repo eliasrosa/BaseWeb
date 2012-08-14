@@ -246,11 +246,11 @@ class bwUtil
         if ($router) {
             $url = bwRouter::_($url);
         }
-        
+
         if ($h301) {
             header('HTTP/1.1 301 Moved Permanently');
         }
-        
+
         header('Location: ' . $url);
         exit();
     }
@@ -439,6 +439,35 @@ class bwUtil
             return $object;
         } else {
             return FALSE;
+        }
+    }
+
+    /**
+     * Retorna uma array com os meses ou um string
+     * mês em pt-br
+     * ********************************************* */
+    function getMeses($id = NULL)
+    {
+        $m = array(
+            '1' => 'Janeiro',
+            '2' => 'Fevereiro',
+            '3' => 'Março',
+            '4' => 'Abril',
+            '5' => 'Maio',
+            '6' => 'Junho',
+            '7' => 'Julho',
+            '8' => 'Agosto',
+            '9' => 'Setembro',
+            '10' => 'Outubro',
+            '11' => 'Novembro',
+            '12' => 'Dezembro'
+        );
+
+        if (is_null($id)) {
+            return $m;
+        } else {
+            $id = (int) $id;
+            return $m[$id];
         }
     }
 

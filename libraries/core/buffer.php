@@ -52,7 +52,7 @@ class bwBuffer extends bwObject
             if (defined('BW_ADM')) {
                 $com = explode('/', $view);
                 if (isset($com[1]) && bwFolder::is(BW_PATH_COMPONENTS . DS . $com[1])) {
-                    
+
                     bwRequest::setVar('com', $com[1]);
 
                     $path = BW_PATH_COMPONENTS . DS . $com[1] . DS . 'adm' . DS . 'views';
@@ -68,8 +68,15 @@ class bwBuffer extends bwObject
         // is folder or file
         if (substr($view, -1) == '/') {
             $file = $path . $view . 'index.php';
+            $view = substr($view, 0, -1);
         } else {
             $file = $path . $view . '.php';
+        }
+
+        // is header301
+        if (isset($routes[$view]) && $routes[$view]['type'] == 'header301') {
+            bwUtil::redirect($routes[$view]['redirect'], true, true);
+            return;
         }
 
         // is exist file
@@ -93,9 +100,22 @@ class bwBuffer extends bwObject
 
         //
         if (isset($routes[$view])) {
-            $type = $routes[$view]['type'];
 
-            switch ($type) {
+            // SEO
+            if ($routes[$view]['title'] != '') {
+                bwHtml::setTitle($routes[$view]['title']);
+            }
+            
+            if ($routes[$view]['keywords'] != '') {
+                bwHtml::setKeywords($routes[$view]['keywords']);
+            }
+            
+            if ($routes[$view]['description'] != '') {
+                bwHtml::setDescription($routes[$view]['description']);
+            }
+            
+            // type
+            switch ($routes[$view]['type']) {
                 case 'static':
                     $this->setHtml($html);
                     return;

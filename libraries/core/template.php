@@ -21,6 +21,12 @@ class bwTemplate extends bwObject
         $this->setName($template);
         $this->setPath();
         $this->setUrl();
+
+        // Define a contante
+        if (!defined('BW_URL_TEMPLATE')) {
+            define('BW_URL_TEMPLATE', $this->getUrl());
+            define('BW_PATH_TEMPLATE', $this->getPath());
+        }
     }
 
     private function setName($template = NULL)
@@ -74,12 +80,12 @@ class bwTemplate extends bwObject
     {
         return $this->_url;
     }
-    
+
     function isDefault()
     {
         $t1 = $this->getDefault();
         $t2 = bwRequest::getVar('template', $t1);
-        
+
         return ($t1 == $t2);
     }
 

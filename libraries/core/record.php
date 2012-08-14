@@ -64,8 +64,7 @@ class bwRecord extends Doctrine_Record
 
 
     public function getUrl($nome, $tpl_prefix = true){
-        $i = $this->data;
-        return bwRouter::_($nome, $tpl_prefix, $i);
+        return bwRouter::_($nome, $tpl_prefix, $this->data);
     }
 }
 

@@ -35,7 +35,7 @@ class bwCore
 
         // Inicia a instancia do template
         $template = bwTemplate::getInstance();
-
+        
         // pega todas as rotas
         bwRouter::load();
 

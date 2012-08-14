@@ -13,11 +13,11 @@ class bwForm
     var $isEdit = false;
     private $_primary = null;
 
-    function __construct($db = false, $action = '', $method = 'delete', $blockEdit = false, $primary = 'id')
+    function __construct($db = false, $action = '', $method = 'post', $blockEdit = false, $primary = 'id')
     {
         $method = ($method != 'get') ? 'post' : 'get';
 
-        $this->formAttr['action'] = $action;
+        $this->formAttr['action'] = bwRouter::_($action);
         $this->formAttr['method'] = $method;
         $this->formAttr['id'] = 'bwForm_' . rand();
 
@@ -617,9 +617,9 @@ class bwForm
     {
         $this->addH2('SEO - Otimização para motores de busca' . $info);
 
-        $this->addInput('metatagalias', 'text', array(
-            'label' => 'Alias:'
-        ));
+        //$this->addInput('metatagalias', 'text', array(
+        //    'label' => 'Alias:'
+        //));
 
         $this->addInput('metatagkeywords', 'text', array(
             'label' => 'Metatag (keywords):'

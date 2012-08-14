@@ -7,7 +7,6 @@ class bwUsuarios extends bwComponent
     // variaveis obrigatórias
     var $id = 'usuarios';
     var $nome = 'Usuários';
-    var $adm_url_default = 'adm.php?com=usuarios&view=perfil';
     var $adm_visivel = true;
         
 
