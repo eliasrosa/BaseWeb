@@ -6,22 +6,68 @@ class bwUtil
 {
 
     /**
-     * Cria um valor visivel, mas seguro
-     * ********************************************* */
-    public function createSafeValue($value, $customKey = '', $randKey = NULL)
+     * Valida o CPF
+     * 
+     * @param string $cpf
+     * @return boolean 
+     */
+    function validaCPF($cpf)
+    {
+        // limpa o cpf
+        $cpf = preg_replace('#[^0-9]#', '', $cpf);
+
+        // Verifiva se o número digitado contém todos os digitos
+        if (strlen($cpf) != 11 || $cpf == '') {
+            return false;
+        }
+
+        // Verifiva se o cpf contém digitos repetidos ou fakes, ex: 01234567890, 99999999999, 
+        if (preg_match('#^(0{11}|1{11}|2{11}|3{11}|4{11}|5{11}|6{11}|7{11}|8{11}|9{11}|01234567890)$#', $cpf)) {
+            return false;
+        }
+
+        // Calcula os números para verificar se o CPF é verdadeiro
+        for ($t = 9; $t < 11; $t++) {
+            for ($d = 0, $c = 0; $c < $t; $c++) {
+                $d += $cpf{$c} * (($t + 1) - $c);
+            }
+
+            $d = ((10 * $d) % 11) % 10;
+
+            if ($cpf{$c} != $d) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Cria um valor visivel e seguro
+     * 
+     * @param string $value      Valor a ser passado
+     * @param string $customKey  Chave opcional de segurança
+     * @param type $randKey      Não usar
+     * @param type $expire       Tempo em segundos para expirar, 0 = disable
+     * 
+     * @return string (base64_encode)
+     */
+    public function createSafeValue($value, $customKey = NULL, $randKey = NULL, $expire = 0)
     {
         //
-        if (is_null($randKey))
+        if (is_null($randKey)) {
             $randKey = strtoupper(substr(sha1(rand()), 0, 10));
+        }
 
         //
-        $customKey = strtoupper(sha1($customKey));
+        if (!is_null($customKey)) {
+            $customKey = 'BW';
+        }
 
         //
-        $sha1 = strtoupper(substr(sha1("SAFE::VALUE::$randKey::$value::$customKey"), 0, 10));
-
-        //
-        $safeValue = sprintf('%s|%s|%s', $randKey, $sha1, $value);
+        $sha1 = strtoupper(substr(sha1("SAFE::VALUE::$randKey::$value::$customKey::$expire"), 0, 10));
+        $safeValue = sprintf('%s|%s|%s|%s', $randKey, $sha1, $value, $expire);
+        $safeValue = base64_encode($safeValue);
 
         return $safeValue;
     }
@@ -32,13 +78,19 @@ class bwUtil
      * ********************************************* */
     public function getSafeValue($safeValue, $customKey = NULL)
     {
-        $a = explode('|', $safeValue);
-        $safeValue2 = bwUtil::createSafeValue($a[2], $customKey, $a[0]);
+        $safeValue = base64_decode($safeValue);
 
-        //echo "$safeValue<br>$safeValue2";
-        //var_dump($safeValue == $safeValue2); // ? $a[2] : NULL;
-        //
-        return ($safeValue == $safeValue2) ? $a[2] : NULL;
+        $a = explode('|', $safeValue);
+        $safeValue2 = base64_decode(bwUtil::createSafeValue($a[2], $customKey, $a[0], $a[3]));
+        $b = explode('|', $safeValue2);
+
+        if ($safeValue == $safeValue2) {
+            if ($a[3] == 0 || time() <= $a[3]) {
+                return $a[2];
+            }
+        }
+
+        return NULL;
     }
 
     /**

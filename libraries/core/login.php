@@ -26,6 +26,7 @@ class bwLogin extends bwObject
         $this->mensagens['permissao'] = 'Você não tem permissão \'ADM!\'';
         $this->mensagens['invalido'] = 'Usuário ou senha inválido!';
         $this->mensagens['grupo'] = 'Usuário ou senha inválido, tente novamente!';
+        $this->mensagens['email.fail'] = 'E-mail inválido, tente novamente!';
     }
 
     // getInstance
@@ -131,12 +132,48 @@ class bwLogin extends bwObject
     }
 
     // gera a senha para o banco
-    private function gerarSenha($user, $pass)
+    public function gerarSenha($user, $pass)
     {
         $pass1 = "baseweb://{$user}:{$pass}";
         $pass2 = sha1(md5($pass1));
 
         return $pass2;
+    }
+
+    /**
+     * Cria uma senha aleatória
+     * 
+     * @param integer $tamanho Tamanho da senha a ser gerada
+     * @param boolean $maiusculas Se terá letras maiúsculas
+     * @param boolean $numeros Se terá números
+     * @param boolean $simbolos Se terá símbolos
+     *
+     * @return string A senha gerada
+     */
+    function createSenhaRand($tamanho = 8, $maiusculas = true, $numeros = true, $simbolos = false)
+    {
+        $lmin = 'abcdefghijklmnopqrstuvwxyz';
+        $lmai = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $num = '1234567890';
+        $simb = '!@#$%*-';
+        $retorno = '';
+        $caracteres = '';
+
+        $caracteres .= $lmin;
+        if ($maiusculas)
+            $caracteres .= $lmai;
+        if ($numeros)
+            $caracteres .= $num;
+        if ($simbolos)
+            $caracteres .= $simb;
+
+        $len = strlen($caracteres);
+        for ($n = 1; $n <= $tamanho; $n++) {
+            $rand = mt_rand(1, $len);
+            $retorno .= $caracteres[$rand - 1];
+        }
+
+        return $retorno;
     }
 
     // seta o erro
@@ -165,10 +202,16 @@ class bwLogin extends bwObject
     //
     public function restrito($is_grupo_adm, $url_login)
     {
-        $view = BW_URL_BASE2 . bwRequest::getVar('view');
+        $router = bwRouter::getRoute();
+        if (isset($router['skip_constraint']) && $router['skip_constraint'] == true) {
+            return;
+        }
+
+        $view = bwRequest::getVar('view');
+        $url_atual = BW_URL_BASE2 . $view;
         $url_login = bwRouter::_($url_login);
 
-        if($view == $url_login){
+        if ($url_atual == $url_login) {
             $this->sair();
             return;
         }
@@ -181,7 +224,7 @@ class bwLogin extends bwObject
             // mostra o login se o usuário tentar acessar o ADM e o grupo não for ADM
             if ($is_grupo_adm && $u->Grupo->isAdm == 0) {
                 $this->sair();
-                bwUtil::redirect($url_login.'?m=noadm', false);
+                bwUtil::redirect($url_login . '?m=noadm', false);
             }
 
             // dados da session
@@ -206,7 +249,7 @@ class bwLogin extends bwObject
                 $dql->save();
             } else {
                 $this->sair();
-                bwUtil::redirect($url_login.'?m=expired', false);
+                bwUtil::redirect($url_login . '?m=expired', false);
             }
 
             return;
@@ -216,6 +259,73 @@ class bwLogin extends bwObject
         bwUtil::redirect($url_login, false);
     }
 
-}
+    public function enviarSolitacaoSenha($email, $url, $expire = 120)
+    {
+        if (Usuario::findByEmail($email)) {
+            $time = strtotime(sprintf('+%s minutes', $expire));
+            $safe_email = bwUtil::createSafeValue($email, NULL, NULL, $time);
+            $u = bwRouter::_($url . '?k=' . $safe_email);
 
-?>
+            $html .= sprintf('<br>Olá<br><br>');
+            $html .= sprintf('Recebemos uma solicitação de recuperação de senha. ');
+            $html .= sprintf('Caso você não tenha solicitado, por favor ignore esta mensagem.<br><br>');
+            $html .= sprintf('Para realizar este processo, clique no link abaixo:<br>');
+            $html .= sprintf('<a href="%s">%s</a>', $u, $u);
+
+            $this->sendMail($email, 'Solicitação de troca de senha', $html);
+
+            return true;
+        } else {
+            $this->setMsg('email.fail');
+            return false;
+        }
+    }
+
+    public function enviarNovaSenha($email)
+    {
+        $u = Usuario::findByEmail($email);
+        if ($u) {
+
+            $senha = $this->createSenhaRand();
+            $u->pass = $this->gerarSenha($u->user, $senha);
+            $u->save();
+
+            $html = sprintf('<br>Olá<br><br>');
+            $html .= sprintf('Conforme solicitado, uma nova senha foi criada para você.<br><br>');
+            $html .= sprintf('E-mail: %s<br>', $email);
+            $html .= sprintf('Senha: %s<br>', $senha);
+            $html .= sprintf('Site: %s<br>', BW_URL_BASE2);
+
+            $this->sendMail($email, 'Nova senha', $html);
+
+            return true;
+        } else {
+            $this->setMsg('email.fail');
+            return false;
+        }
+    }
+
+    /**
+     * Envia um e-mail como mail-noreplay@domain...
+     * 
+     * @param type $email
+     * @param type $prefix_subject
+     * @param type $html 
+     */
+    private function sendMail($email, $prefix_subject, $html)
+    {
+        $site_title = bwCore::getConfig()->getValue('site.titulo');
+        $site_domain = $_SERVER['HTTP_HOST'];
+        $site_email = sprintf('%s <mail-noreply@%s>', $site_title, $site_domain);
+        $subject = $prefix_subject . ' - ' . $site_title;
+
+        $headers = sprintf("MIME-Version: 1.0 \r\n");
+        $headers .= sprintf("Content-type: text/html; charset=utf-8 \r\n");
+        $headers .= sprintf("From: %s \r\n", $site_email);
+        $headers .= sprintf("Reply-To: mail-noreply@%s \r\n", $site_domain);
+        $headers .= sprintf("X-Mailer: PHP/%s \r\n", phpversion());
+
+        return mail($email, $subject, $html, $headers);
+    }
+
+}

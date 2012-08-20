@@ -38,8 +38,6 @@ $logo = $template->getUrl() . '/img/logo.jpg';
     </head>
     <body>  
 
-        <div id="top"></div>
-
         <img class="logo" src="<?= $logo ?>" alt="logo" />
 
         <form class="login" action="" method="post">
@@ -50,17 +48,21 @@ $logo = $template->getUrl() . '/img/logo.jpg';
             <label>Senha</label>
             <input type="password" class="txt pass" name="pass" title="Senha" value="" />
 
-            <input type="submit" value="Entrar" class="sub" />
+            <input type="submit" value="Entrar" class="submit" />
 
-            <? if ($login->mostrarMensagem()): ?>
-                <span class="erro"><?= $login->mostrarMensagem(); ?></span>
-            <? endif; ?>
-
+            <span class="erro">
+                <?
+                if ($login->mostrarMensagem()) {
+                    echo $login->mostrarMensagem();
+                }
+                ?>
+            </span>
+            
+            <div class="loading">
+                <img src="<?= BW_URL_TEMPLATE ?>/img/load1.gif" />
+            </div>
         </form>
-
-
-
-        <div id="rodape"></div>
-
+        <span>Esqueceu sua senha, <a href="<?= bwRouter::_('/senha'); ?>">clique aqui!</a><span>
+        
     </body>
 </html>

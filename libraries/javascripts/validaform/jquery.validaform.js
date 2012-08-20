@@ -1,6 +1,7 @@
 jQuery.fn.extend({
        
     validaForm: function(parametros){
+    
         var options = {
             error: function(campos, callback) {
                 var msg = "Preencha corretamente o(s) seguinte(s) campo(s):\n";
@@ -20,46 +21,47 @@ jQuery.fn.extend({
             type: ''
         };
 
-        var form = $(this);
         var op = jQuery.extend(options, parametros);
-        
-        // evento para desabilitar as validação
-        $(form).bind("validaFormDisable", function(){
-            op.enabled = false;
-        });
-
-        var caracterObrigatorio = '_';
-        var camposErrados = new Array();
-
-        var tipo = function(campo) {
-            var r = $(campo).attr('rel');
-            if(r.substr(r.length -1) == caracterObrigatorio){
-                r = r.substr(0, r.length -1);
-            }
-            return r;
-        };
-
-        var isObrigatorio = function(campo) {
-            var rel = $(campo).attr('rel');
-            var val = $(campo).val();
-            
-            if(rel.substr(rel.length -1) == caracterObrigatorio || val != ''){
-                return true;
-            }
-
-            return false;
-        };
-
-        var validar = function(campo, exp) {
-            var name = $(campo).attr('name');
-            var deft = $(campo).attr('default-value');
-            var value = $(campo).val();
-            if(!exp.test(value) || deft == value){
-                camposErrados.push(campo);
-            }
-        };
 
         return this.each(function(){
+
+            // vars
+            var form = $(this);
+            var caracterObrigatorio = '_';        
+            var camposErrados = new Array();
+
+            // evento para desabilitar as validação
+            $(form).bind("validaFormDisable", function(){
+                op.enabled = false;
+            });
+
+            var tipo = function(campo) {
+                var r = $(campo).attr('rel');
+                if(r.substr(r.length -1) == caracterObrigatorio){
+                    r = r.substr(0, r.length -1);
+                }
+                return r;
+            };
+
+            var isObrigatorio = function(campo) {
+                var rel = $(campo).attr('rel');
+                var val = $(campo).val();
+            
+                if(rel.substr(rel.length -1) == caracterObrigatorio || val != ''){
+                    return true;
+                }
+
+                return false;
+            };
+
+            var validar = function(campo, exp) {
+                var name = $(campo).attr('name');
+                var deft = $(campo).attr('default-value');
+                var value = $(campo).val();
+                if(!exp.test(value) || deft == value){
+                    camposErrados.push(campo);
+                }
+            };
 
             if (op.mask){
                 // Busca todos os campos input e ativa os plugins/Mascaras
@@ -292,7 +294,7 @@ jQuery.fn.extend({
                                 
                                 // limpa o formulário
                                 var form_id = $(form).attr('id');
-                            //document.getElementById(form_id).reset();
+                                //document.getElementById(form_id).reset();
 
                             }, 500);
                         });

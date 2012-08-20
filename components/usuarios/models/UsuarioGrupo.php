@@ -7,7 +7,7 @@ class UsuarioGrupo extends bwRecord
         'id' => 'ID',
         'idgrupo' => 'Grupo',
         'nome' => 'Nome',
-        'isAdm' => 'Privilégios de administrador',
+        'isAdm' => 'Acesso completo',
         'descricao' => 'Descrição do grupo',
         'status' => 'Status',
     );
@@ -30,6 +30,8 @@ class UsuarioGrupo extends bwRecord
             'unsigned' => false,
             'primary' => false,
             'notnull' => true,
+            'notblank' => true,
+            'unique' => true,
             'autoincrement' => false,
         ));
         $this->hasColumn('isAdm', 'integer', 4, array(
@@ -54,7 +56,7 @@ class UsuarioGrupo extends bwRecord
             'fixed' => false,
             'unsigned' => false,
             'primary' => false,
-            'notnull' => true,
+            'notnull' => false,
             'autoincrement' => false,
         ));
         $this->hasColumn('status', 'integer', 4, array(
@@ -76,6 +78,34 @@ class UsuarioGrupo extends bwRecord
             'local' => 'id',
             'foreign' => 'idgrupo'
         ));
+    }
+
+    public function salvar($dados)
+    {
+        $db = bwComponent::save('UsuarioGrupo', $dados);
+        $r = bwComponent::retorno($db);
+
+        return $r;
+    }
+
+    public function remover($dados)
+    {
+        // verifica se exite usuários relacionadas
+        $dql = Doctrine_Query::create()
+            ->from('Usuario')
+            ->where('idgrupo = ?', $dados['id']);
+
+        if ($dql->fetchOne()) {
+            return array(
+                'retorno' => false,
+                'msg' => 'Existem usuários relacionados com este grupo!',
+            );
+        }
+
+        $db = bwComponent::remover('UsuarioGrupo', $dados);
+        $r = bwComponent::retorno($db);
+
+        return $r;
     }
 
 }

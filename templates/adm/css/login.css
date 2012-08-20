@@ -2,8 +2,9 @@ html { font-family: Arial, Tahoma, Verdana; position: relative; }
 body { margin: 0; padding: 0; width: 100%; font-size: 12px; text-align: center; }
 
 .logo { margin: 80px 0 35px 0; }
-.login { background: #EEE; border: 1px solid #CCC; padding: 15px 10px; width: 270px; margin: 15px auto 100px auto; text-align: left; }
+.login { background: #EEE; border: 1px solid #CCC; padding: 15px 10px; width: 270px; margin: 15px auto 15px auto; text-align: left; }
 .login input.txt { width: 258px; border: 1px solid #999; background: #FFF; padding: 5px; font-size: 18px; margin: 3px 0 10px 0; }
 .login label { font-size: 13px; color: #444; }
 .erro { color: #FF0000; }
-.login .sub { margin-right: 5px; }
+.login .submit { margin-right: 5px; }
+.loading { text-align: center; display: none; margin-top: 7px; }

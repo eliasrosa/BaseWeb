@@ -4,12 +4,12 @@ defined('BW') or die("Acesso negado!");
 
 echo bwAdm::createHtmlSubMenu(1);
 
-$id = bwRequest::getVar('id', 0, 'get');
+$id = bwRequest::getInt('id');
 $i = bwComponent::openById('Usuario', $id);
 $login = bwLogin::getInstance()->getSession();
 
 
-$form = new bwForm($i);
+$form = new bwForm($i, '/usuarios/task');
 $form->addH2('Informações do usuário');
 $form->addInputID();
 $form->addInput('nome');
@@ -21,7 +21,6 @@ $form->addH2('Informações do grupo');
 $form->addSelectDB('idgrupo', 'UsuarioGrupo');
 
 $form->addH2('Informações de login');
-$form->addInput('user', 'text', array('edit' => false));
 $form->addInput('email');
 
 if($i->id)

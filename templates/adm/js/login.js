@@ -6,4 +6,10 @@ $(function(){
 		pass.focus();
 	else
 		user.focus();
+    
+    $('form.login').bind('submit', function(){
+        $('.submit, .erro').hide();
+        $('.loading').show();
+    });
+    
 });

@@ -28,7 +28,7 @@ abstract class bwRouter
         if (preg_match('#^(https?|ftps?|ssh|git|rsync)://#', $url)) {
             return $url;
         }
-        
+
         $routes = bwRouter::getRoutes();
 
         if (isset($routes[$url]) && count($i)) {
@@ -58,8 +58,12 @@ abstract class bwRouter
      * @param string $type_return 'array' || 'object'
      * @return array|object
      */
-    function getRoute($router, $type_return = 'array')
+    function getRoute($router = NULL, $type_return = 'array')
     {
+        if(is_null($router)){
+            $router = bwRouter::getRealView();
+        }
+        
         $r = bwRouter::getRoutes($router);
         if ($type_return == 'array') {
             return $r[$router];
@@ -68,6 +72,20 @@ abstract class bwRouter
         if ($type_return == 'object') {
             return bwUtil::array2object($r[$router]);
         }
+    }
+
+    function getRealView()
+    {
+        //
+        $view = bwRequest::getVar('view');
+
+        //
+        if (!bwTemplate::getInstance()->isDefault()) {
+            $template = strlen(bwRequest::getVar('template'));
+            $view = substr($view, $template + 1);
+        }
+
+        return $view;
     }
 
     /**
@@ -118,6 +136,9 @@ abstract class bwRouter
             'redirect' => $redirect,
             'fields' => $fields,
         );
+            
+        if(isset($skip_constraint))
+            $routes[$name]['skip_constraint'] = $skip_constraint;
 
         //
         bwRouter::setRoutes($routes);
