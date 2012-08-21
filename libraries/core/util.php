@@ -344,10 +344,15 @@ class bwUtil
         if ($length == 0)
             return '';
 
-        if (strlen($string) > $length) {
-            if (!$break_words)
-                $string = preg_replace('/\s+?(\S+)?$/', '', substr($string, 0, $length + 1));
+        //
+        $string = strip_tags($string);
+        $string = str_replace("\r\n", ' ', $string);
 
+        //
+        if (strlen($string) > $length) {
+            if (!$break_words) {
+                $string = preg_replace('/\s+?(\S+)?$/', '', substr($string, 0, $length + 1));
+            }
             return substr($string, 0, $length) . '...';
         } else
             return $string;
