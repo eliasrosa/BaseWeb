@@ -9,7 +9,7 @@ class bwPluginAnalytics
         $config = new bwConfigDB();
         $id = $config->getValue('plugins.analytics.code');
 
-        if (!BW_ADM && $_SERVER['HTTP_HOST'] != 'localhost' && $id != '')
+        if (!defined('BW_ADM') && $_SERVER['HTTP_HOST'] != 'localhost' && $id != '')
         {
             $html = "
 
