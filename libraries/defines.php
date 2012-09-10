@@ -25,17 +25,12 @@ define('BW_PATH_MODELS', BW_PATH_LIBRARIES .DS. 'models');
 // URL
 define('BW_URL_BASE', bwConfig::$url_base);
 define('BW_URL_BASE2', 'http://'. $_SERVER['HTTP_HOST'] . BW_URL_BASE);
-define('BW_URL_TEMPLATES', BW_URL_BASE . '/templates');
-define('BW_URL_MEDIA', BW_URL_BASE . '/media');
-define('BW_URL_CACHE', BW_URL_BASE . '/cache');
-define('BW_URL_LIBRARIES', BW_URL_BASE . '/libraries');
+define('BW_URL_TEMPLATES', BW_URL_BASE2 . '/templates');
+define('BW_URL_MEDIA', BW_URL_BASE2 . '/media');
+define('BW_URL_CACHE', BW_URL_BASE2 . '/cache');
+define('BW_URL_LIBRARIES', BW_URL_BASE2 . '/libraries');
 define('BW_URL_JAVASCRIPTS', BW_URL_LIBRARIES . '/javascripts');
-define('BW_URL_COMPONENTS', BW_URL_BASE .'/components');
-define('BW_URL_MODULOS', BW_URL_BASE .'/modules');
-define('BW_URL_INSTALL', BW_URL_BASE . '/install.php');
-
-// logo
-define('BW_PATH_LOGO', BW_PATH_MEDIA . DS . 'baseweb' .DS. 'imagens' .DS. 'logo.jpg');
-define('BW_URL_LOGO', BW_URL_MEDIA .'/baseweb/imagens/logo.jpg');
+define('BW_URL_COMPONENTS', BW_URL_BASE2 .'/components');
+define('BW_URL_MODULOS', BW_URL_BASE2 .'/modules');
 
 ?>

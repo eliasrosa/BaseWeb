@@ -31,6 +31,7 @@ class bwBuffer extends bwObject
         $view = bwRequest::getVar('view');
         $template = bwRequest::getVar('template', bwTemplate::getInstance()->getDefault());
         $path = BW_PATH_TEMPLATES . DS . $template . DS . 'html';
+        $path_tpl = BW_PATH_TEMPLATES . DS . $template . DS . 'tpl';
         $template_prefix = '';
         $routes = bwRouter::getRoutes();
 
@@ -68,9 +69,11 @@ class bwBuffer extends bwObject
         // is folder or file
         if (substr($view, -1) == '/') {
             $file = $path . $view . 'index.php';
+            $file_tpl = $path_tpl . $view . 'index.tpl';
             $view = substr($view, 0, -1);
         } else {
             $file = $path . $view . '.php';
+            $file_tpl = $path_tpl . $view . '.tpl';
         }
 
         // is header301
@@ -82,6 +85,12 @@ class bwBuffer extends bwObject
         // is exist file
         if (bwFile::exists($file)) {
             $html = bwUtil::execPHP($file);
+
+            if (bwFile::exists($file_tpl)) {
+                $smarty = bwSmarty::getInstance();
+                $html = $smarty->fetch('file:' . $file_tpl);
+            }
+
         } else {
             $folder = $path . $view;
             if (bwFolder::is($folder) && (substr($folder, -1) != '/')) {
@@ -105,15 +114,15 @@ class bwBuffer extends bwObject
             if ($routes[$view]['title'] != '') {
                 bwHtml::setTitle($routes[$view]['title']);
             }
-            
+
             if ($routes[$view]['keywords'] != '') {
                 bwHtml::setKeywords($routes[$view]['keywords']);
             }
-            
+
             if ($routes[$view]['description'] != '') {
                 bwHtml::setDescription($routes[$view]['description']);
             }
-            
+
             // type
             switch ($routes[$view]['type']) {
                 case 'static':
