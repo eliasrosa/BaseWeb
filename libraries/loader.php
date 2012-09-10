@@ -5,7 +5,7 @@ defined('BW') or die("Acesso negado!");
 require(BW_PATH_LIBRARIES .DS. 'core' .DS. 'loader.php');
 
 // auto load
-bwLoader::import('doctrine.doctrine');
+bwLoader::import('doctrine.Doctrine');
 
 // inicia o auto load
 spl_autoload_register('bwLoader::autoload');
