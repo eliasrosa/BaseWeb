@@ -88,6 +88,26 @@ class bwRequest
         return bwSession::getToken();
     }
 
+    function getDate($var, $type = 'string')
+    {
+        $d = $m = $y = 0;
+
+        if ($type == 'array') {
+            $dt = bwRequest::getVar($var, array());
+            extract($dt);
+        }
+        
+        if ($type == 'string') {
+            list($d, $m, $y) = explode('/', bwRequest::getVar($var));
+        }
+
+        if (!checkdate((int) $m, (int) $d, (int) $y)) {
+            return false;
+        }
+
+        return new bwDateTime("$y-$m-$d");
+    }
+
 }
 
 ?>

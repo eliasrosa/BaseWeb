@@ -262,24 +262,16 @@ class bwUtil
 
     /**
      * Converte a data para o formato do mysql
-     * retorna false em caso de erro
      * ********************************************* */
     function dataToMysql($data)
     {
-        if (preg_match('#^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$#', $data))
-            return bwUtil::data($data, true);
+        $d = new bwDateTime($data);
 
-        elseif (preg_match('#^\d{2}\/\d{2}\/\d{4}$#', $data))
-            return bwUtil::data($data, false);
-
-        elseif (preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $data))
-            return $data;
-
-        elseif (preg_match('#^\d{4}-\d{2}-\d{2}$#', $data))
-            return $data;
-
-        else
-            return false;
+        if (strlen($data) > 10) {
+            return $d->toMysql(true);
+        } else {
+            return $d->toMysql(false);
+        }
     }
 
     /**
@@ -384,15 +376,12 @@ class bwUtil
      * ********************************************* */
     public function dataNow($mysql = true, $hora = true)
     {
-        if ($hora)
-            $data = date("Y-m-d H:i:s");
-        else
-            $data = date("Y-m-d");
+        $d = new bwDateTime();
 
-        if ($mysql)
-            return $data;
-        else
-            return bwUtil::data($data);
+        $hora = (bool) $hora ? ' H:i:s' : '';
+        $data = (bool) $mysql ? 'Y-m-d' : 'd/m/Y';
+
+        return $d->format($data . $hora);
     }
 
     /**
@@ -496,35 +485,6 @@ class bwUtil
             return $object;
         } else {
             return FALSE;
-        }
-    }
-
-    /**
-     * Retorna uma array com os meses ou um string
-     * mês em pt-br
-     * ********************************************* */
-    function getMeses($id = NULL)
-    {
-        $m = array(
-            '1' => 'Janeiro',
-            '2' => 'Fevereiro',
-            '3' => 'Março',
-            '4' => 'Abril',
-            '5' => 'Maio',
-            '6' => 'Junho',
-            '7' => 'Julho',
-            '8' => 'Agosto',
-            '9' => 'Setembro',
-            '10' => 'Outubro',
-            '11' => 'Novembro',
-            '12' => 'Dezembro'
-        );
-
-        if (is_null($id)) {
-            return $m;
-        } else {
-            $id = (int) $id;
-            return $m[$id];
         }
     }
 
