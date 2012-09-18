@@ -10,38 +10,42 @@ class bwHtml
      * 
      * Exemplos:
      * bwHtml::js2css('contato');
-     * bwHtml::js2css('plugin', true);
+     * bwHtml::js2css('ie8', 'ie < 9');
+     * bwHtml::js2css('chrome', 'chrome');
      * bwHtml::js2css('http://www.exemplo.com/js/contato');
      * 
      * @param string $file
-     * @param boolean $jsFolder 
+     * @param boolean $condition 
      */
-    function js2css($file, $jsFolder = false)
+    function js2css($file, $condition = false)
     {
-        bwHtml::js($file . '.js', $jsFolder);
-        bwHtml::css($file . '.css', $jsFolder);
+        bwHtml::js($file . '.js', $condition);
+        bwHtml::css($file . '.css', $condition);
     }
 
     /**
      * Adiciona um arquivo JavaScript ao template
      * 
-     * Exemplos:
      * bwHtml::js('contato.js');
-     * bwHtml::js('plugin.js', true);
+     * bwHtml::js('ie8.js', 'ie < 9');
+     * bwHtml::js('chrome.js', 'chrome');
      * bwHtml::js('http://www.exemplo.com/js/contato.js');
      * 
      * @param string $file
-     * @param boolean $jsFolder 
+     * @param boolean $condition 
      */
-    function js($file, $jsFolder = false)
+    function js($file, $condition = false)
     {
-        if ($jsFolder) {
-            $file = BW_URL_JAVASCRIPTS . $file;
-        } else {
-            $template = bwTemplate::getInstance();
-            if (bwFile::exists($template->getPath() . DS . 'js' . DS . str_replace('/', DS, $file))) {
-                $file = $template->getUrl() . '/js/' . $file;
-            }
+        if ($condition != false) {
+            $b = new bwBrowser;
+
+            if (!$b->isBrowser($condition))
+                return;
+        }
+        
+        $template = bwTemplate::getInstance();
+        if (bwFile::exists($template->getPath() . DS . 'js' . DS . str_replace('/', DS, $file))) {
+            $file = $template->getUrl() . '/js/' . $file;
         }
 
         $GLOBALS['bw.html.js'][$file] = $file;
@@ -50,23 +54,26 @@ class bwHtml
     /**
      * Adiciona um arquivo CSS ao template
      * 
-     * Exemplos:
      * bwHtml::css('contato.css');
-     * bwHtml::css('plugin.css', true);
+     * bwHtml::css('ie8.css', 'ie < 9');
+     * bwHtml::css('chrome.css', 'chrome');
      * bwHtml::css('http://www.exemplo.com/css/contato.css');
      * 
      * @param string $file
-     * @param boolean $jsFolder 
+     * @param $condition bwBrowser 
      */
-    function css($file, $jsFolder = false)
+    function css($file, $condition = false)
     {
-        if ($jsFolder) {
-            $file = BW_URL_JAVASCRIPTS . $file;
-        } else {
-            $template = bwTemplate::getInstance();
-            if (bwFile::exists($template->getPath() . DS . 'css' . DS . str_replace('/', DS, $file))) {
-                $file = $template->getUrl() . '/css/' . $file;
-            }
+        if ($condition != false) {
+            $b = new bwBrowser;
+
+            if (!$b->isBrowser($condition))
+                return;
+        }
+
+        $template = bwTemplate::getInstance();
+        if (bwFile::exists($template->getPath() . DS . 'css' . DS . str_replace('/', DS, $file))) {
+            $file = $template->getUrl() . '/css/' . $file;
         }
 
         $GLOBALS['bw.html.css'][$file] = $file;
@@ -118,8 +125,7 @@ class bwHtml
         $head .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
         $head .= '<meta http-equiv="Content-Language" content="pt-br, pt" />' . "\n";
         $head .= '<meta name="rating" content="general" />' . "\n";
-        $head .= '<meta name="generator" content="BaseWeb 2.0" />' . "\n";
-        $head .= '<meta name="author" content="Elias da Rosa - http://www.eliasdarosa.com.br/" />' . "\n";
+        $head .= '<meta name="generator" content="BaseWeb | http://github.com/eliasrosa/baseweb" />' . "\n";
 
         $meta = isset($GLOBALS['bw.html.meta']) && is_array($GLOBALS['bw.html.meta']) ? $GLOBALS['bw.html.meta'] : array();
         foreach ($meta as $k => $v)
