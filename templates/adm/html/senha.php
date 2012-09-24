@@ -13,9 +13,10 @@ $login->sair();
 // login/entrar
 $email = bwRequest::getVar('email', false);
 $safeValue = bwRequest::getSafeVar('k');
+$solicitacao = false;
 
 if (bwRequest::getMethod() == 'POST') {
-    $login->enviarSolitacaoSenha($email, '/senha');
+    $solicitacao = $login->enviarSolitacaoSenha($email, '/senha');
 }
 
 $logo = $template->getUrl() . '/img/logo.jpg';
@@ -42,6 +43,8 @@ $logo = $template->getUrl() . '/img/logo.jpg';
         if (!is_null($safeValue)) {
             $login->enviarNovaSenha($safeValue);
             echo sprintf('<p>Uma nova senha foi criada e envida para %s</p>', $safeValue);
+        } elseif ($solicitacao === true) {
+            echo sprintf('<p>%s</p>', $login->mostrarMensagem());
         } else {
             ?>
             <form class="login" action="" method="post">

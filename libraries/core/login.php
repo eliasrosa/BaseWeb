@@ -27,6 +27,8 @@ class bwLogin extends bwObject
         $this->mensagens['invalido'] = 'Usuário ou senha inválido!';
         $this->mensagens['grupo'] = 'Usuário ou senha inválido, tente novamente!';
         $this->mensagens['email.fail'] = 'E-mail inválido, tente novamente!';
+        $this->mensagens['email.solicitacao'] = 'Uma mensagem foi enviada para seu e-mail!';
+        $this->mensagens['email.novasenha'] = 'Uma senha foi criada e enviada para seu e-mail!';
     }
 
     // getInstance
@@ -150,7 +152,8 @@ class bwLogin extends bwObject
      *
      * @return string A senha gerada
      */
-    function createSenhaRand($tamanho = 8, $maiusculas = true, $numeros = true, $simbolos = false)
+    function createSenhaRand($tamanho = 8, $maiusculas = true, $numeros = true,
+        $simbolos = false)
     {
         $lmin = 'abcdefghijklmnopqrstuvwxyz';
         $lmai = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -273,7 +276,7 @@ class bwLogin extends bwObject
             $html .= sprintf('<a href="%s">%s</a>', $u, $u);
 
             $this->sendMail($email, 'Solicitação de troca de senha', $html);
-
+            $this->setMsg('email.solicitacao');
             return true;
         } else {
             $this->setMsg('email.fail');
@@ -297,7 +300,7 @@ class bwLogin extends bwObject
             $html .= sprintf('Site: %s<br>', BW_URL_BASE2);
 
             $this->sendMail($email, 'Nova senha', $html);
-
+            $this->setMsg('email.novasenha');
             return true;
         } else {
             $this->setMsg('email.fail');
