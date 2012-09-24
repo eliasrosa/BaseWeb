@@ -23,9 +23,6 @@ abstract class bwEditInSite
 
         $conteudo = bwFile::getConteudo($file);
 
-        if (!$conteudo)
-            $conteudo = '{NULL}';
-
         return $conteudo;
     }
 
