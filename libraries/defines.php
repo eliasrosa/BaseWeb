@@ -14,7 +14,6 @@ date_default_timezone_set('America/Sao_Paulo');
 // PATH
 define('BW_PATH_CACHE', BW_PATH .DS. 'cache');
 define('BW_PATH_MEDIA', BW_PATH .DS. 'media');
-define('BW_PATH_MODULOS', BW_PATH .DS. 'modules');
 define('BW_PATH_PLUGINS', BW_PATH .DS. 'plugins');
 define('BW_PATH_LIBRARIES', BW_PATH .DS. 'libraries');
 define('BW_PATH_TEMPLATES', BW_PATH .DS. 'templates');
@@ -31,6 +30,4 @@ define('BW_URL_CACHE', BW_URL_BASE2 . '/cache');
 define('BW_URL_LIBRARIES', BW_URL_BASE2 . '/libraries');
 define('BW_URL_JAVASCRIPTS', BW_URL_LIBRARIES . '/javascripts');
 define('BW_URL_COMPONENTS', BW_URL_BASE2 .'/components');
-define('BW_URL_MODULOS', BW_URL_BASE2 .'/modules');
-
-?>
+define('BW_URL_PLUGINS', BW_URL_BASE2 .'/plugins');
