@@ -224,8 +224,8 @@ class bwForm
                 $input .= "</select>\n";
             } elseif ($type == 'textarea') {
                 if ($params['autoresize']) {
-                    bwHtml::js('/autoresize.js', true);
-                    bwHtml::js('/autoresize.textarea.js', true);
+                    bwHtml::js(BW_URL_JAVASCRIPTS . '/autoresize.js');
+                    bwHtml::js(BW_URL_JAVASCRIPTS . '/autoresize.textarea.js');
                 }
 
                 $input = "<textarea name=\"{$params['name']}\"{$attr} wrap=\"off\">{$params['value']}</textarea>\n";
@@ -270,7 +270,7 @@ class bwForm
 
     function addEditorHTML($name)
     {
-        bwHtml::js('/tiny_mce/jquery.tinymce.js', true);
+        bwHtml::js(BW_URL_JAVASCRIPTS . '/tiny_mce/jquery.tinymce.js');
 
         $class = 'editor_' . rand();
 
@@ -559,7 +559,7 @@ class bwForm
 
     function addInputsPassword($name = 'senha')
     {
-        bwHtml::js('/passwordStrengthMeter.js', true);
+        bwHtml::js(BW_URL_JAVASCRIPTS . '/passwordStrengthMeter.js');
 
         $this->html .= "
             <script type=\"text/javascript\">
