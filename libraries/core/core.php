@@ -28,6 +28,9 @@ class bwCore
         // inicia a session
         bwSession::init();
 
+        if(defined('BW_NOT_INIT'))
+            return ;
+        
         // url atual
         $url = new bwUrl();
         $view = str_replace(BW_URL_BASE, '', $url->getPath());
