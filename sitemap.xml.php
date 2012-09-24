@@ -37,22 +37,25 @@ addUrl('/', '1.0');
 
 foreach (bwRouter::getRoutes() as $k => $router) {
     $is_fields = count($router['fields']);
-    $view_file = $template->getPathHtml() . $k . '.php';
-    $view_folder = $template->getPathHtml() . $k . '/index.php';
-    $view_exist = (bwFile::exists($view_file) || bwFile::exists($view_folder));
 
-    if ($view_exist && !$is_fields) {
-        addUrl($k, '0.5');
-    }
+    if($router['sitemap'] === true) {
+        $view_file = $template->getPathHtml() . $k . '.php';
+        $view_folder = $template->getPathHtml() . $k . '/index.php';
+        $view_exist = (bwFile::exists($view_file) || bwFile::exists($view_folder));
 
-    if ($view_exist && $is_fields) {
-        $priority = '0.5';
-        $dynamic_sitemap_file = $template->getPath() . '/xml' . $k . '.php';
-        if (bwFile::exists($view_file)) {
-            require ($dynamic_sitemap_file);
-            if (count($dql)) {
-                foreach ($dql as $i) {
-                    addUrl($i->getUrl($k), $priority);
+        if ($view_exist && !$is_fields) {
+            addUrl($k, '0.5');
+        }
+
+        if ($view_exist && $is_fields) {
+            $priority = '0.5';
+            $dynamic_sitemap_file = $template->getPath() . '/xml' . $k . '.php';
+            if (bwFile::exists($dynamic_sitemap_file)) {
+                require ($dynamic_sitemap_file);
+                if (count($dql)) {
+                    foreach ($dql as $i) {
+                        addUrl($i->getUrl($k), $priority);
+                    }
                 }
             }
         }

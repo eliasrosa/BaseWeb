@@ -60,10 +60,10 @@ abstract class bwRouter
      */
     function getRoute($router = NULL, $type_return = 'array')
     {
-        if(is_null($router)){
+        if (is_null($router)) {
             $router = bwRouter::getRealView();
         }
-        
+
         $r = bwRouter::getRoutes($router);
         if ($type_return == 'array') {
             return $r[$router];
@@ -100,6 +100,7 @@ abstract class bwRouter
     {
         // sobreescreve os parametros
         extract(array_merge(array(
+                'sitemap' => true,
                 'fields' => array(),
                 'type' => 'view',
                 'title' => '',
@@ -135,9 +136,10 @@ abstract class bwRouter
             'description' => $description,
             'redirect' => $redirect,
             'fields' => $fields,
+            'sitemap' => $sitemap,
         );
-            
-        if(isset($skip_constraint))
+
+        if (isset($skip_constraint))
             $routes[$name]['skip_constraint'] = $skip_constraint;
 
         //
