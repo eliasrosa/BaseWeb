@@ -49,7 +49,7 @@
 .aviso { margin: 10px; background: #FFFFCC; border: 1px solid #FFCD35; padding: 10px; }
 .aviso h1 { margin: 0 0 10px 0; font-size: 15px; }
 .aviso p { margin: 0; font-size: 13px; }
-.erro { margin: 10px; background: #FF7878; border: 1px solid #FF4B4B; padding: 10px; }
+.erro { margin: 10px; background: #FFBBBB; border: 1px solid #FF4B4B; padding: 10px; }
 
 
 /* Elements

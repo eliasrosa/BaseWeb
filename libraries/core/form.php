@@ -13,7 +13,8 @@ class bwForm
     var $isEdit = false;
     private $_primary = null;
 
-    function __construct($db = false, $action = '', $method = 'post', $blockEdit = false, $primary = 'id')
+    function __construct($db = false, $action = '', $method = 'post',
+        $blockEdit = false, $primary = 'id')
     {
         $method = ($method != 'get') ? 'post' : 'get';
 
@@ -303,8 +304,8 @@ class bwForm
     {
         $params = array_merge(array(
             'linkFile' => true,
-            'width' => '488',
-            'height' => '488',
+            'width' => '320',
+            'height' => '320',
             'src' => '',
             'resizeImage' => '',
             ), $attr);
@@ -334,27 +335,48 @@ class bwForm
         return $this;
     }
 
-    function addInputFileImg($name = '', $attr = array())
+    function addInputFileImg($name = 'default', $label = 'Imagem')
     {
-        $this->addInputFile('file', 'Imagem:');
+        $name_input = $this->db->getComponentName() . '-imagem-' . $name;
+        $params = array();
 
         if ($this->isEdit) {
-            $img = $this->db->bwImagem;
 
-            $params = array_merge(array(
-                'label' => '',
-                'url' => $img->getUrl(),
-                'path' => $img->getPath(),
-                'label' => '',
-                'src' => '',
-                'findDB' => false,
-                ), $attr);
+            if (!isset($this->db->bwImagem->$name)) {
+                return;
+            }
 
-            $params['src'] = $params['url'];
-            $path = $dados[$params['path']];
+            $img = $this->db->bwImagem->$name;
+            $html = '<p style="display: block; margin: 5px 0 5px 155px;">';
+            
+            if (!$img->isError404()) {
 
-            $this->addImg($name, $params);
+                $html .= sprintf('<img src="%s" /><br/>', $img->resize(320, 320));
+
+                $html .= sprintf(
+                    'Remover imagem acima ao salvar: <input type="checkbox" name="remover-bwimagem[]" value="%s"/><br/>', $name_input
+                );
+            }
+
+            $html .= sprintf(
+                'Tamanho máximo permitido pelo servidor: %s<br/>Tamanho máximo recomendado: 1M<br/>'
+                , ini_get('upload_max_filesize')
+            );
+
+            if (!$img->isError404()) {
+                $html .= sprintf(
+                    '<a href="%s" target="_blank">Visualizar imagem original</a><br/>'
+                    , $img->getUrl()
+                );
+            }
+
+            $html .= '</p>';
+
+            $params['posInput'] = $html;
         }
+
+        $this->addInputFile($name_input, $label . ':', $params);
+
         return $this;
     }
 

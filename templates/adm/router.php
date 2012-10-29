@@ -17,3 +17,12 @@ bwRouter::addUrl('/sair', array(
     'skip_constraint' => true
 ));
 
+
+
+bwRouter::addUrl('/galeria/album');
+bwRouter::addUrl('/galeria/upload');
+bwRouter::addUrl('/galeria/imagens');
+bwRouter::addUrl('/galeria/imagem');
+bwRouter::addUrl('/galeria/ordem');
+bwRouter::addUrl('/galeria/remover');
+bwRouter::addUrl('/galeria/salvar');

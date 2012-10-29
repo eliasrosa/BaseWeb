@@ -1,0 +1,45 @@
+.aviso.ie { margin: 20px 0 25px 0; }
+.aviso.ie strong { font-size: 14px; }
+
+#upload { width: 350px; padding-right: 10px; float: left; }
+#upload input { margin-bottom: 15px; }
+#upload .status { font-style: italic; }
+#upload .name {  }
+#upload .toolbar { margin-top: 10px; border: 1px solid #BBBBBB; padding: 5px; border-left: none; border-right: none; text-align: center; }
+#upload .toolbar a { padding: 0 5px; }
+#upload .bar { margin-top: 10px; padding: 5px; border: 1px solid #BBBBBB; display: none; }
+#upload .bar div { background: #DDDDFF; margin: 0; padding: 0; height: 5px; }
+
+#imagens { display: block; width: 820px; min-height: 165px; float: right; background: #DDDDFF; border: 1px solid #BBBBBB; padding: 5px; margin-top: 20px; }
+#imagens .file { position: relative; display: block; width: 150px; height: 150px; float: left; margin: 5px; border: 2px solid #CCC; }
+#imagens .file:hover { border: 2px solid #FFF; cursor: pointer; }
+#imagens .ui-state-highlight { display: block; width: 150px; height: 150px; float: left; margin: 5px; border: 2px dashed #AAA; }
+#imagens .file .bg { display: none; width: 150px; height: 150px; border: none; background: #000; position: absolute; margin: 0; opacity: 0.3; }
+#imagens .file:hover .bg { display: block; }
+#imagens .file .editar { display: none; position: absolute; top: 10px; right: 32px; opacity: 0.7; }
+#imagens .file .editar:hover { position: absolute; opacity: 1; }
+#imagens .file:hover .editar { display: block; }
+#imagens .file .remover { display: none; position: absolute; top: 10px; right: 10px; opacity: 0.7; }
+#imagens .file .remover:hover { position: absolute; opacity: 1; }
+#imagens .file:hover .remover { display: block; }
+
+#log { display: block; overflow: auto; height: 300px; padding-left: 10px; direction: rtl; margin-top: 10px; }
+#log .aviso { margin: 0 0 10px 0; direction: ltr; }
+#log .aviso h3 { margin: 0; font-size: 13px; font-weight: bold; }
+
+#editbox form { padding: 20px;}
+#editbox form div { margin-bottom: 25px; float: left; }
+#editbox form div.imagem { margin-right: 20px; }
+#editbox form div.imagem a { display: block; }
+#editbox form div.imagem .img { margin-bottom: 10px; border: 1px solid #CCC; width: 300px; height: 300px;  }
+#editbox form div input { border: 1px solid #CCC; margin-top: 3px; }
+#editbox form div select { border: 1px solid #CCC; }
+#editbox form div.title input { width: 380px; }
+#editbox form div.alt input { width: 300px; margin-right: 5px; }
+#editbox form div.position input { width: 257px; }
+#editbox form div.status { margin-right: 20px; }
+#editbox form div.status select { width: 100px; }
+#editbox form .submit { margin-top: 20px; float: left; }
+#editbox form .fechar { margin-top: 20px; float: right; }
+
+#rodape { margin-top: 20px; }
