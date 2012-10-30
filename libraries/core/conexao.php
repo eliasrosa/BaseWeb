@@ -6,14 +6,20 @@ try {
     // Inicia
     $manager = Doctrine_Manager::getInstance();
 
-    // Insira aqui os dados de sua conexão
-    $conn = Doctrine_Manager::connection(
-            'mysql://' .
-            bwConfig::$db_user . ':' .
-            bwConfig::$db_pass . '@' .
-            bwConfig::$db_host . ':' .
-            bwConfig::$db_port . '/' .
-            bwConfig::$db_name, 'default');
+    try {
+        // Insira aqui os dados de sua conexão
+        $conn = Doctrine_Manager::connection(
+                'mysql://' .
+                bwConfig::$db_user . ':' .
+                bwConfig::$db_pass . '@' .
+                bwConfig::$db_host . ':' .
+                bwConfig::$db_port . '/' .
+                bwConfig::$db_name, 'default');
+
+        $conn->connect();
+    } catch (Doctrine_Connection_Exception $e) {
+        die("Erro ao tentar abrir conexão com banco de dados\n");
+    }
 
     $manager->setAttribute(Doctrine::ATTR_QUOTE_IDENTIFIER, true);
     $manager->setAttribute(Doctrine::ATTR_MODEL_LOADING, Doctrine::MODEL_LOADING_CONSERVATIVE);
