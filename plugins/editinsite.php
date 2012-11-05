@@ -9,16 +9,15 @@ class bwPluginEditinsite
     {
         $buffer = bwBuffer::getInstance();
 
-        if (preg_match_all('#{EDITINSITE (.*)}#', $buffer->getHtml(), $matches)) {
+        if (preg_match_all('#\[edit (.*)\]#', $buffer->getHtml(), $matches)) {
 
             $login = bwLogin::getInstance();
-
             foreach ($matches[1] as $file) {
 
                 $file_path = bwTemplate::getInstance()->getName() . DS . 'edit-in-site' . DS . $file;
                 $conteudo = bwEditInSite::getConteudo($file_path);
                 $tipo = bwFile::getExt($file);
-
+                
                 if (bwEditInSite::getPath($file_path) !== false) {
 
                     // verifica se esta logado                    
@@ -44,7 +43,7 @@ class bwPluginEditinsite
                 }
 
                 // altera o html do buffer
-                $buffer->setHtml(str_replace("{EDITINSITE $file}", $conteudo, $buffer->getHtml()));
+                $buffer->setHtml(str_replace("[edit $file]", $conteudo, $buffer->getHtml()));
             }
         }
     }

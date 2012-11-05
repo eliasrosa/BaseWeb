@@ -1,2 +1,2 @@
-#editinsite form h3 { font-size: 15px; font-family: Tahoma; border-bottom: 1px solid #cccccc; margin-bottom: 10px; padding-bottom: 3px; }
-#editinsite form textarea { width: 100%;  border: 1px solid #CCC; font-size: 14px; resize: none;  }
+#editinsite form h3 { font-size: 15px; font-family: Tahoma; border-bottom: 1px solid #cccccc; margin-bottom: 10px; padding-bottom: 3px; color: #333 !important; }
+#editinsite form textarea { width: 100%;  border: 1px solid #CCC; font-size: 12px !important; resize: none; color: #333 !important;  }
