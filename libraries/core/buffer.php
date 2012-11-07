@@ -99,7 +99,7 @@ class bwBuffer extends bwObject
         }
 
         //
-        if ($html === false) {
+        if ($html === false || bwRequest::getVar('is_show_page_404', false)) {
             $view = "{$template_prefix}/error/404";
             $html = bwUtil::execPHP(BW_PATH_TEMPLATES . DS . $template . '/html/error/404.php');
 

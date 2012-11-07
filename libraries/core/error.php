@@ -23,6 +23,12 @@ class bwError
         header('HTTP/1.0 404 Not Found');
     }
 
+    function show404()
+    {
+        bwError::header404();
+        bwRequest::setVar('is_show_page_404', true);
+    }
+
 }
 
 ?>
