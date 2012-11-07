@@ -97,7 +97,7 @@ class bwPager
      * @param $hydrationMode        Hydration Mode of Doctrine_Query::execute returned ResultSet.
      * @return Doctrine_Collection  The root collection
      */
-    public function execute($params = array(), $hydrationMode = NULL)
+    public function execute($params = array(), $hydrationMode = NULL, $createSeo = true)
     {
         $this->pager = new Doctrine_Pager($this->dql, $this->_getRequestValue('pagina', 1), $this->records_per_page);
 
@@ -109,7 +109,13 @@ class bwPager
         $this->pager_layout->setTemplate('<a class="pag" href="{%url}">{%page}</a>');
         $this->pager_layout->setSelectedTemplate('<a href="{%url}" class="pag active">{%page}</a>');
 
-        return $this->pager->execute($params, $hydrationMode);
+        $result = $this->pager->execute($params, $hydrationMode);
+        
+        if($createSeo === true){
+            $this->createSeo();
+        }
+        
+        return $result;
     }
 
     /**
@@ -159,5 +165,48 @@ class bwPager
         return $this->pager->getNumResults();
     }
 
+    /**
+     * @return void
+     */
+    private function createSeo()
+    {
+        if (!$this->pager)
+            die("bwPager não executado!");
+
+        // url atual
+        $url = new bwUrl();
+
+
+        //
+        if ($this->pager->haveToPaginate()) {
+            $page = $this->pager->getPage();
+            $last = $this->pager->getLastPage();
+
+            for ($i = 1; $i <= $last; $i++) {
+
+                if($i == $page){
+                    continue;
+                }
+                
+                $url->setVar($this->_getRequestName('pagina'), $i);
+                $href = $url->toString();
+
+                if ($i < $page) {
+                    $rel = 'prev';
+                }
+
+                if ($i > $page) {
+                    $rel = 'next';
+                }
+
+                if (isset($rel)) {
+                    $head = sprintf('<link rel="%s" href="%s" />', $rel, $href);
+                    $GLOBALS['bw.html.link'][] = $head;
+                }
+            }
+        }
+    }
+
 }
+
 ?>

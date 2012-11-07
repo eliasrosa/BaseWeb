@@ -42,7 +42,7 @@ class bwHtml
             if (!$b->isBrowser($condition))
                 return;
         }
-        
+
         $template = bwTemplate::getInstance();
         if (bwFile::exists($template->getPath() . DS . 'js' . DS . str_replace('/', DS, $file))) {
             $file = $template->getUrl() . '/js/' . $file;
@@ -146,6 +146,13 @@ class bwHtml
         else
             $tit = bwCore::getConfig()->getValue('site.titulo.formato');
 
+        
+        // adiciona os link
+        $links = isset($GLOBALS['bw.html.link']) && is_array($GLOBALS['bw.html.link']) ? $GLOBALS['bw.html.link'] : array();
+        foreach ($links as $f)
+            $head .= $f."\n";
+
+        
         // corrige de acordo com o formato
         $tit = str_replace('%title%', bwCore::getConfig()->getValue('site.titulo'), $tit);
         $head .= "<title>{$tit}</title>\n";
