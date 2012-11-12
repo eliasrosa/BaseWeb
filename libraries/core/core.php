@@ -24,13 +24,16 @@ class bwCore
     {
         // set utf8
         bwCore::setUtf8();
-        
+
         // inicia a session
         bwSession::init();
 
-        if(defined('BW_NOT_INIT'))
-            return ;
-        
+        if (defined('BW_NOT_INIT'))
+            return;
+
+        // errors
+        ini_set("display_errors", bwCore::getConfig()->getValue('core.debug.showerrors'));
+
         // url atual
         $url = new bwUrl();
         $view = str_replace(BW_URL_BASE, '', $url->getPath());
@@ -38,7 +41,30 @@ class bwCore
 
         // Inicia a instancia do template
         $template = bwTemplate::getInstance();
-        
+
+        // use www
+        if (bwCore::getConfig()->getValue('core.site.usewww')) {
+
+            if ($url->getHost() != 'localhost') {
+                if (!preg_match('#$www\.#', $url->getHost())) {
+                    $new_url = str_replace($url->getHost()
+                        , 'www.' . $url->getHost()
+                        , $url->toString());
+
+                    bwUtil::redirect($new_url, false, true);
+                }
+            }
+        }
+
+        // is offline
+        if (bwCore::getConfig()->getValue('core.site.offline')) {
+            if ($template->getName() != 'adm') {
+                if (!bwLogin::getInstance()->isLogin()) {
+                    die(bwCore::getConfig()->getValue('core.site.offline.mensagem'));
+                }
+            }
+        }
+
         // pega todas as rotas
         bwRouter::load();
 

@@ -2,8 +2,10 @@
 
 defined('BW') or die("Acesso negado!");
 
-class bwHtml
+abstract class bwHtml
 {
+
+    static $data = array();
 
     /**
      * Adiciona dois arquivos com o mesmo nome ao template alterando o tipo (js e css)
@@ -14,13 +16,13 @@ class bwHtml
      * bwHtml::js2css('chrome', 'chrome');
      * bwHtml::js2css('http://www.exemplo.com/js/contato');
      * 
-     * @param string $file
-     * @param boolean $condition 
+     * @param string $url
+     * @param string $condition 
      */
-    function js2css($file, $condition = false)
+    function js2css($url, $condition = false)
     {
-        bwHtml::js($file . '.js', $condition);
-        bwHtml::css($file . '.css', $condition);
+        bwHtml::js($url . '.js', $condition);
+        bwHtml::css($url . '.css', $condition);
     }
 
     /**
@@ -31,10 +33,10 @@ class bwHtml
      * bwHtml::js('chrome.js', 'chrome');
      * bwHtml::js('http://www.exemplo.com/js/contato.js');
      * 
-     * @param string $file
-     * @param boolean $condition 
+     * @param string $url
+     * @param string $condition 
      */
-    function js($file, $condition = false)
+    function js($url, $condition = false)
     {
         if ($condition != false) {
             $b = new bwBrowser;
@@ -44,11 +46,12 @@ class bwHtml
         }
 
         $template = bwTemplate::getInstance();
-        if (bwFile::exists($template->getPath() . DS . 'js' . DS . str_replace('/', DS, $file))) {
-            $file = $template->getUrl() . '/js/' . $file;
+        if (bwFile::exists($template->getPath() . DS . 'js' . DS . str_replace('/', DS, $url))) {
+            $url = $template->getUrl() . '/js/' . $url;
         }
 
-        $GLOBALS['bw.html.js'][$file] = $file;
+        $head = "<script type=\"text/javascript\" src=\"$url\"></script>";
+        bwHtml::addHead('js', $head);
     }
 
     /**
@@ -59,10 +62,11 @@ class bwHtml
      * bwHtml::css('chrome.css', 'chrome');
      * bwHtml::css('http://www.exemplo.com/css/contato.css');
      * 
-     * @param string $file
-     * @param $condition bwBrowser 
+     * @param string $url
+     * @param string $condition  
+     * @param string $rel = 'Stylesheet'
      */
-    function css($file, $condition = false)
+    function css($url, $condition = false, $rel = 'Stylesheet')
     {
         if ($condition != false) {
             $b = new bwBrowser;
@@ -72,28 +76,67 @@ class bwHtml
         }
 
         $template = bwTemplate::getInstance();
-        if (bwFile::exists($template->getPath() . DS . 'css' . DS . str_replace('/', DS, $file))) {
-            $file = $template->getUrl() . '/css/' . $file;
+        if (bwFile::exists($template->getPath() . DS . 'css' . DS . str_replace('/', DS, $url))) {
+            $url = $template->getUrl() . '/css/' . $url;
         }
 
-        $GLOBALS['bw.html.css'][$file] = $file;
+        $head = "<link type=\"text/css\" href=\"$url\" rel=\"$rel\" />";
+        bwHtml::addHead('css', $head);
     }
 
-    function setMetaData($name, $value)
+    function addMeta($name, $content, $type_name = 'name')
     {
-        $GLOBALS['bw.html.meta'][$name] = $value;
+        $head = "<meta $type_name=\"$name\" content=\"$content\" />";
+        bwHtml::addHead('meta', $head);
     }
 
     function setDescription($value, $len = 160)
     {
-        bwUtil::cleanText($value);
-        $value = bwUtil::truncate($value, $len);
-        bwHtml::setMetaData('description', $value);
+        $value = bwUtil::truncate(bwUtil::cleanText($value), $len);
+        $head = "<meta name=\"description\" content=\"$value\" />";
+        bwHtml::addHead('description', $head, true);
     }
 
     function setKeywords($value)
     {
-        bwHtml::setMetaData('keywords', $value);
+        if (is_array($value)) {
+            $value = implode(', ', $value);
+        }
+
+        $head = "<meta name=\"keywords\" content=\"$value\" />";
+        bwHtml::addHead('keywords', $head, true);
+    }
+
+    function setTitle($title_page, $add_site_name = true)
+    {
+        if ($add_site_name) {
+            $site_name = bwCore::getConfig()->getValue('site.titulo');
+            $title_format = bwCore::getConfig()->getValue('site.titulo.formato');
+            $title_format = str_replace('%title_page%', $title_page, $title_format);
+            $title_page = str_replace('%site_name%', $site_name, $title_format);
+        }
+
+        bwHtml::addHead('title', "<title>$title_page</title>", true);
+
+        return;
+    }
+
+    function setCanonical($router)
+    {
+        $router = bwRouter::_($router);
+        $head = "<link rel=\"canonical\" href=\"$router\" />";
+        bwHtml::addHead('canonical', $head, true);
+    }
+
+    function addLink($rel, $href)
+    {
+        $head = "<link rel=\"$rel\" href=\"$href\" />";
+        bwHtml::addHead('link', $head);
+    }
+
+    function addCutom($head)
+    {
+        bwHtml::addHead('custom', $head);
     }
 
     function createInputToken()
@@ -101,65 +144,60 @@ class bwHtml
         return '<input type="hidden" class="token" name="' . bwRequest::getToken() . '" value="1" />';
     }
 
-    function setTitle($titulo, $autoAddSiteName = true)
-    {
-        if ($autoAddSiteName)
-            $titulo = $titulo . ' - ' . bwCore::getConfig()->getValue('site.titulo.formato');
-
-        $GLOBALS['bw.html.head']['title'] = $titulo;
-    }
-
     function head()
     {
-        $head = "\n";
+        //
+        bwHtml::addMeta('rating', 'general');
+        bwHtml::addMeta('generator', 'BW - PHP Framework | http://github.com/eliasrosa/baseweb');
+        bwHtml::addMeta('Content-Language', 'pt-br', 'http-equiv');
+        bwHtml::addMeta('Content-Type', 'text/html; charset=utf-8', 'http-equiv');
 
-        // setDescription default
-        if (!isset($GLOBALS['bw.html.meta']['description']) || empty($GLOBALS['bw.html.meta']['description']))
-            bwHtml::setDescription(bwCore::getConfig()->getValue('seo.description'));
+        //
+        if (!bwHtml::$data['title']) {
+            bwHtml::setTitle(bwCore::getConfig()->getValue('site.titulo'), false);
+        }
 
-        // setKeywords
-        if (!isset($GLOBALS['bw.html.meta']['keywords']) || empty($GLOBALS['bw.html.meta']['keywords']))
+        //
+        if (!isset(bwHtml::$data['keywords'])) {
             bwHtml::setKeywords(bwCore::getConfig()->getValue('seo.keywords'));
+        }
 
-        // meta tags
-        $head .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
-        $head .= '<meta http-equiv="Content-Language" content="pt-br, pt" />' . "\n";
-        $head .= '<meta name="rating" content="general" />' . "\n";
-        $head .= '<meta name="generator" content="BaseWeb | http://github.com/eliasrosa/baseweb" />' . "\n";
+        //
+        if (!isset(bwHtml::$data['description'])) {
+            bwHtml::setDescription(bwCore::getConfig()->getValue('seo.description'));
+        }
 
-        $meta = isset($GLOBALS['bw.html.meta']) && is_array($GLOBALS['bw.html.meta']) ? $GLOBALS['bw.html.meta'] : array();
-        foreach ($meta as $k => $v)
-            $head .= '<meta name="' . $k . '" content="' . $v . '" />' . "\n";
+        //
+        $head = "\n\t\t<!-- bw include head -->\n";
+        foreach (bwHtml::$data as $types) {
 
-        // adiciona os css
-        $css = isset($GLOBALS['bw.html.css']) && is_array($GLOBALS['bw.html.css']) ? $GLOBALS['bw.html.css'] : array();
-        foreach ($css as $f)
-            $head .= '<link type="text/css" href="' . $f . '" rel="Stylesheet" />' . "\n";
-
-        // adiciona os scripts
-        $js = isset($GLOBALS['bw.html.js']) && is_array($GLOBALS['bw.html.js']) ? $GLOBALS['bw.html.js'] : array();
-        foreach ($js as $f)
-            $head .= '<script type="text/javascript" src="' . $f . '"></script>' . "\n";
-
-        if (isset($GLOBALS['bw.html.head']['title']))
-            $tit = $GLOBALS['bw.html.head']['title'];
-        else
-            $tit = bwCore::getConfig()->getValue('site.titulo.formato');
-
+            if (is_array($types)) {
+                foreach ($types as $h) {
+                    $head .= "\t\t$h\n";
+                }
+            } else {
+                $head .= "\t\t$types\n";
+            }
+        }
         
-        // adiciona os link
-        $links = isset($GLOBALS['bw.html.link']) && is_array($GLOBALS['bw.html.link']) ? $GLOBALS['bw.html.link'] : array();
-        foreach ($links as $f)
-            $head .= $f."\n";
-
-        
-        // corrige de acordo com o formato
-        $tit = str_replace('%title%', bwCore::getConfig()->getValue('site.titulo'), $tit);
-        $head .= "<title>{$tit}</title>\n";
-
         return $head;
     }
 
-}
+    /**
+     * 
+     * @param type $tipo
+     * @param type $head
+     */
+    function addHead($type, $head, $unique = false)
+    {
+        if ($unique) {
+            bwHtml::$data[$type] = $head;
+            return;
+        }
 
-?>
+        $sha1 = sha1($head);
+        bwHtml::$data[$type][$sha1] = $head;
+        return;
+    }
+
+}

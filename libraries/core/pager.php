@@ -97,7 +97,8 @@ class bwPager
      * @param $hydrationMode        Hydration Mode of Doctrine_Query::execute returned ResultSet.
      * @return Doctrine_Collection  The root collection
      */
-    public function execute($params = array(), $hydrationMode = NULL, $createSeo = true)
+    public function execute($params = array(), $hydrationMode = NULL,
+        $createSeo = true)
     {
         $this->pager = new Doctrine_Pager($this->dql, $this->_getRequestValue('pagina', 1), $this->records_per_page);
 
@@ -110,11 +111,11 @@ class bwPager
         $this->pager_layout->setSelectedTemplate('<a href="{%url}" class="pag active">{%page}</a>');
 
         $result = $this->pager->execute($params, $hydrationMode);
-        
-        if($createSeo === true){
+
+        if ($createSeo === true) {
             $this->createSeo();
         }
-        
+
         return $result;
     }
 
@@ -184,10 +185,10 @@ class bwPager
 
             for ($i = 1; $i <= $last; $i++) {
 
-                if($i == $page){
+                if ($i == $page) {
                     continue;
                 }
-                
+
                 $url->setVar($this->_getRequestName('pagina'), $i);
                 $href = $url->toString();
 
@@ -200,8 +201,7 @@ class bwPager
                 }
 
                 if (isset($rel)) {
-                    $head = sprintf('<link rel="%s" href="%s" />', $rel, $href);
-                    $GLOBALS['bw.html.link'][] = $head;
+                    bwHtml::addLink($rel, $href);
                 }
             }
         }

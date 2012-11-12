@@ -35,75 +35,73 @@ class bwPluginResizeImageHelper
 
     function _($tag)
     {
-        $cache = bwCache::get($tag, false);
+        $file = bwPluginResizeImageHelper::getAttr($tag, 'href|src', false);
+        $w = bwPluginResizeImageHelper::getAttr($tag, 'width', NULL);
+        $h = bwPluginResizeImageHelper::getAttr($tag, 'height', NULL);
+        $f = bwPluginResizeImageHelper::getAttr($tag, 'fit', 'inside');
+        $s = bwPluginResizeImageHelper::getAttr($tag, 'scale', 'any');
+        $rule = bwPluginResizeImageHelper::getAttr($tag, 'rule', false);
+        $rule_params = bwPluginResizeImageHelper::getAttr($tag, 'rule-params', NULL);
 
-        if (!$cache || bwCore::getConfig()->getValue('cache.resizeimage')) {
+        $ext = bwFile::getExt($file);
+        if ($file && ($w || $h) && preg_match('#jpg|gif#', $ext)) {
+            $newFile = bwPluginResizeImageHelper::resize($file, $w, $h, $f, $s, $rule, $rule_params);
 
-            $file = bwPluginResizeImageHelper::getAttr($tag, 'href|src', false);
-            $w = bwPluginResizeImageHelper::getAttr($tag, 'width', NULL);
-            $h = bwPluginResizeImageHelper::getAttr($tag, 'height', NULL);
-            $f = bwPluginResizeImageHelper::getAttr($tag, 'fit', 'inside');
-            $s = bwPluginResizeImageHelper::getAttr($tag, 'scale', 'any');
-            $rule = bwPluginResizeImageHelper::getAttr($tag, 'rule', false);
-            $rule_params = bwPluginResizeImageHelper::getAttr($tag, 'rule-params', NULL);
+            if ($newFile) {
+                $newTag = $tag;
+                $newTag = str_replace($file, $newFile, $newTag);
 
-            $ext = bwFile::getExt($file);
-            if ($file && ($w || $h) && preg_match('#jpg|gif#', $ext)) {
-                $newFile = bwPluginResizeImageHelper::resize($file, $w, $h, $f, $s, $rule, $rule_params);
+                if ($w)
+                    $newTag = str_replace("width=\"$w\"", '', $newTag);
 
-                if ($newFile) {
-                    $newTag = $tag;
-                    $newTag = str_replace($file, $newFile, $newTag);
+                if ($h)
+                    $newTag = str_replace("height=\"$h\"", '', $newTag);
 
-                    if ($w)
-                        $newTag = str_replace("width=\"$w\"", '', $newTag);
+                if ($f)
+                    $newTag = str_replace("fit=\"$f\"", '', $newTag);
 
-                    if ($h)
-                        $newTag = str_replace("height=\"$h\"", '', $newTag);
+                if ($s)
+                    $newTag = str_replace("scale=\"$s\"", '', $newTag);
 
-                    if ($f)
-                        $newTag = str_replace("fit=\"$f\"", '', $newTag);
+                if ($rule)
+                    $newTag = str_replace("rule=\"$rule\"", '', $newTag);
 
-                    if ($s)
-                        $newTag = str_replace("scale=\"$s\"", '', $newTag);
+                if ($rule_params)
+                    $newTag = str_replace("rule-params=\"$rule_params\"", '', $newTag);
 
-                    if ($rule)
-                        $newTag = str_replace("rule=\"$rule\"", '', $newTag);
-
-                    if ($rule_params)
-                        $newTag = str_replace("rule-params=\"$rule_params\"", '', $newTag);
-
-                    // se for [image]
-                    if (substr($tag, 0, 6) == '[image') {
-                        $newTag = $newFile;
-                    }
-
-                    // se existir [image
-                    if (preg_match('#\[image .*\]#', $newTag, $images)) {
-                        foreach ($images as $i) {
-                            $path = bwPluginResizeImageHelper::_($i);
-                            $newTag = str_replace($i, $path, $newTag);
-                        }
-                    }
-
-                    // salva cache
-                    if (bwCore::getConfig()->getValue('cache.resizeimage'))
-                        $cache = bwCache::set($tag, $newTag);
-
-                    return $newTag;
+                // se for [image]
+                if (substr($tag, 0, 6) == '[image') {
+                    $newTag = $newFile;
                 }
-            }else
-                return $tag;
-        }
-        else {
-            return $cache;
-        }
+
+                // se existir [image
+                if (preg_match('#\[image .*\]#', $newTag, $images)) {
+                    foreach ($images as $i) {
+                        $path = bwPluginResizeImageHelper::_($i);
+                        $newTag = str_replace($i, $path, $newTag);
+                    }
+                }
+
+                return $newTag;
+            }
+        }else
+            return $tag;
     }
 
     function resize($file, $w, $h, $f = 'inside', $s = 'any', $rule = false,
         $rule_params = NULL)
     {
         $file_original = $file;
+        $sha1 = substr(sha1(print_r(func_get_args(), 1)), 0, 10);
+
+        //
+        if (bwCore::getConfig()->getValue('core.cache.resizeimage')) {
+            $cache = bwCache::get($sha1, false);
+
+            if ($cache !== false) {
+                return $cache;
+            }
+        }
 
         // limpa o caminho, absoluto ou relativo
         $file = preg_replace('#' . BW_URL_BASE2 . '#', '', $file, 1);
@@ -124,7 +122,7 @@ class bwPluginResizeImageHelper
             return $file_original;
 
         // nome do arquivo de cache
-        $cache_file_name = substr(sha1(print_r(func_get_args(), 1)), 0, 10) . '.' . $file_type;
+        $cache_file_name = $sha1 . '.' . $file_type;
 
         //return count(explode(DS, $fileMedia));
         // se a imagem for de algum componente/media
@@ -187,11 +185,12 @@ class bwPluginResizeImageHelper
 
             // save a imagem
             $img->saveToFile($cache_file_path, 90);
-
-            return $cache_file_url;
         }
-        else
-            return $cache_file_url;
+
+        if (bwCore::getConfig()->getValue('core.cache.resizeimage'))
+            bwCache::set($sha1, $cache_file_url);
+
+        return $cache_file_url;
     }
 
 }

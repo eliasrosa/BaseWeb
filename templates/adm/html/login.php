@@ -9,10 +9,6 @@ $template = bwTemplate::getInstance();
 // finaliza qualquer sessão iniciada antes
 $login->sair();
 
-// verifica se o site esta em manuntencao
-if (bwCore::getConfig()->getValue('site.offline'))
-    $login->setMsg('site.offline');
-
 // login/entrar
 $user = bwRequest::getVar('user', false);
 $pass = bwRequest::getVar('pass', false);
