@@ -46,7 +46,7 @@ class bwCore
         if (bwCore::getConfig()->getValue('core.site.usewww')) {
 
             if ($url->getHost() != 'localhost') {
-                if (!preg_match('#$www\.#', $url->getHost())) {
+                if (!preg_match('#^www.*$#', $url->getHost())) {
                     $new_url = str_replace($url->getHost()
                         , 'www.' . $url->getHost()
                         , $url->toString());
