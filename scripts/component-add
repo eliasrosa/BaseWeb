@@ -33,7 +33,7 @@ if ($com_total) {
             continue;
         }
 
-        $rep = sprintf('git@github.com:eliasrosa/bwcom_%s.git', $com);
+        $rep = sprintf('https://github.com/eliasrosa/bwcom_%s.git', $com);
         $command = sprintf('cd ..;git submodule add %s %s', $rep, $pasta);
 
         $com_ok++;
