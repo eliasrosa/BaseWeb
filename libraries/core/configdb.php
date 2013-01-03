@@ -100,7 +100,7 @@ class bwConfigDB
 
     private function _addBottonSalvar($db)
     {
-        $this->_form->addBottonSalvar('salvarConfig');
+        $this->_form->addBottonSalvar('salvarConfig', 'Salvar configuração');
     }
 
     private function _addInputTipo($db)

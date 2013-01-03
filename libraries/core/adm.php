@@ -67,10 +67,11 @@ class bwAdm
         $titulo = (!$titulo) ? $tituloPage : $titulo;
 
         // div
-        $menu = '<div id="submenu" class="sm01">';
-        $menu .= "<h2>{$titulo}</h2>";
+        $menu = '<div id="submenu"><div class="center">';
         $menu .= $html;
-        $menu .= '</div>';
+        $menu .= '</div></div>';
+        
+        $menu .= '<h1>'.$titulo.'</h1>';
 
         return $menu;
     }

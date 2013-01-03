@@ -29,7 +29,7 @@ $a = new bwGrid();
 $a->setQuery(Doctrine_Query::create()->from('UsuarioGrupo'));
 $a->addCol('ID', 'id', 'tac', 50);
 $a->addCol('Nome', ' nome');
-$a->addCol('Descrição', 'descricao', NULL, '40%');
+$a->addCol('Descrição', 'descricao', NULL, 300);
 $a->addCol('Acesso Administrador', 'isAdm', 'tac', 100);
 $a->show();
 ?>

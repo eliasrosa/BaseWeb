@@ -58,7 +58,7 @@ $logo = $template->getUrl() . '/img/logo.jpg';
                 <img src="<?= BW_URL_TEMPLATE ?>/img/load1.gif" />
             </div>
         </form>
-        <span>Esqueceu sua senha, <a href="<?= bwRouter::_('/senha'); ?>">clique aqui!</a><span>
+        <p>Esqueceu sua senha, <a href="<?= bwRouter::_('/senha'); ?>">clique aqui!</a><p>
         
     </body>
 </html>

@@ -31,18 +31,20 @@ $menu = array(
 );
 
 echo sprintf('<div class="sm01" id="submenu">');
-echo sprintf('<h2>Configurações do sistema</h2>');
+echo sprintf('<div class="center">');
+
 echo sprintf('<ul>');
 
 $tab = bwRequest::getVar('tab', 'core.site');
 
-foreach($menu as $k=>$m) {
+foreach ($menu as $k => $m) {
     $class = ($tab == $k) ? ' active' : '';
     echo sprintf('<li class="item%s"><a href="%s">%s</a></li>', $class, bwRouter::_($m['url']), $m['tit']);
 }
 
-echo sprintf('</ul>');
-echo sprintf('</div>');
+echo sprintf('</ul></div></div>');
+
+echo sprintf('<h1>Configurações do sistema</h1>');
 
 $config = new bwConfigDB();
 $config->setPrefix($tab);

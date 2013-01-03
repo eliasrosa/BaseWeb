@@ -1,7 +1,7 @@
 .aviso.ie { margin: 20px 0 25px 0; }
 .aviso.ie strong { font-size: 14px; }
 
-#upload { width: 350px; padding-right: 10px; float: left; }
+#upload { width: 400px; padding-right: 10px; float: left; }
 #upload input { margin-bottom: 15px; }
 #upload .status { font-style: italic; }
 #upload .name {  }
@@ -10,7 +10,7 @@
 #upload .bar { margin-top: 10px; padding: 5px; border: 1px solid #BBBBBB; display: none; }
 #upload .bar div { background: #DDDDFF; margin: 0; padding: 0; height: 5px; }
 
-#imagens { display: block; width: 820px; min-height: 165px; float: right; background: #DDDDFF; border: 1px solid #BBBBBB; padding: 5px; margin-top: 20px; }
+#imagens { display: block; width: 492px; min-height: 165px; float: right; background: #DDDDFF; border: 1px solid #BBBBBB; padding: 5px; margin-top: 20px; }
 #imagens .file { position: relative; display: block; width: 150px; height: 150px; float: left; margin: 5px; border: 2px solid #CCC; }
 #imagens .file:hover { border: 2px solid #FFF; cursor: pointer; }
 #imagens .ui-state-highlight { display: block; width: 150px; height: 150px; float: left; margin: 5px; border: 2px dashed #AAA; }

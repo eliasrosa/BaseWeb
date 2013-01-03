@@ -30,25 +30,14 @@ function grid_col4($i)
     return bwUtil::data($i->dataLastVisit);
 }
 
-function grid_col5($i)
-{
-    return bwUtil::data($i->dataRegistro);
-}
-
-function grid_col6($i)
-{
-    return bwUtil::data($i->lastIp);
-}
 
 $a = new bwGrid();
 $a->setQuery(Doctrine_Query::create()->from('Usuario u')->innerJoin('u.Grupo g'));
 $a->addCol('ID', 'u.id', 'tac', 50);
 $a->addCol('Nome', ' u.nome');
-$a->addCol('E-mail', 'u.email');
-$a->addCol('Grupo', 'g.nome', 'tac', 200);
+$a->addCol('E-mail', 'u.email', NULL, 280);
+$a->addCol('Grupo', 'g.nome', 'tac', 150);
 $a->addCol('Último acesso', 'u.dataLastVisit', 'tac', 150);
-$a->addCol('Cadastrado', 'u.dataRegistro', 'tac', 150);
-$a->addCol('Último IP', 'u.lastIp', 'tac', 150);
 $a->show();
 ?>
 

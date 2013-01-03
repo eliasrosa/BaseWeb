@@ -5,9 +5,7 @@ $(function() {
     
     
     //
-    $("#upload").scrollFixed();
     $('html, body').scrollTop(0);
-
 
     //
     $('#upload .toolbar .limpar-avisos').click(function(){
@@ -74,6 +72,10 @@ $(function() {
         html.hide();
                 
         $('#imagens form').append(html);
+        
+        if($('#imagens form .file').length == 10){
+            $("#upload").scrollFixed();
+        }
         
         $(html).fadeIn('slow');
         
