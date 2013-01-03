@@ -54,6 +54,7 @@
                 }
                     
                 $span.prettyPhoto({
+                    keyboard_shortcuts: false,
                     default_width: iw,
                     default_height: ih,
                     social_tools: false,
