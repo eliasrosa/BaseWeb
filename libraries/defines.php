@@ -1,8 +1,6 @@
 <?php
 defined('BW') or die("Acesso negado!");
 
-error_reporting(E_ALL & ~E_NOTICE);
-
 if (get_magic_quotes_gpc()) {
     die("Error security risk: Set magic_quotes_gpc Off");
 }
