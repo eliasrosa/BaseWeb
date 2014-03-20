@@ -2,7 +2,7 @@ $(function(){
     
     
     
-    /* cssfix
+    /* cssfix - submenu
      **************************************/
     if($("#conteudo #submenu").length > 0) {
         $("#conteudo #submenu").clone().appendTo("#menu");
@@ -19,7 +19,19 @@ $(function(){
         $(this).removeClass('hover');
     });
     
-    
+ 
+	/* cssfix - rodape
+     **************************************/
+    var rh = $(window).height() - ($("#rodape .center").outerHeight(true) + $("#topo .center").outerHeight(true) + $("#menu .center").outerHeight(true));
+	if($("#conteudo .center").height() < rh) {
+		$("#rodape").css({
+			position: 'absolute', 
+			left: 0,
+			bottom: 0,
+			width: '100%'
+		});
+    }
+	
     
     /* menu
      **************************************/
