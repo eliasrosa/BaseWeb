@@ -104,7 +104,7 @@ list($com, $view) = explode('/', $view, 2);
 
             <div id="rodape">
                 <div class="center">
-                    <p>BW - PHP Framework | <a href="http://github.com/eliasrosa/baseweb" target="_blank">http://github.com/eliasrosa/basewebr</a></p>
+                    <p>BW - PHP Framework | <a href="http://github.com/eliasrosa/baseweb" target="_blank">http://github.com/eliasrosa/baseweb</a></p>
                 </div>
             </div>
     </body>
