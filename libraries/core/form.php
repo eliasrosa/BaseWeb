@@ -2,8 +2,7 @@
 
 defined('BW') or die("Acesso negado!");
 
-class bwForm
-{
+class bwForm {
 
     // dados
     var $html;
@@ -13,9 +12,7 @@ class bwForm
     var $isEdit = false;
     private $_primary = null;
 
-    function __construct($db = false, $action = '', $method = 'post',
-        $blockEdit = false, $primary = 'id')
-    {
+    function __construct($db = false, $action = '', $method = 'post', $blockEdit = false, $primary = 'id') {
         $method = ($method != 'get') ? 'post' : 'get';
 
         $this->formAttr['action'] = bwRouter::_($action);
@@ -49,8 +46,7 @@ class bwForm
             $this->blockEdit = true;
     }
 
-    function createAttrs($attrs)
-    {
+    function createAttrs($attrs) {
         $h = '';
         foreach ($attrs as $k => $v) {
             if ($v != '' && preg_match('/class|title|value|id|rel|style|width|height/', $k))
@@ -60,8 +56,7 @@ class bwForm
         return $h;
     }
 
-    function createTemplate($params = array(), $campo = '')
-    {
+    function createTemplate($params = array(), $campo = '') {
         // imput hydden
         if (!$params['template']) {
             $this->html .= $campo;
@@ -86,8 +81,7 @@ class bwForm
         return $this;
     }
 
-    function configureParams($name, $type, $attr = array())
-    {
+    function configureParams($name, $type, $attr = array()) {
         $config = array(
             'campoName' => $name,
             'radio' => array(),
@@ -175,8 +169,7 @@ class bwForm
         return $config;
     }
 
-    function addInput($name, $type = 'text', $attr = array())
-    {
+    function addInput($name, $type = 'text', $attr = array()) {
         //radio|button|checkbox|hidden|password|reset|submit|text
         if (preg_match('/radio|hidden|text|select|password|imagem|file|textarea|EditorHTML/', $type)) {
             $params = $this->configureParams($name, $type, $attr);
@@ -236,29 +229,26 @@ class bwForm
 
             $this->createTemplate($params, $input);
             return $this;
-        }
-        else
+        } else
             die("Tipo inválido!");
     }
 
-    function addInputFile($name = 'file', $label = 'Arquivo:', $attr = array())
-    {
+    function addInputFile($name = 'file', $label = 'Arquivo:', $attr = array()) {
         $params = array_merge(array(
             'findDB' => false,
             'name' => $name,
             'label' => $label,
-            ), $attr);
+                ), $attr);
         $this->addInput($name, 'file', $params);
 
         return $this;
     }
 
-    function addTextArea($name, $attr = array())
-    {
+    function addTextArea($name, $attr = array()) {
         $params = array_merge(array(
             'autoresize' => true,
             'class' => 'w100'
-            ), $attr);
+                ), $attr);
 
         if ($params['autoresize']) {
             $params['class'] = isset($params['class']) ? "{$params['class']} autoresize" : "autoresize";
@@ -269,8 +259,7 @@ class bwForm
         return $this;
     }
 
-    function addEditorHTML($name)
-    {
+    function addEditorHTML($name) {
         bwHtml::js(BW_URL_JAVASCRIPTS . '/tiny_mce/jquery.tinymce.js');
 
         $class = 'editor_' . rand();
@@ -294,21 +283,20 @@ class bwForm
         $this->addInput($name, 'EditorHTML', array(
             'autoresize' => false,
             'class' => "editorHTML $class"
-            //'template' => false
+                //'template' => false
         ));
 
         return $this;
     }
 
-    function addImg($name, $attr = array())
-    {
+    function addImg($name, $attr = array()) {
         $params = array_merge(array(
             'linkFile' => true,
             'width' => '320',
             'height' => '320',
             'src' => '',
             'resizeImage' => '',
-            ), $attr);
+                ), $attr);
 
         $params['resizeImage'] = bwUtil::resizeImage("[image src='{$params['src']}' width='{$params['width']}' height='{$params['width']}']");
         unset($params['width'], $params['height']);
@@ -320,14 +308,13 @@ class bwForm
         return $this;
     }
 
-    function addCustonFile($file, $vars = array())
-    {
+    function addCustonFile($file, $vars = array()) {
         $com = bwRequest::getVar('com');
 
         $vars = array_merge(array(
             'i' => $this->db,
             'form' => $this,
-            ), $vars);
+                ), $vars);
 
 
         $this->html .= bwUtil::execPHP($file, $vars);
@@ -335,8 +322,7 @@ class bwForm
         return $this;
     }
 
-    function addInputFileImg($name = 'default', $label = 'Imagem')
-    {
+    function addInputFileImg($name = 'default', $label = 'Imagem') {
         $name_input = $this->db->getComponentName() . '-imagem-' . $name;
         $params = array();
 
@@ -348,25 +334,25 @@ class bwForm
 
             $img = $this->db->bwImagem->$name;
             $html = '<p style="display: block; margin: 5px 0 5px 155px;">';
-            
+
             if (!$img->isError404()) {
 
                 $html .= sprintf('<img src="%s" /><br/>', $img->resize(320, 320));
 
                 $html .= sprintf(
-                    'Remover imagem acima ao salvar: <input type="checkbox" name="remover-bwimagem[]" value="%s"/><br/>', $name_input
+                        'Remover imagem acima ao salvar: <input type="checkbox" name="remover-bwimagem[]" value="%s"/><br/>', $name_input
                 );
             }
 
             $html .= sprintf(
-                'Tamanho máximo permitido pelo servidor: %s<br/>Tamanho máximo recomendado: 1M<br/>'
-                , ini_get('upload_max_filesize')
+                    'Tamanho máximo permitido pelo servidor: %s<br/>Tamanho máximo recomendado: 1M<br/>'
+                    , ini_get('upload_max_filesize')
             );
 
             if (!$img->isError404()) {
                 $html .= sprintf(
-                    '<a href="%s" target="_blank">Visualizar imagem original</a><br/>'
-                    , $img->getUrl()
+                        '<a href="%s" target="_blank">Visualizar imagem original</a><br/>'
+                        , $img->getUrl()
                 );
             }
 
@@ -380,29 +366,25 @@ class bwForm
         return $this;
     }
 
-    function addH2($text, $class = '')
-    {
+    function addH2($text, $class = '') {
         $this->html .= "<h2 class=\"{$class}\">{$text}</h2>";
 
         return $this;
     }
 
-    function addHTML($html)
-    {
+    function addHTML($html) {
         $this->html .= $html;
 
         return $this;
     }
 
-    function addHR($class = 'botton')
-    {
+    function addHR($class = 'botton') {
         $this->html .= "<hr class=\"{$class}\" />";
 
         return $this;
     }
 
-    function addBottonSalvar($task, $label = 'Salvar', $class = '')
-    {
+    function addBottonSalvar($task, $label = 'Salvar', $class = '') {
         if (!$this->blockEdit) {
             $id = bwbutton::getId();
 
@@ -427,8 +409,7 @@ class bwForm
         return $this;
     }
 
-    function addSubmit($label = 'Salvar', $class = '')
-    {
+    function addSubmit($label = 'Salvar', $class = '') {
         if (!$this->blockEdit) {
             $class = $class == '' ? '' : ' ' . $class;
             $this->html .= sprintf('<input value="%s" class="submit%s" type="submit" />', $label, $class);
@@ -437,22 +418,20 @@ class bwForm
         return $this;
     }
 
-    function addStatus($name = 'status', $attr = array())
-    {
+    function addStatus($name = 'status', $attr = array()) {
         $params = array_merge(array(
             'label' => 'Status:',
-            ), $attr);
+                ), $attr);
 
         $this->addInputRadio($name, array(
             '1' => 'Ativado',
             '0' => 'Desativado'
-            ), $params);
+                ), $params);
 
         return $this;
     }
 
-    function addBoolean($name)
-    {
+    function addBoolean($name) {
         $this->addInputRadio($name, array(
             '1' => 'Sim',
             '0' => 'Não'
@@ -461,87 +440,80 @@ class bwForm
         return $this;
     }
 
-    function addInputRadio($name, $opcoes = array(), $attr = array())
-    {
+    function addInputRadio($name, $opcoes = array(), $attr = array()) {
         $params = array_merge(array(
             'radio' => array(
                 'opcoes' => $opcoes,
                 'class' => '',
             ),
             'class' => 'radio'
-            ), $attr);
+                ), $attr);
 
         $this->addInput($name, 'radio', $params);
 
         return $this;
     }
 
-    function addInputInteger($name, $attr = array())
-    {
+    function addInputInteger($name, $attr = array()) {
         $params = array_merge(array(
             'rel' => 'int',
             'value' => '0',
             'class' => 'w30',
-            ), $attr);
+                ), $attr);
 
         $this->addInput($name, 'text', $params);
 
         return $this;
     }
 
-    function addInputMoeda($name, $attr = array())
-    {
+    function addInputMoeda($name, $attr = array()) {
         $params = array_merge(array(
             'rel' => 'moeda',
             'value' => '0,00',
             'class' => 'w30',
-            ), $attr);
+                ), $attr);
 
         $this->addInput($name, 'text', $params);
 
         return $this;
     }
 
-    function addInputDataHora($name, $attr = array())
-    {
+    function addInputDataHora($name, $attr = array()) {
         $params = array_merge(array(
             'class' => 'w30',
             'rel' => 'datetime',
             'dateVerify' => true,
-            ), $attr);
+                ), $attr);
 
         $this->addInput($name, 'text', $params);
 
         return $this;
     }
 
-    function addInputData($name, $attr = array())
-    {
+    function addInputData($name, $attr = array()) {
         $params = array_merge(array(
             'rel' => 'date',
             'class' => 'w30',
             'dateVerify' => true,
-            ), $attr);
+                ), $attr);
 
         $this->addInput($name, 'text', $params);
 
         return $this;
     }
 
-    function addSelect($name, $opcoes = array(), $attr = array())
-    {
+    function addSelect($name, $opcoes = array(), $attr = array()) {
         $params = array_merge(array(
             'opcoes' => $opcoes,
             'style' => 'width: 358px;',
-            ), $attr);
+                ), $attr);
 
         $this->addInput($name, 'select', $params);
 
         return $this;
     }
 
-    function addSelectDB($name, $tabela, $attr = array())
-    {
+    function addSelectDB($name, $tabela, $attr = array()) {
 
         $params = array_merge(array(
             'opcoes' => array(),
@@ -549,20 +521,20 @@ class bwForm
             'db.key' => 'id',
             'db.value' => 'nome',
             'where' => '',
-            ), $attr);
+                ), $attr);
 
         $order = $params['order'] != '' ? $params['order'] : "{$params['db.value']} ASC";
 
         $query = Doctrine_Query::create()
-            ->from($tabela);
+                ->from($tabela);
 
         if ($params['where'] != '')
             $query->where($params['where']);
 
 
         $query = $query
-            ->orderBy($order)
-            ->execute();
+                ->orderBy($order)
+                ->execute();
 
         $key = $params['db.key'];
         $val = $params['db.value'];
@@ -579,8 +551,7 @@ class bwForm
         return $this;
     }
 
-    function addInputsPassword($name = 'senha')
-    {
+    function addInputsPassword($name = 'senha') {
         bwHtml::js(BW_URL_JAVASCRIPTS . '/passwordStrengthMeter.js');
 
         $this->html .= "
@@ -622,8 +593,7 @@ class bwForm
         return $this;
     }
 
-    function addInputID()
-    {
+    function addInputID() {
         if ($this->isEdit)
             $this->addHidden($this->_primary);
 
@@ -635,8 +605,7 @@ class bwForm
         return $this;
     }
 
-    function addSeo()
-    {
+    function addSeo() {
         $this->addH2('SEO - Otimização para motores de busca' . $info);
 
         //$this->addInput('metatagalias', 'text', array(
@@ -655,20 +624,18 @@ class bwForm
         return $this;
     }
 
-    function addHidden($name, $class = '', $params = array())
-    {
+    function addHidden($name, $class = '', $params = array()) {
         $params = array_merge(array(
             'template' => false,
             'class' => $class
-            ), $params);
+                ), $params);
 
         $this->addInput($name, 'hidden', $params);
 
         return $this;
     }
 
-    function addToken()
-    {
+    function addToken() {
         $this->addInput(bwRequest::getToken(), 'hidden', array(
             'template' => false,
             'class' => 'token',
@@ -679,8 +646,7 @@ class bwForm
         return $this;
     }
 
-    function addTask($task = 'null')
-    {
+    function addTask($task = 'null') {
         $this->addInput('task', 'hidden', array(
             'template' => false,
             'class' => 'task',
@@ -691,14 +657,16 @@ class bwForm
         return $this;
     }
 
-    function show($returnHtml = false)
-    {
+    function show($returnHtml = false) {
         $attr = '';
         foreach ($this->formAttr as $a => $v) {
             $attr .= " {$a}=\"{$v}\"";
         }
 
-        $this->html = "<form class=\"validaForm\"{$attr}>{$this->html}</form>";
+        $this->html = "<form class=\"validaForm\"{$attr}>"
+                . "{$this->html}"
+                . "</form>"
+                . "<br class=\"clearfix\" />";
 
         $this->createValidaForm();
 
@@ -708,8 +676,7 @@ class bwForm
             echo $this->html;
     }
 
-    public function addBottonRemover($task = 'remover', $nome = 'Remover')
-    {
+    public function addBottonRemover($task = 'remover', $nome = 'Remover') {
         if ($this->isEdit && !$this->blockEdit) {
             $id = bwbutton::getId();
 
@@ -740,8 +707,7 @@ class bwForm
         return $this;
     }
 
-    public function addBottonRedirect($label, $url)
-    {
+    public function addBottonRedirect($label, $url) {
         $id = bwbutton::getId();
 
         $this->html .= "
@@ -757,8 +723,7 @@ class bwForm
         return $this;
     }
 
-    function createValidaForm()
-    {
+    function createValidaForm() {
         $this->html .= "
             <script type=\"text/javascript\">       
                 $(function() {

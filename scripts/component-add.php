@@ -1,5 +1,6 @@
-#!/usr/bin/php -dmemory_limit=128M
 <?php
+#!/usr/bin/php -dmemory_limit=128M
+
 unset($argv[0]);
 $com_total = count($argv);
 $com_ok = 0;

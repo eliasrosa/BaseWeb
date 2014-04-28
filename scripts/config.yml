@@ -1,0 +1,82 @@
+component: 
+    titulo: Pessoas 
+    class: Pessoas
+    folder: pessoas
+
+tables: 
+    pessoas: 
+        id: 
+            type: id
+        id_grupo: 
+            type: int
+            label: ID Grupo
+        nome: 
+            type: text
+        endereco: 
+            type: text
+            label: Endereço
+            null: true
+        telefone: 
+            type: text
+            length: 15
+        cidade:
+            type: longtext
+            null: true
+        numero:
+            type: integer
+            length: 5
+            null: true
+            label: Número
+        codebar: 
+            type: integer
+            length: 11
+            null: true
+        descricao: 
+            type: html
+            label: Descrição
+            null: true
+        valor: 
+            type: float
+        salario: 
+            type: decimal
+            null: true
+        salario2: 
+            type: moeda
+            null: true
+        nascimento: 
+            type: date
+        registro: 
+            type: datetime
+        bwSetup:
+            images:
+                pessoa
+            galleries:
+                pessoa
+                
+                
+    pessoas_grupos: 
+        id: 
+            type: id
+        nome:
+            type: text
+        status: 
+            type: status
+        bwSetup:
+            relationships:
+                -
+                    type: hasMany
+                    model: Pessoa
+                    alias: Pessoas
+                    local: id
+                    foreign: id_grupo
+                -
+                    type: hasOne
+                    model: UsuarioGrupo
+                    alias: GG
+                    local: id
+                    foreign: id_grupo
+                    label: Grupo/Usuário
+            images:
+                grupo
+            galleries:
+                grupo

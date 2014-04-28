@@ -9,6 +9,7 @@ if (get_magic_quotes_gpc()) {
 date_default_timezone_set('America/Sao_Paulo');
 
 // PATH
+define('BW_PATH_SCRIPTS', BW_PATH .DS. 'scripts');
 define('BW_PATH_CACHE', BW_PATH .DS. 'cache');
 define('BW_PATH_MEDIA', BW_PATH .DS. 'media');
 define('BW_PATH_PLUGINS', BW_PATH .DS. 'plugins');

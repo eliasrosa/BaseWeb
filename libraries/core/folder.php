@@ -2,11 +2,9 @@
 
 defined('BW') or die("Acesso negado!");
 
-class bwFolder
-{
+class bwFolder {
 
-    function remove($dir)
-    {
+    function remove($dir) {
         if (is_dir($dir)) {
             $files = scandir($dir);
             array_shift($files);    // remove '.' from array
@@ -17,8 +15,7 @@ class bwFolder
                 if (is_dir($file)) {
                     bwFolder::remove($file);
                     rmdir($file);
-                }
-                else
+                } else
                     unlink($file);
             }
 
@@ -30,19 +27,15 @@ class bwFolder
         return false;
     }
 
-    function create($dir, $mode = 0777, $recursive = false)
-    {
+    function create($dir, $mode = 0777, $recursive = false) {
         return mkdir($dir, $mode, $recursive);
     }
 
-    function is($dir)
-    {
+    function is($dir) {
         return is_dir($dir);
     }
 
-    function listarConteudo($dir, $listFiles = true, $listFolders = true,
-        $listDots = false, $fullPath = false)
-    {
+    function listarConteudo($dir, $listFiles = true, $listFolders = true, $listDots = false, $fullPath = false) {
         // Abre um diretorio conhecido, e faz a leitura de seu conteudo
         if (bwFolder::is($dir)) {
             if ($dh = opendir($dir)) {
@@ -69,14 +62,42 @@ class bwFolder
                 }
                 closedir($dh);
                 return $r;
-            }
-            else
+            } else
                 return false;
-        }
-        else
+        } else
             return false;
     }
 
-}
+    function xcopy($source, $dest, $permissions = 0755, &$log = array()) {
+        // log path
+        $log[] = $dest;
 
-?>
+        // Simple copy for a file
+        if (is_file($source)) {
+            return copy($source, $dest);
+        }
+
+        // Make destination directory
+        if (!is_dir($dest)) {
+            mkdir($dest, $permissions);
+        }
+
+        // Loop through the folder
+        $dir = dir($source);
+        while (false !== $entry = $dir->read()) {
+
+            // Skip pointers
+            if ($entry == '.' || $entry == '..') {
+                continue;
+            }
+
+            // Deep copy directories
+            bwFolder::xcopy($source . DS . $entry, $dest . DS . $entry, 0755, $log);
+        }
+
+        // Clean up
+        $dir->close();
+        return true;
+    }
+
+}

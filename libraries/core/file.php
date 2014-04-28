@@ -101,6 +101,16 @@ class bwFile
         return $w;
     }
 
+    function copy($file1, $file2)
+    {
+        return copy($file1, $file2);
+    }
+
+    function rename($file1, $file2)
+    {
+        return rename($file1, $file2);
+    }
+
 }
 
 ?>
