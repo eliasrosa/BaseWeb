@@ -1,4 +1,4 @@
-<?
+<?php
 defined('BW') or die("Acesso negado!");
 
 bwAdm::init('/login');
@@ -40,72 +40,59 @@ list($com, $view) = explode('/', $view, 2);
         <div id="page">
 
             <div id="topo">
-                <div class="center">
 
-                    <h1>BW - PHP Framework</h1>
+                <h1>BW - PHP Framework</h1>
 
-                    <div class="dados">
-                        <a href="#"><?= $login->getSession()->email; ?></a> |
-                        <a href="<?= BW_URL_BASE2 ?>" target="_blank">Visualizar site</a> |
-                        <a href="<?= bwRouter::_('/config'); ?>">Configurações</a> | 
-                        <a class="sair" href="<?= bwRouter::_('/sair'); ?>">Sair</a>
-                    </div>
+                <div class="dados">
+                    <a href="#"><?= $login->getSession()->email; ?></a> |
+                    <a href="<?= BW_URL_BASE2 ?>" target="_blank">Visualizar site</a> |
+                    <a href="<?= bwRouter::_('/config'); ?>">Configurações</a> | 
+                    <a class="sair" href="<?= bwRouter::_('/sair'); ?>">Sair</a>
+                </div>
 
-                    <select class="componentes" onchange="window.location.href=this.options[this.selectedIndex].value">
-                        <option>-- Selecione um componente --</option>
-                        <?
-                        foreach (bwComponent::getAll() as $c) {
-                            if ($c['adm_visivel']) {
-                                echo sprintf('<option value="%s">%s</option>'
+                <select class="componentes" onchange="window.location.href = this.options[this.selectedIndex].value">
+                    <option>-- Selecione um componente --</option>
+                    <?php
+                    foreach (bwComponent::getAll() as $c) {
+                        if ($c['adm_visivel']) {
+                            echo sprintf('<option value="%s">%s</option>'
                                     , bwRouter::_('/' . $c['id'])
                                     , $c['nome']
-                                );
-                            }
+                            );
                         }
-                        ?>
-                    </select>
-                </div>
+                    }
+                    ?>
+                </select>
             </div>
 
             <div id="menu">
-
                 <a href="#" class="prev">Scroll Left</a>
-
-                <div class="center">
-                    <ul class="com">
-                        <?
-                        foreach (bwComponent::getAll() as $c) {
-                            if ($c['adm_visivel']) {
-                                $active = ($com == $c['id']) ? ' active' : '';
-                                $class = "{$c['id']}{$active}";
-                                echo sprintf('<li class="%s"><a href="%s">%s</a></li><li>|</li>'
+                <ul class="com">
+                    <?php
+                    foreach (bwComponent::getAll() as $c) {
+                        if ($c['adm_visivel']) {
+                            $active = ($com == $c['id']) ? ' active' : '';
+                            $class = "{$c['id']}{$active}";
+                            echo sprintf('<li class="%s"><a href="%s">%s</a></li><li>|</li>'
                                     , $class
                                     , bwRouter::_('/' . $c['id'])
                                     , $c['nome']
-                                );
-                            }
+                            );
                         }
-                        ?>
-                    </ul>
-                </div>
-
-
-                <a href="#" class="next">Scroll Right</a>    
-
+                    }
+                    ?>
+                </ul>
+                <a href="#" class="next">Scroll Right</a>
             </div>      
 
             <div id="conteudo">
-                <div class="center">
-                    {BW VIEW}
-                </div>
+                {BW VIEW}
             </div>
 
-            <br class="clearfix"></br>
-
-            <div id="rodape">
-                <div class="center">
-                    <p>BW - PHP Framework | <a href="http://github.com/eliasrosa/baseweb" target="_blank">http://github.com/eliasrosa/baseweb</a></p>
-                </div>
+            <div id="rodape"><br class="clear" />
+                <p>BW - PHP Framework | <a href="http://github.com/eliasrosa/baseweb" target="_blank">http://github.com/eliasrosa/baseweb</a></p>
             </div>
+        </div>
+
     </body>
 </html>
